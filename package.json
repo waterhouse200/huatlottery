@@ -1,0 +1,22 @@
+{
+  "name": "huatlottery-backend",
+  "version": "1.0.0",
+  "description": "Huatlottery Express + SQLite backend for Singapore 4D & TOTO",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "node server.js",
+    "seed": "node seed.js",
+    "scrape:toto": "node scraper/scrape-toto.js",
+    "scrape:fourd": "node scraper/scrape-fourd.js",
+    "scrape:floor:toto": "node scraper/scrape-toto.js --find-floor",
+    "scrape:floor:fourd": "node scraper/scrape-fourd.js --find-floor"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "lunar-javascript": "^1.7.7"
+  }
+}

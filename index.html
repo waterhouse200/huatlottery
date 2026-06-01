@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Huatlottery</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--p:#3730a3;--pl:#4f46e5;--pp:#eef2ff;--red:#dc2626;--amb:#d97706;--em:#059669;--cy:#0891b2;--vi:#7c3aed;--bg:#f4f5f7;--cd:#fff;--bd:#e2e4e9;--bl:#f0f1f3;--tx:#1a1d26;--t2:#5c6070;--t3:#9196a6;--mo:'IBM Plex Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--tx)}
+body{display:flex}
+.sb{width:240px;min-width:240px;height:100vh;background:var(--cd);border-right:1px solid var(--bd);display:flex;flex-direction:column}
+.sbh{padding:18px 16px;display:flex;align-items:center;gap:11px;border-bottom:1px solid var(--bl)}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,var(--p),var(--pl));display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px #3730a340;flex-shrink:0}
+.logo svg{width:18px;height:18px}
+.ltitle{font-size:15px;font-weight:800;letter-spacing:-.02em}.ltitle b{color:var(--p)}.lsub{font-size:9.5px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.sb nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:var(--t2);font:500 13px 'Plus Jakarta Sans',sans-serif;width:100%;text-align:left;transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;position:relative}
+.nav-btn:hover{transform:translateX(2px) scale(1.02);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.nav-btn:active{transform:scale(.97);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.nav-btn.active{background:rgba(55,48,163,.06);color:var(--p);font-weight:700}
+.nav-btn.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:2px;background:var(--p)}
+.nav-btn svg{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:48px;min-height:48px;background:var(--cd);border-bottom:1px solid var(--bd);display:flex;align-items:center;padding:0 24px}
+.status{margin-left:auto;display:flex;align-items:center;gap:6px;font:600 11.5px 'Plus Jakarta Sans';color:var(--em);background:rgba(5,150,105,.06);padding:4px 14px;border-radius:20px}
+.status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--em)}
+.content{flex:1;overflow-y:auto;padding:28px 32px 52px}
+.content>div{max-width:1060px;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
+h1{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
+.desc{font-size:13.5px;color:var(--t2);margin-bottom:24px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--cd);border-radius:12px;padding:22px;border:1px solid var(--bd)}
+.ball{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:700;font-family:var(--mo);flex-shrink:0;animation:popIn .35s cubic-bezier(.34,1.56,.64,1) both}
+.section-title{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.section-title .dot{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center}
+.section-title .dot svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.section-title h3{font-size:14px;font-weight:700;margin:0}
+.section-title small{font-size:11px;color:var(--t3);display:block}
+.stat-card{background:var(--cd);border-radius:12px;padding:18px 20px;border:1px solid var(--bd);position:relative;overflow:hidden}
+.stat-val{font-size:22px;font-weight:800;font-family:var(--mo);letter-spacing:-.03em}
+.stat-sub{margin-top:4px;font-size:11.5px;color:var(--em);font-weight:600}
+.pbar{display:flex;align-items:center;gap:9px;margin-bottom:5px}
+.pbar-label{font-size:12px;color:var(--t2);font-weight:600;min-width:28px;font-family:var(--mo)}
+.pbar-track{flex:1;height:6px;border-radius:3px;background:var(--bl);overflow:hidden}
+.pbar-fill{height:100%;border-radius:3px}
+.pbar-pct{font-size:11px;color:var(--t3);font-weight:600;min-width:32px;text-align:right}
+.meter{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bl)}
+.meter:last-child{border-bottom:none}
+.meter-rank{font-size:11px;font-weight:700;color:var(--t3);width:18px}
+.meter-bar{position:relative;flex:1;height:28px;border-radius:6px;background:var(--bg);overflow:hidden}
+.meter-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+.meter-num{position:relative;z-index:1;font:700 13.5px var(--mo);color:var(--tx);padding-left:10px;line-height:28px}
+.meter-end{text-align:right;min-width:58px}
+.meter-end b{font-size:12.5px;display:block}.meter-end small{font-size:10px;color:var(--t3)}
+.numgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.ncell{display:flex;flex-direction:column;align-items:center;padding:6px 2px;border-radius:8px}
+.ncell b{font-size:13.5px;font-weight:800;font-family:var(--mo)}.ncell small{font-size:9px;color:var(--t3);font-weight:600}
+.hero{background:linear-gradient(140deg,var(--p),var(--pl),#818cf8);border-radius:12px;padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:20px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;border:1px solid var(--bd);background:var(--cd);color:var(--t2);font:600 13px 'Plus Jakarta Sans';cursor:pointer;transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.10)}
+.btn:active{transform:translateY(0) scale(.96);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.btn-p{background:var(--p);color:#fff;border-color:var(--p)}
+.btn-p:hover{box-shadow:0 6px 16px rgba(55,48,163,.28)}
+.tab{padding:6px 16px;border-radius:7px;border:none;cursor:pointer;font:600 12.5px 'Plus Jakarta Sans';text-transform:uppercase;background:var(--bg);color:var(--t3);transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s}
+.tab:hover{transform:translateY(-1px) scale(1.03);box-shadow:0 3px 8px rgba(0,0,0,.08)}
+.tab:active{transform:scale(.95);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.tab.active{background:var(--p);color:#fff}
+.tab.active:hover{box-shadow:0 4px 10px rgba(55,48,163,.28)}
+input[type=text],input[type=date],input[type=time]{padding:9px 14px;border-radius:8px;border:1px solid var(--bd);font:13px 'Plus Jakarta Sans';outline:none;background:var(--cd);color:var(--tx);height:36px;line-height:1}
+input:focus{border-color:var(--p)}
+.tool-card{cursor:pointer;transition:all .2s}.tool-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--bl);border-top-color:var(--p);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-step{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:8px;font-size:13px;color:var(--t2);opacity:.4;transition:all .3s;background:var(--bg)}
+.load-step.active{opacity:1;background:var(--pp);color:var(--p);font-weight:600}
+.load-step.done{opacity:.85;color:var(--em)}
+.load-step .mark{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex-shrink:0}
+.daily-card{display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:var(--bg);border:1px solid var(--bd)}
+.daily-card .ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.daily-card .lab{font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.daily-card .val{font-size:14px;font-weight:700;color:var(--tx);margin-top:1px}
+.color-swatch{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--bd),inset 0 1px 2px rgba(0,0,0,.1);flex-shrink:0}
+.lang-toggle .tab{padding:5px 11px;font-size:11px}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+</style>
+</head>
+<body>
+<aside class="sb">
+  <div class="sbh">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M16.2 3.8a2.7 2.7 0 0 0-3.81 0l-.4.38-.4-.38a2.7 2.7 0 0 0-3.82 0C6.73 4.85 6.67 6.64 7.66 7.72L12 12l4.34-4.28c1-1.08.93-2.87-.14-3.92z"/><path d="M12 12l-4.34 4.28c-1 1.08-.93 2.87.14 3.92a2.7 2.7 0 0 0 3.81 0l.4-.38.4.38a2.7 2.7 0 0 0 3.82 0c1.06-1.05 1.13-2.84.14-3.92L12 12z"/></svg></div>
+    <div><div class="ltitle">Huat<b>lottery</b></div><div class="lsub">SG 4D & TOTO</div></div>
+  </div>
+  <nav id="nav"></nav>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div style="flex:1"></div>
+    <div class="lang-toggle" style="display:flex;gap:4px;margin-right:14px">
+      <button class="tab" id="langEn" onclick="setLang('en')">EN</button>
+      <button class="tab" id="langZh" onclick="setLang('zh')">中文</button>
+    </div>
+    <div class="status" id="statusBadge">Huatlottery v1.0</div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<script>
+// ═══ DATA ════════════════════════════════════════════════════
+// State populated by loadData() from real DB via /api/*. Renders check
+// DATA.ready and show a loading state if not yet hydrated.
+var DATA = {
+  ready: false,
+  latest: null,         // { toto: {...}, fourd: {...} }
+  totoStats: null,      // /api/toto/stats payload
+  fourdStats: null      // /api/fourd/stats payload
+};
+
+function loadData(then) {
+  Promise.all([
+    fetch('/api/latest').then(r => r.json()),
+    fetch('/api/toto/stats').then(r => r.json()),
+    fetch('/api/fourd/stats').then(r => r.json())
+  ]).then(function(parts) {
+    DATA.latest     = parts[0].data;
+    DATA.totoStats  = parts[1].data;
+    DATA.fourdStats = parts[2].data;
+    DATA.ready = true;
+    console.log('DB loaded:', DATA.totoStats.total_draws, 'TOTO,', DATA.fourdStats.total_draws, '4D');
+    if (then) then();
+  }).catch(function(e) {
+    console.error('Failed to load data from API', e);
+    if (then) then();
+  });
+}
+
+// ═══ SVG ICONS ═══════════════════════════════════════════════
+var icons = {
+  dash:'<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+  chart:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+  search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  flask:'<path d="M10 2v7.5a2 2 0 0 1-.2.9L4.7 20.6a1 1 0 0 0 .9 1.4h12.8a1 1 0 0 0 .9-1.4l-5.1-10.2A2 2 0 0 1 14 9.5V2"/><path d="M8.5 2h7"/>',
+  brain:'<path d="M12 5a3 3 0 1 0-6 .1 4 4 0 0 0-2.5 5.8 4 4 0 0 0 .6 6.6A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 6 .1 4 4 0 0 1 2.5 5.8 4 4 0 0 1-.6 6.6A4 4 0 1 1 12 18Z"/><path d="M12 5v13"/>',
+  sparkle:'<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/>',
+  clover:'<circle cx="8" cy="8" r="3.5"/><circle cx="16" cy="8" r="3.5"/><circle cx="8" cy="16" r="3.5"/><circle cx="16" cy="16" r="3.5"/><path d="M13 13 Q 18 16 22 22"/>',
+  flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  snow:'<line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  trend:'<polyline points="22,7 13.5,15.5 8.5,10.5 2,17"/><polyline points="16,7 22,7 22,13"/>',
+  trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+  cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  activity:'<polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>'
+};
+
+function svgIcon(name, size) {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:'+(size||18)+'px;height:'+(size||18)+'px">' + (icons[name]||'') + '</svg>';
+}
+
+function makeBall(n, size, color, delay) {
+  return '<div class="ball" style="width:'+size+'px;height:'+size+'px;font-size:'+(size*0.38)+'px;background:linear-gradient(145deg,'+color+','+color+'cc);animation-delay:'+(delay||0)+'ms;box-shadow:0 0 12px '+color+'33,inset 0 1px 2px rgba(255,255,255,.4)">'+n+'</div>';
+}
+
+// ═══ i18n ════════════════════════════════════════════════════
+var LANG = (localStorage.getItem('huat_lang')) || ((navigator.language||'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
+var STRINGS = null;     // dictionary loaded async
+
+function L(path, fallback) {
+  if (!STRINGS) return fallback || path;
+  var parts = path.split('.'); var o = STRINGS;
+  for (var i = 0; i < parts.length; i++) { o = o && o[parts[i]]; if (o == null) return fallback || path; }
+  return o;
+}
+
+function loadStrings(then) {
+  fetch('/api/i18n?lang='+LANG).then(function(r){return r.json();}).then(function(j) {
+    if (j && j.strings) { STRINGS = j.strings; }
+    if (then) then();
+  }).catch(function() { if (then) then(); });
+}
+
+window.setLang = function(lang) {
+  if (lang === LANG) return;
+  LANG = lang;
+  localStorage.setItem('huat_lang', lang);
+  STRINGS = null;
+  loadStrings(function() { renderAll(); });
+};
+
+function renderAll() {
+  document.getElementById('langEn').className = 'tab' + (LANG==='en' ? ' active' : '');
+  document.getElementById('langZh').className = 'tab' + (LANG==='zh' ? ' active' : '');
+  document.getElementById('statusBadge').textContent = L('app.status', 'Huatlottery v1.0');
+  renderNav();
+  renderPage();
+}
+
+// ═══ NAVIGATION ══════════════════════════════════════════════
+function getTabs() {
+  // Research Lab is intentionally NOT listed — internal sandbox only.
+  // Accessible privately via ?tab=research in the URL.
+  return [
+    { id:"dashboard",  icon:"dash",    label: L('tabs.dashboard',  'Dashboard') },
+    { id:"lucky",      icon:"clover",  label: L('tabs.lucky',      'Lucky Numbers') },
+    { id:"prediction", icon:"brain",   label: L('tabs.prediction', 'AI Prediction') },
+    { id:"toto",       icon:"chart",   label: L('tabs.toto',       'TOTO Stats') },
+    { id:"fourd",      icon:"hash",    label: L('tabs.fourd',      '4D Stats') },
+    { id:"history",    icon:"search",  label: L('tabs.history',    'History Search') }
+  ];
+}
+
+var currentTab = "dashboard";
+var navEl = document.getElementById("nav");
+var contentEl = document.getElementById("content");
+
+function renderNav() {
+  navEl.innerHTML = getTabs().map(function(t) {
+    return '<button class="nav-btn'+(currentTab===t.id?' active':'')+'" data-tab="'+t.id+'">'+svgIcon(t.icon)+'<span>'+t.label+'</span></button>';
+  }).join('');
+  navEl.querySelectorAll('.nav-btn').forEach(function(btn) {
+    btn.onclick = function() { currentTab = btn.dataset.tab; renderNav(); renderPage(); };
+  });
+}
+
+// ═══ PAGES ═══════════════════════════════════════════════════
+function renderPage() {
+  var html = '<div>';
+  if (currentTab === "dashboard") html += renderDashboard();
+  else if (currentTab === "toto") html += renderTotoStats();
+  else if (currentTab === "fourd") html += render4DStats();
+  else if (currentTab === "history") html += renderHistory();
+  else if (currentTab === "research") html += renderResearch();
+  else if (currentTab === "prediction") html += renderPrediction();
+  else if (currentTab === "lucky") html += renderLucky();
+  html += '</div>';
+  contentEl.innerHTML = html;
+  bindEvents();
+}
+
+function loadingCard() {
+  return '<div class="card" style="padding:30px;text-align:center;color:var(--t3);font-size:13px"><span class="spin" style="margin-right:8px"></span>'+L('common.loading','Loading…')+'</div>';
+}
+
+function renderDashboard() {
+  if (!DATA.ready) return loadingCard();
+  var t = DATA.latest.toto;       // { draw_no, draw_date, numbers, additional_num, ... }
+  var f = DATA.latest.fourd;      // { ..., first_prize, ..., starter_prizes, consolation_prizes }
+  var totoCount = DATA.totoStats.total_draws;
+  var fourdCount = DATA.fourdStats.total_draws;
+  var hot1 = DATA.totoStats.hot_numbers[0];
+  var h = '<h1>'+L('dashboard.title','Dashboard')+'</h1><p class="desc">'+L('dashboard.desc','Singapore 4D & TOTO intelligence hub.')+'</p>';
+
+  // Stat cards
+  h += '<div class="grid g4" style="margin-bottom:22px">';
+  [{l:"TOTO",v:"#"+t.draw_no,s:t.draw_date,c:"var(--p)",i:"trophy"},{l:L('dashboard.draws','Draws'),v:totoCount,s:L('dashboard.analyzed','analyzed'),c:"var(--cy)",i:"target"},{l:L('dashboard.hot','Hot #'),v:hot1,s:L('dashboard.frequent','frequent'),c:"#be123c",i:"trend"},{l:"4D",v:"#"+f.draw_no,s:f.draw_date,c:"var(--amb)",i:"hash"}].forEach(function(s) {
+    h += '<div class="stat-card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:11px"><div style="width:34px;height:34px;border-radius:8px;background:'+s.c+'11;display:flex;align-items:center;justify-content:center;color:'+s.c+'">'+svgIcon(s.i,16)+'</div><span style="font-size:12px;color:var(--t2);font-weight:600">'+s.l+'</span></div><div class="stat-val">'+s.v+'</div><div class="stat-sub">\u2197 '+s.s+'</div></div>';
+  });
+  h += '</div>';
+
+  // TOTO + 4D cards
+  h += '<div class="grid g2" style="margin-bottom:20px">';
+  // TOTO
+  h += '<div class="card"><div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("trophy",14)+'</div><div><h3>'+L('dashboard.latestToto','Latest TOTO')+'</h3><small>#'+t.draw_no+' \u00B7 '+t.draw_date+'</small></div></div>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">';
+  t.numbers.forEach(function(n,i) { h += makeBall(n, 40, "var(--p)", i*75+100); });
+  h += '<div style="width:2px;height:26px;background:var(--bd);margin:0 2px"></div>';
+  h += makeBall(t.additional_num, 40, "var(--red)", 650);
+  h += '</div>';
+  h += '<div style="margin-top:14px;padding:8px 12px;background:var(--pp);border-radius:8px;font-size:12px;color:var(--p);font-weight:600">'+L('dashboard.sum','Sum')+': '+t.numbers.reduce(function(a,b){return a+b;},0)+' \u00B7 '+L('dashboard.range','Range')+': '+(Math.max.apply(null,t.numbers)-Math.min.apply(null,t.numbers))+'</div>';
+  h += '</div>';
+
+  // 4D
+  h += '<div class="card"><div class="section-title"><div class="dot" style="background:#d9770611;color:var(--amb)">'+svgIcon("hash",14)+'</div><div><h3>'+L('dashboard.latest4d','Latest 4D')+'</h3><small>#'+f.draw_no+' \u00B7 '+f.draw_date+'</small></div></div>';
+  [{l:L('dashboard.first','1st'),v:f.first_prize,c:"var(--amb)"},{l:L('dashboard.second','2nd'),v:f.second_prize,c:"var(--t2)"},{l:L('dashboard.third','3rd'),v:f.third_prize,c:"#b45309"}].forEach(function(item,i) {
+    h += '<div style="display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:'+(i<2?'1px solid var(--bl)':'none')+'">';
+    h += '<span style="font-size:10.5px;font-weight:800;color:'+item.c+';width:24px;text-transform:uppercase">'+item.l+'</span>';
+    h += '<div style="display:flex;gap:5px">';
+    item.v.split("").forEach(function(d,di) { h += makeBall(d, 30, i===0?"var(--amb)":"var(--p)", i*110+di*55+160); });
+    h += '</div></div>';
+  });
+  h += '<div style="margin-top:10px"><div style="font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em">'+L('dashboard.starters','Starters')+'</div><div style="display:flex;gap:4px;flex-wrap:wrap">';
+  (f.starter_prizes || []).forEach(function(p) { h += '<span style="padding:2px 7px;border-radius:5px;background:var(--bg);font-size:11px;font-family:var(--mo);font-weight:600">'+p+'</span>'; });
+  h += '</div></div></div>';
+  h += '</div>';
+
+  // Freq chart
+  // Frequency mini-chart (top 20)
+  var freq = DATA.totoStats.frequency;       // sorted desc by count
+  var maxFreq = freq.length ? freq[0].count : 1;
+  var hotSet = new Set(DATA.totoStats.hot_numbers);
+  h += '<div class="card"><div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("chart",14)+'</div><div><h3>'+L('toto.title','TOTO Stats')+'</h3><small>'+totoCount+' '+L('dashboard.draws','draws')+'</small></div></div>';
+  h += '<div style="display:flex;align-items:flex-end;gap:3px;height:85px">';
+  freq.slice(0,20).forEach(function(it) {
+    var pct = maxFreq > 0 ? (it.count/maxFreq)*100 : 0;
+    var bg = hotSet.has(it.number) ? "linear-gradient(180deg,var(--red),#dc262688)" : "linear-gradient(180deg,var(--p),#4f46e577)";
+    h += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1"><div style="width:100%;border-radius:3px;min-height:3px;height:'+pct+'%;background:'+bg+'"></div><span style="font-size:8px;color:var(--t3);font-weight:600">'+it.number+'</span></div>';
+  });
+  h += '</div></div>';
+  return h;
+}
+
+function renderTotoStats() {
+  if (!DATA.ready) return loadingCard();
+  var s = DATA.totoStats;
+  var freq = s.frequency;
+  var maxFreq = freq.length ? freq[0].count : 1;
+  var hot = s.hot_numbers, cold = s.cold_numbers;
+  var tE = s.even_odd.total_even, tO = s.even_odd.total_odd;
+  var evenPct = s.even_odd.even_pct, oddPct = s.even_odd.odd_pct;
+  var h = '<h1>'+L('toto.title','TOTO Stats')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.analyzed','draws analyzed')+'.</p>';
+
+  // Hot / Cold
+  h += '<div class="grid g2" style="margin-bottom:20px">';
+  [{title:L('toto.hot','Hot numbers'),nums:hot,color:"var(--red)",icon:"flame",bg:"#dc262611"},{title:L('toto.cold','Cold numbers'),nums:cold,color:"var(--cy)",icon:"snow",bg:"#0891b211"}].forEach(function(sec) {
+    h += '<div class="card"><div class="section-title"><div class="dot" style="background:'+sec.bg+';color:'+sec.color+'">'+svgIcon(sec.icon,14)+'</div><h3>'+sec.title+'</h3></div>';
+    h += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">';
+    sec.nums.forEach(function(n,i) { h += makeBall(n, 42, sec.color, i*65); });
+    h += '</div>';
+    sec.nums.forEach(function(n) {
+      var it = freq.find(function(f){return f.number===n;});
+      var w = Math.round((it?it.count:0)/maxFreq*100);
+      h += '<div class="pbar"><span class="pbar-label">'+n+'</span><div class="pbar-track"><div class="pbar-fill" style="width:'+w+'%;background:linear-gradient(90deg,'+sec.color+','+sec.color+'99)"></div></div><span class="pbar-pct">'+w+'%</span></div>';
+    });
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // Even/Odd
+  h += '<div class="card" style="margin-bottom:20px"><div class="section-title"><div class="dot" style="background:#7c3aed11;color:var(--vi)">'+svgIcon("activity",14)+'</div><h3>Even / Odd</h3></div>';
+  h += '<div class="grid g3"><div style="text-align:center"><div style="font-size:34px;font-weight:800;color:var(--p);font-family:var(--mo)">'+evenPct+'%</div><div style="font-size:11px;font-weight:700;color:var(--t3)">Even ('+tE+')</div></div>';
+  h += '<div style="display:flex;align-items:center;justify-content:center"><svg width="85" height="85" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="none" stroke="var(--bl)" stroke-width="8"/><circle cx="50" cy="50" r="38" fill="none" stroke="var(--p)" stroke-width="8" stroke-dasharray="'+(evenPct*2.39)+' '+(239-evenPct*2.39)+'" stroke-dashoffset="60" stroke-linecap="round"/><text x="50" y="50" text-anchor="middle" dominant-baseline="middle" style="font-size:10px;font-weight:700;fill:var(--t3)">E/O</text></svg></div>';
+  h += '<div style="text-align:center"><div style="font-size:34px;font-weight:800;color:var(--vi);font-family:var(--mo)">'+oddPct+'%</div><div style="font-size:11px;font-weight:700;color:var(--t3)">Odd ('+tO+')</div></div></div></div>';
+
+  // Full grid 1-49
+  var hotSet = new Set(hot), coldSet = new Set(cold);
+  var byNumber = freq.slice().sort(function(a,b){return a.number-b.number;});
+  h += '<div class="card"><div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("chart",14)+'</div><h3>Grid 1\u201349</h3></div><div class="numgrid">';
+  byNumber.forEach(function(it) {
+    var isH = hotSet.has(it.number), isC = coldSet.has(it.number);
+    var r = maxFreq > 0 ? it.count/maxFreq : 0;
+    var bg = isH ? "rgba(220,38,38,"+(0.08+r*0.2)+")" : isC ? "rgba(8,145,178,"+(0.06+r*0.12)+")" : "rgba(55,48,163,"+(0.02+r*0.12)+")";
+    var tc = isH ? "var(--red)" : isC ? "var(--cy)" : "var(--tx)";
+    h += '<div class="ncell" style="background:'+bg+'"><b style="color:'+tc+'">'+it.number+'</b><small>'+it.count+'x</small></div>';
+  });
+  h += '</div></div>';
+  return h;
+}
+
+function render4DStats() {
+  if (!DATA.ready) return loadingCard();
+  var s = DATA.fourdStats;
+  var top10 = s.top10_hot;
+  var maxHot = top10.length ? top10[0].count : 1;
+  var h = '<h1>'+L('fourd.title','4D Stats')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.draws','draws')+' \u00B7 '+s.total_numbers.toLocaleString()+' numbers</p>';
+  h += '<div class="card" style="margin-bottom:20px"><div class="section-title"><div class="dot" style="background:#dc262611;color:var(--red)">'+svgIcon("flame",14)+'</div><h3>Top 10 hot 4D numbers</h3></div>';
+  h += '<div class="grid g2" style="gap:6px">';
+  top10.forEach(function(it,i) {
+    h += '<div class="meter"><span class="meter-rank" style="color:'+(i<3?"var(--red)":"var(--t3)")+'">#'+(i+1)+'</span><div class="meter-bar"><div class="meter-fill" style="width:'+(it.count/maxHot*100)+'%;background:'+(i<3?"#dc262618":"#3730a30c")+'"></div><span class="meter-num">'+it.number+'</span></div><div class="meter-end"><b>'+it.count+'x</b><small>'+it.pct+'%</small></div></div>';
+  });
+  h += '</div></div>';
+  return h;
+}
+
+function renderHistory() {
+  var h = '<h1>'+L('history.title','History Search')+'</h1><p class="desc">'+L('history.desc','Search past draws by number.')+'</p>';
+  h += '<div class="card"><div style="display:flex;gap:6px;margin-bottom:14px"><button class="tab active" id="tab4d" onclick="setHistGame(\'4d\')">4D</button><button class="tab" id="tabtoto" onclick="setHistGame(\'toto\')">TOTO</button></div>';
+  h += '<div style="display:flex;gap:8px"><input type="text" id="histQ" class="imo" placeholder="'+L('history.placeholder4d','4D number (e.g. 1234)')+'" style="flex:1"><button class="btn btn-p" onclick="doHistSearch()">'+svgIcon("search",13)+' '+L('common.search','Search')+'</button></div></div>';
+  h += '<div id="histResults"></div>';
+  return h;
+}
+
+function renderResearch() {
+  var h = '<h1>'+L('research.title','Research Lab')+'</h1><p class="desc">'+L('research.desc','Environmental correlations.')+'</p><div class="grid g4">';
+  [{i:"moon",t:"Moon phase",d:"Lunar correlations",c:"var(--vi)"},{i:"cloud",t:"Weather",d:"Environmental",c:"var(--cy)"},{i:"cal",t:"Day analysis",d:"By draw day",c:"var(--amb)"},{i:"trend",t:"Sum trend",d:"Over time",c:"var(--em)"}].forEach(function(tool) {
+    h += '<div class="card tool-card"><div style="width:28px;height:28px;border-radius:7px;background:'+tool.c+'11;display:flex;align-items:center;justify-content:center;color:'+tool.c+';margin-bottom:12px">'+svgIcon(tool.i,14)+'</div><h3 style="font-size:13.5px;font-weight:700;margin-bottom:3px">'+tool.t+'</h3><p style="font-size:12px;color:var(--t2);margin:0">'+tool.d+'</p></div>';
+  });
+  h += '</div>';
+  return h;
+}
+
+function renderPrediction() {
+  var h = '<h1>'+L('prediction.title','AI Prediction')+'</h1><p class="desc">'+L('prediction.desc','Data-driven suggestions.')+'</p>';
+  h += '<div class="hero"><div style="position:relative"><div style="display:flex;align-items:center;gap:9px;margin-bottom:10px"><span style="color:#fff">'+svgIcon("brain",20)+'</span><span style="font-size:12.5px;font-weight:600;opacity:.9">'+L('prediction.engine','PREDICTION ENGINE')+'</span></div>';
+  h += '<p style="margin:0 0 18px;font-size:13px;opacity:.85;line-height:1.6">'+L('prediction.blurb','Analyzes the full draw history.')+'</p>';
+  h += '<button onclick="generatePrediction()" style="padding:10px 22px;border-radius:10px;border:2px solid rgba(255,255,255,.4);background:rgba(255,255,255,.2);color:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">\u2728 '+L('prediction.generate','Generate')+'</button>';
+  h += '</div></div><div id="predResult"></div>';
+  return h;
+}
+
+function renderLucky() {
+  var h = '<h1>'+L('lucky.heading','Your Lucky Numbers')+'</h1>';
+  h += '<p class="desc">'+L('lucky.subheading','Personalised picks + a daily luck reading.')+'</p>';
+  h += '<div class="card" style="margin-bottom:20px">';
+  h += '<div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("user",14)+'</div><h3>'+L('lucky.heading','Your Lucky Numbers')+'</h3></div>';
+  h += '<div class="grid g2" style="gap:10px">';
+  h += '<div><label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px">'+L('lucky.birthdayLabel','Birthday')+'</label><input type="date" id="luckyBd" style="width:100%" required></div>';
+  h += '<div><label style="font-size:11px;font-weight:600;color:var(--t2);display:block;margin-bottom:4px">'+L('lucky.timeLabel','Birth time (optional)')+'</label><input type="time" id="luckyTime" style="width:100%"></div>';
+  h += '</div>';
+  h += '<button class="btn btn-p" onclick="generateLucky()" style="margin-top:14px">'+svgIcon("sparkle",14)+' '+L('lucky.submit','Get my numbers')+'</button>';
+  h += '<div style="margin-top:10px;font-size:11px;color:var(--t3)">'+L('lucky.disclaimer','For entertainment only.')+'</div>';
+  h += '</div>';
+  h += '<div id="luckyResult"></div>';
+  return h;
+}
+
+// ═══ EVENT HANDLERS ══════════════════════════════════════════
+var histGame = "4d";
+
+function bindEvents() {
+  var qInput = document.getElementById("histQ");
+  if (qInput) qInput.addEventListener("keydown", function(e) { if (e.key === "Enter") doHistSearch(); });
+}
+
+window.setHistGame = function(g) {
+  histGame = g;
+  document.getElementById("tab4d").className = "tab" + (g==="4d"?" active":"");
+  document.getElementById("tabtoto").className = "tab" + (g==="toto"?" active":"");
+  document.getElementById("histQ").placeholder = g==="4d" ? L('history.placeholder4d','4D number (e.g. 1234)') : L('history.placeholderToto','TOTO number (1-49)');
+  document.getElementById("histResults").innerHTML = "";
+};
+
+window.doHistSearch = function() {
+  var q = document.getElementById("histQ").value.trim();
+  if (!q) return;
+  var resEl = document.getElementById("histResults");
+  resEl.innerHTML = loadingCard();
+  var url = '/api/' + (histGame === '4d' ? 'fourd' : 'toto') + '/search?number=' + encodeURIComponent(q);
+  fetch(url).then(function(r){return r.json();}).then(function(j) {
+    if (!j.success) { resEl.innerHTML = '<div class="card">'+L('common.error','Error')+': '+(j.error||'unknown')+'</div>'; return; }
+    var rows = j.data || [];
+    var html = '<div class="card" style="margin-top:16px"><div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:12px">'+rows.length+' '+L('history.results','result(s)')+'</div>';
+    if (rows.length === 0) {
+      html += '<p style="font-size:12.5px;color:var(--t3)">'+L('history.noMatches','No matches.')+'</p>';
+    } else if (histGame === '4d') {
+      rows.slice(0,30).forEach(function(r) {
+        html += '<div style="padding:8px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:12.5px;align-items:center"><span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span><span style="color:var(--t2);min-width:90px">'+r.draw_date+'</span><span style="font-weight:600">'+r.prizes.join(', ')+'</span></div>';
+      });
+    } else {
+      rows.slice(0,30).forEach(function(r) {
+        var nums = [r.num1, r.num2, r.num3, r.num4, r.num5, r.num6].filter(function(n){return n!=null;}).join(', ');
+        html += '<div style="padding:8px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:12.5px;align-items:center"><span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span><span style="color:var(--t2);min-width:90px">'+(r.draw_date||'—')+'</span><span style="font-weight:600">'+nums+(r.additional_num?' + '+r.additional_num:'')+'</span></div>';
+      });
+    }
+    html += '</div>';
+    resEl.innerHTML = html;
+  }).catch(function(e) {
+    resEl.innerHTML = '<div class="card">'+L('common.error','Error')+': '+e.message+'</div>';
+  });
+};
+
+window.generatePrediction = function() {
+  var nums = new Set();
+  while (nums.size < 6) nums.add(Math.floor(Math.random()*49)+1);
+  var arr = Array.from(nums).sort(function(a,b){return a-b;});
+  var conf = Math.floor(Math.random()*18)+62;
+  var html = '<div class="card"><div style="display:flex;align-items:center;gap:7px;margin-bottom:16px"><span style="color:var(--p)">'+svgIcon("target",15)+'</span><h3 style="font-size:14px;font-weight:700;margin:0">TOTO prediction</h3><span style="margin-left:auto;padding:3px 10px;border-radius:14px;background:rgba(5,150,105,.08);color:var(--em);font-size:11px;font-weight:700">'+conf+'%</span></div>';
+  html += '<div style="display:flex;gap:10px;margin-bottom:16px">';
+  arr.forEach(function(n,i) { html += makeBall(n, 44, "var(--p)", i*85); });
+  html += '</div><div style="padding:8px 12px;background:rgba(217,119,6,.06);border-radius:8px;font-size:11.5px;color:#92400e">\u26A0 Entertainment only. Play responsibly.</div></div>';
+  document.getElementById("predResult").innerHTML = html;
+};
+
+window.generateLucky = function() {
+  var bd = document.getElementById("luckyBd").value || "";
+  var t  = document.getElementById("luckyTime").value || "";
+  if (!bd) { alert(L('lucky.birthdayLabel','Birthday')+' ?'); return; }
+
+  var resEl = document.getElementById("luckyResult");
+  var steps = L('lucky.loadingSteps', [
+    "Reading your birth chart…",
+    "Calculating BaZi 4 pillars…",
+    "Checking Qi Men palace alignment…",
+    "Cross-referencing numerology and zodiac…",
+    "Synthesizing your weekly picks…"
+  ]);
+
+  // Render loading shell
+  var loadHtml = '<div class="card" style="padding:22px"><div style="font-size:13px;font-weight:700;color:var(--t2);margin-bottom:14px;display:flex;align-items:center;gap:9px"><span class="spin"></span><span id="loadStatus">'+steps[0]+'</span></div>';
+  loadHtml += '<div id="loadSteps" style="display:flex;flex-direction:column;gap:6px">';
+  steps.forEach(function(s, i) {
+    loadHtml += '<div class="load-step'+(i===0?' active':'')+'" data-i="'+i+'"><span class="mark">'+(i===0?'<span class="spin" style="width:11px;height:11px;border-width:2px"></span>':'•')+'</span><span>'+s+'</span></div>';
+  });
+  loadHtml += '</div></div>';
+  resEl.innerHTML = loadHtml;
+
+  // Kick off API request immediately
+  var q = '?bd='+encodeURIComponent(bd)+'&lang='+LANG+(t?'&time='+encodeURIComponent(t):'');
+  var apiPromise = fetch('/api/lucky'+q).then(function(r){return r.json();});
+
+  // Step animation (~700ms per step, 5 steps ≈ 3.5s)
+  var stepIdx = 0;
+  var stepTimer = setInterval(function() {
+    var els = document.querySelectorAll('.load-step');
+    if (stepIdx < els.length) {
+      els[stepIdx].classList.remove('active'); els[stepIdx].classList.add('done');
+      els[stepIdx].querySelector('.mark').innerHTML = '✓';
+    }
+    stepIdx++;
+    if (stepIdx < els.length) {
+      els[stepIdx].classList.add('active');
+      els[stepIdx].querySelector('.mark').innerHTML = '<span class="spin" style="width:11px;height:11px;border-width:2px"></span>';
+      var st = document.getElementById('loadStatus'); if (st) st.textContent = steps[stepIdx];
+    } else {
+      clearInterval(stepTimer);
+    }
+  }, 700);
+
+  // Show result after BOTH api done AND ~3.2s minimum (so animation is visible)
+  var minDelay = new Promise(function(r){ setTimeout(r, 3200); });
+  Promise.all([apiPromise, minDelay]).then(function(parts) {
+    clearInterval(stepTimer);
+    var j = parts[0];
+    if (!j.success) { resEl.innerHTML = '<div class="card">'+L('common.error','Error')+': '+(j.error||'unknown')+'</div>'; return; }
+    resEl.innerHTML = renderLuckyResult(j.data);
+  }).catch(function(e) {
+    clearInterval(stepTimer);
+    resEl.innerHTML = '<div class="card">'+L('common.error','Error')+': '+e.message+'</div>';
+  });
+};
+
+function renderLuckyResult(d) {
+  var sys = d.systems;
+  var daily = d.daily;
+  var html = '';
+
+  // Compact week header
+  html += '<div class="hero" style="margin-bottom:18px;padding:20px 24px"><div style="position:relative">';
+  html += '<div style="font-size:10.5px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">'+L('lucky.weekOf','Week of')+'</div>';
+  html += '<div style="font-size:18px;font-weight:800">'+d.weekRange.start+' → '+d.weekRange.end+'</div>';
+  if (sys.zodiacWestern.moonApproximated) {
+    html += '<div style="margin-top:8px;font-size:11px;opacity:.8">ⓘ '+L('lucky.noteMoon','Moon sign approximated — add birth time for higher accuracy.')+'</div>';
+  }
+  html += '</div></div>';
+
+  // 4D picks
+  html += '<div class="card" style="margin-bottom:16px">';
+  html += '<div class="section-title"><div class="dot" style="background:#d9770611;color:var(--amb)">'+svgIcon("hash",14)+'</div><div><h3>'+L('lucky.fourDHeading','4D — 3 sets')+'</h3><small>'+L('lucky.fourDSubheading','For the next 4D draw')+' · '+d.picks.fourDForDrawDate+'</small></div></div>';
+  html += '<div style="display:flex;gap:22px;flex-wrap:wrap;justify-content:center;padding:14px 0 6px">';
+  d.picks.fourD.forEach(function(num, i) {
+    html += '<div style="display:flex;flex-direction:column;align-items:center">';
+    html += '<div style="display:flex;gap:6px">';
+    String(num).split('').forEach(function(dg, di) {
+      html += '<div class="ball" style="width:44px;height:44px;font-size:18px;background:linear-gradient(145deg,#d97706,#b45309);animation-delay:'+(i*220+di*70)+'ms;box-shadow:0 4px 10px rgba(217,119,6,.25),inset 0 1px 2px rgba(255,255,255,.35)">'+dg+'</div>';
+    });
+    html += '</div><div style="margin-top:8px;font-size:10px;color:var(--t3);font-weight:800;letter-spacing:.08em">SET '+(i+1)+'</div></div>';
+  });
+  html += '</div></div>';
+
+  // TOTO picks
+  html += '<div class="card" style="margin-bottom:16px">';
+  html += '<div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("trophy",14)+'</div><div><h3>'+L('lucky.totoHeading','TOTO — 2 sets (6 main numbers)')+'</h3><small>'+L('lucky.totoSubheading','For the next TOTO draw')+' · '+d.picks.totoForDrawDate+'</small></div></div>';
+  d.picks.toto.forEach(function(set, i) {
+    html += '<div style="display:flex;align-items:center;gap:14px;padding:12px 4px;'+(i===0?'border-bottom:1px solid var(--bl)':'')+'">';
+    html += '<span style="font-size:10px;font-weight:800;color:var(--t3);width:46px;letter-spacing:.08em">SET '+(i+1)+'</span>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    set.forEach(function(n, j) {
+      html += '<div class="ball" style="width:42px;height:42px;font-size:16px;background:linear-gradient(145deg,#3730a3,#4f46e5);animation-delay:'+(i*400+j*70)+'ms;box-shadow:0 4px 10px rgba(55,48,163,.25),inset 0 1px 2px rgba(255,255,255,.35)">'+n+'</div>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  // Today's Luck — daily-rotating. Render only if engine returned the daily payload.
+  if (daily && daily.date) {
+  html += '<div class="card" style="margin-bottom:16px">';
+  html += '<div class="section-title"><div class="dot" style="background:#0891b211;color:var(--cy)">'+svgIcon("sparkle",14)+'</div><div><h3>'+L('lucky.todayHeading',"Today's Luck")+'</h3><small>'+L('lucky.todayDate','Today')+' · '+daily.date+' · '+L('lucky.dayAnimal','Day governed by')+' '+daily.dayAnimal+'</small></div></div>';
+  html += '<div class="grid g2" style="gap:10px;margin-top:6px">';
+  // Color
+  html += '<div class="daily-card"><div class="ico" style="background:'+daily.color.hex+'33"><div class="color-swatch" style="background:'+daily.color.hex+'"></div></div><div><div class="lab">'+L('lucky.todayColor','Lucky color')+'</div><div class="val">'+daily.color.name+'</div></div></div>';
+  // Direction
+  html += '<div class="daily-card"><div class="ico" style="background:#3730a311;color:var(--p)">🧭</div><div><div class="lab">'+L('lucky.todayDirection','Lucky direction')+'</div><div class="val">'+daily.direction+'</div></div></div>';
+  // Hour
+  html += '<div class="daily-card"><div class="ico" style="background:#7c3aed11;color:var(--vi)">⏰</div><div><div class="lab">'+L('lucky.todayHour','Auspicious hour')+'</div><div class="val">'+daily.luckyHour.label+'</div></div></div>';
+  // Day animal
+  html += '<div class="daily-card"><div class="ico" style="background:#d9770611;color:var(--amb)">🐉</div><div><div class="lab">'+L('lucky.dayAnimal','Day governed by')+'</div><div class="val">'+daily.dayAnimal+'</div></div></div>';
+  html += '</div>';
+  // Do / Avoid
+  html += '<div class="grid g2" style="gap:10px;margin-top:10px">';
+  html += '<div class="daily-card" style="background:rgba(5,150,105,.06);border-color:rgba(5,150,105,.2)"><div class="ico" style="background:#05966911;color:var(--em);font-size:14px;font-weight:800">✓</div><div><div class="lab" style="color:var(--em)">'+L('lucky.todayDo','Do today')+'</div><div class="val" style="font-weight:600;font-size:13px;line-height:1.4">'+daily.doActivity+'</div></div></div>';
+  html += '<div class="daily-card" style="background:rgba(220,38,38,.06);border-color:rgba(220,38,38,.2)"><div class="ico" style="background:#dc262611;color:var(--red);font-size:14px;font-weight:800">✗</div><div><div class="lab" style="color:var(--red)">'+L('lucky.todayAvoid','Avoid today')+'</div><div class="val" style="font-weight:600;font-size:13px;line-height:1.4">'+daily.avoidActivity+'</div></div></div>';
+  html += '</div>';
+  html += '</div>';
+  }   // end if daily
+
+  // Luck for this week (weekly narrative)
+  html += '<div class="card"><div class="section-title"><div class="dot" style="background:#7c3aed11;color:var(--vi)">'+svgIcon("moon",14)+'</div><div><h3>'+L('lucky.weekHeading','Luck for this week')+'</h3></div></div>';
+  html += '<p style="font-size:13.5px;line-height:1.65;color:var(--t2)">'+d.reading+'</p>';
+  html += '</div>';
+
+  return html;
+}
+
+// ═══ INIT ════════════════════════════════════════════════════
+// Private back-door: ?tab=research lets the owner reach the hidden tab.
+var initialTab = new URLSearchParams(location.search).get('tab');
+if (initialTab) currentTab = initialTab;
+loadStrings(function() {
+  renderAll();                          // render shell + loading state
+  loadData(function() { renderPage(); });  // hydrate from real DB, then re-render
+});
+</script>
+</body>
+</html>

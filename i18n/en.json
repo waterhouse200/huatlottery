@@ -1,0 +1,90 @@
+{
+  "app": {
+    "title": "Huatlottery",
+    "tagline": "Singapore 4D & TOTO data + your weekly lucky picks",
+    "status": "Huatlottery v1.0"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Error",
+    "search": "Search",
+    "generate": "Generate",
+    "of": "of",
+    "to": "to"
+  },
+  "tabs": {
+    "dashboard":  "Dashboard",
+    "toto":       "TOTO Stats",
+    "fourd":      "4D Stats",
+    "history":    "History Search",
+    "research":   "Research Lab",
+    "prediction": "AI Prediction",
+    "lucky":      "Lucky Numbers"
+  },
+  "dashboard": {
+    "title":     "Dashboard",
+    "desc":      "Singapore 4D & TOTO intelligence hub.",
+    "latestToto":"Latest TOTO",
+    "latest4d":  "Latest 4D",
+    "draws":     "Draws",
+    "analyzed":  "analyzed",
+    "hot":       "Hot #",
+    "frequent":  "frequent",
+    "sum":       "Sum",
+    "range":     "Range",
+    "starters":  "Starters",
+    "first":     "1st",
+    "second":    "2nd",
+    "third":     "3rd"
+  },
+  "toto":  { "title": "TOTO Stats",  "desc": "Frequency, hot/cold, even-odd, sum distribution.", "hot": "Hot numbers", "cold": "Cold numbers" },
+  "fourd": { "title": "4D Stats",    "desc": "Top hot numbers, exact and permutation matches." },
+  "history": {
+    "title":       "History Search",
+    "desc":        "Search past draws by number or date.",
+    "placeholder4d":  "4D number (e.g. 1234)",
+    "placeholderToto":"TOTO number (1-49)",
+    "noMatches":   "No matches.",
+    "results":     "result(s)"
+  },
+  "research": { "title": "Research Lab", "desc": "Experimental analyses and tools." },
+  "prediction": {
+    "title":      "AI Prediction",
+    "desc":       "Data-driven suggestions.",
+    "engine":     "PREDICTION ENGINE",
+    "blurb":      "Analyzes the full draw history.",
+    "generate":   "Generate",
+    "prediction": "TOTO prediction",
+    "warn":       "Entertainment only. Play responsibly."
+  },
+  "lucky": {
+    "heading":       "Your Lucky Numbers",
+    "subheading":    "Personalised picks + a daily luck reading. Updates every day.",
+    "birthdayLabel": "Birthday",
+    "timeLabel":     "Birth time (optional, for more accuracy)",
+    "submit":        "Get my numbers",
+    "loadingSteps": [
+      "Reading your birth chart…",
+      "Calculating BaZi 4 pillars…",
+      "Checking Qi Men palace alignment…",
+      "Cross-referencing numerology and zodiac…",
+      "Synthesizing your weekly picks…"
+    ],
+    "weekOf":        "Week of",
+    "fourDHeading":  "4D — 3 sets",
+    "fourDSubheading":"For the next 4D draw",
+    "totoHeading":   "TOTO — 2 sets (6 main numbers)",
+    "totoSubheading":"For the next TOTO draw",
+    "weekHeading":   "Luck for this week",
+    "todayHeading":  "Today's Luck",
+    "todayDate":     "Today",
+    "dayAnimal":     "Day governed by",
+    "todayColor":    "Lucky color",
+    "todayDirection":"Lucky direction",
+    "todayHour":     "Auspicious hour",
+    "todayDo":       "Do today",
+    "todayAvoid":    "Avoid today",
+    "noteMoon":      "Moon sign approximated using noon SGT — add your birth time for higher accuracy.",
+    "disclaimer":    "For entertainment only. Lottery outcomes are random; these picks reflect tradition, not probability."
+  }
+}
