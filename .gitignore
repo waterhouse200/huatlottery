@@ -1,0 +1,23 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# OS
+.DS_Store
+
+# SQLite working files (WAL mode) — main .db file IS committed as a checkpoint
+*.db-shm
+*.db-wal
+
+# Future Python analysis
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+notebooks/
+
+# Logs (scraper output etc.)
+*.log
+
+# Claude Code local project state
+.claude/

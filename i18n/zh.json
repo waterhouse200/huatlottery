@@ -1,0 +1,90 @@
+{
+  "app": {
+    "title": "发达彩票",
+    "tagline": "新加坡4D与多多数据分析 + 每周专属幸运号码",
+    "status": "发达彩票 v1.0"
+  },
+  "common": {
+    "loading": "加载中…",
+    "error": "错误",
+    "search": "搜索",
+    "generate": "生成",
+    "of": "之",
+    "to": "至"
+  },
+  "tabs": {
+    "dashboard":  "主页",
+    "toto":       "多多统计",
+    "fourd":      "4D 统计",
+    "history":    "历史查询",
+    "research":   "研究实验室",
+    "prediction": "AI 预测",
+    "lucky":      "幸运号码"
+  },
+  "dashboard": {
+    "title":     "主页",
+    "desc":      "新加坡4D与多多数据中心。",
+    "latestToto":"最新多多",
+    "latest4d":  "最新 4D",
+    "draws":     "期数",
+    "analyzed":  "已分析",
+    "hot":       "热门号码",
+    "frequent":  "出现频繁",
+    "sum":       "总和",
+    "range":     "号差",
+    "starters":  "安慰号",
+    "first":     "一等",
+    "second":    "二等",
+    "third":     "三等"
+  },
+  "toto":  { "title": "多多统计",  "desc": "频率、冷热号、奇偶分布、总和分布。", "hot": "热门号码", "cold": "冷门号码" },
+  "fourd": { "title": "4D 统计",    "desc": "热门号码、精确与排列匹配。" },
+  "history": {
+    "title":       "历史查询",
+    "desc":        "按号码或日期搜索往期开奖。",
+    "placeholder4d":  "4D 号码 (例如 1234)",
+    "placeholderToto":"多多号码 (1-49)",
+    "noMatches":   "未找到匹配结果。",
+    "results":     "项结果"
+  },
+  "research": { "title": "研究实验室", "desc": "实验性分析与工具。" },
+  "prediction": {
+    "title":      "AI 预测",
+    "desc":       "数据驱动的建议号码。",
+    "engine":     "预测引擎",
+    "blurb":      "分析全部历史开奖数据。",
+    "generate":   "生成",
+    "prediction": "多多预测",
+    "warn":       "仅供娱乐，请理性投注。"
+  },
+  "lucky": {
+    "heading":       "您的幸运号码",
+    "subheading":    "个性化号码 + 每日运势解读。每日更新。",
+    "birthdayLabel": "生日",
+    "timeLabel":     "出生时间（可选，提高准确度）",
+    "submit":        "生成我的号码",
+    "loadingSteps": [
+      "读取您的命盘…",
+      "推算八字四柱…",
+      "检视奇门遁甲宫位…",
+      "交叉比对生命数字与星座…",
+      "综合本周幸运号码…"
+    ],
+    "weekOf":        "本周",
+    "fourDHeading":  "4D — 3 组号码",
+    "fourDSubheading":"下一期4D开奖",
+    "totoHeading":   "多多 — 2 组（6个主号）",
+    "totoSubheading":"下一期多多开奖",
+    "weekHeading":   "本周运势",
+    "todayHeading":  "今日好运",
+    "todayDate":     "今日",
+    "dayAnimal":     "当日值守",
+    "todayColor":    "幸运色",
+    "todayDirection":"幸运方位",
+    "todayHour":     "吉时",
+    "todayDo":       "今日宜",
+    "todayAvoid":    "今日忌",
+    "noteMoon":      "月座为概略估算，输入出生时辰可获得更精准的解读。",
+    "disclaimer":    "本结果仅供娱乐。彩票本质为随机，号码仅反映传统命理推算，非概率预测。"
+  }
+}
