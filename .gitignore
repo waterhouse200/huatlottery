@@ -21,3 +21,4 @@ notebooks/
 
 # Claude Code local project state
 .claude/
+analysis/_cache/
