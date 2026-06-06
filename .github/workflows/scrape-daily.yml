@@ -1,0 +1,53 @@
+name: Daily Singapore Pools scrape
+
+on:
+  schedule:
+    # 8 PM SGT (12:00 UTC) daily — after all draws close
+    - cron: '0 12 * * *'
+    # 10 PM SGT (14:00 UTC) safety retry in case the first run hit a fetch error
+    - cron: '0 14 * * *'
+  workflow_dispatch:          # Allow manual trigger from the GitHub Actions tab
+
+permissions:
+  contents: write             # Needed for the bot to commit + push DB updates
+
+concurrency:
+  group: scrape
+  cancel-in-progress: false   # Don't kill a running scrape if a second cron fires
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Scrape newest 10 4D draws
+        run: npm run scrape:fourd -- --count 10
+
+      - name: Scrape newest 10 TOTO draws
+        run: npm run scrape:toto -- --count 10
+
+      - name: Commit and push if DB updated
+        run: |
+          git config user.name  "Huatlottery Bot"
+          git config user.email "bot@huatlottery.local"
+          git add huatlottery.db
+          if git diff --staged --quiet; then
+            echo "No new draws — nothing to commit."
+          else
+            COUNT_4D=$(sqlite3 huatlottery.db "SELECT COUNT(*) FROM fourd_draws")
+            COUNT_TOTO=$(sqlite3 huatlottery.db "SELECT COUNT(*) FROM toto_draws")
+            git commit -m "chore(scrape): daily update $(date -u +%Y-%m-%d) — 4D=${COUNT_4D} TOTO=${COUNT_TOTO}"
+            git push
+          fi
