@@ -494,7 +494,7 @@ window.generateLucky = function() {
   var q = '?bd='+encodeURIComponent(bd)+'&lang='+LANG+(t?'&time='+encodeURIComponent(t):'');
   var apiPromise = fetch('/api/lucky'+q).then(function(r){return r.json();});
 
-  // Step animation (~700ms per step, 5 steps ≈ 3.5s)
+  // Step animation (~900ms per step, 5 steps ≈ 4.5s — slower for better feel)
   var stepIdx = 0;
   var stepTimer = setInterval(function() {
     var els = document.querySelectorAll('.load-step');
@@ -510,10 +510,10 @@ window.generateLucky = function() {
     } else {
       clearInterval(stepTimer);
     }
-  }, 700);
+  }, 900);
 
-  // Show result after BOTH api done AND ~3.2s minimum (so animation is visible)
-  var minDelay = new Promise(function(r){ setTimeout(r, 3200); });
+  // Show result after BOTH api done AND ~4.2s minimum (so animation is visible)
+  var minDelay = new Promise(function(r){ setTimeout(r, 4200); });
   Promise.all([apiPromise, minDelay]).then(function(parts) {
     clearInterval(stepTimer);
     var j = parts[0];
@@ -534,28 +534,25 @@ function renderLuckyResult(d) {
   html += '<div class="hero" style="margin-bottom:18px;padding:20px 24px"><div style="position:relative">';
   html += '<div style="font-size:10.5px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">'+L('lucky.weekOf','Week of')+'</div>';
   html += '<div style="font-size:18px;font-weight:800">'+d.weekRange.start+' → '+d.weekRange.end+'</div>';
-  if (sys.zodiacWestern.moonApproximated) {
-    html += '<div style="margin-top:8px;font-size:11px;opacity:.8">ⓘ '+L('lucky.noteMoon','Moon sign approximated — add birth time for higher accuracy.')+'</div>';
-  }
   html += '</div></div>';
 
   // 4D picks
   html += '<div class="card" style="margin-bottom:16px">';
-  html += '<div class="section-title"><div class="dot" style="background:#d9770611;color:var(--amb)">'+svgIcon("hash",14)+'</div><div><h3>'+L('lucky.fourDHeading','4D — 3 sets')+'</h3><small>'+L('lucky.fourDSubheading','For the next 4D draw')+' · '+d.picks.fourDForDrawDate+'</small></div></div>';
-  html += '<div style="display:flex;gap:22px;flex-wrap:wrap;justify-content:center;padding:14px 0 6px">';
+  html += '<div class="section-title"><div class="dot" style="background:#d9770611;color:var(--amb)">'+svgIcon("hash",14)+'</div><div><h3>'+L('lucky.fourDHeading','4D — 3 sets')+'</h3><small>'+L('lucky.fourDSubheading',"For this week's 4D draws (Wed / Sat / Sun)")+'</small></div></div>';
+  html += '<div style="display:flex;gap:60px;flex-wrap:wrap;justify-content:center;padding:18px 0 8px">';
   d.picks.fourD.forEach(function(num, i) {
     html += '<div style="display:flex;flex-direction:column;align-items:center">';
-    html += '<div style="display:flex;gap:6px">';
+    html += '<div style="display:flex;gap:14px">';
     String(num).split('').forEach(function(dg, di) {
-      html += '<div class="ball" style="width:44px;height:44px;font-size:18px;background:linear-gradient(145deg,#d97706,#b45309);animation-delay:'+(i*220+di*70)+'ms;box-shadow:0 4px 10px rgba(217,119,6,.25),inset 0 1px 2px rgba(255,255,255,.35)">'+dg+'</div>';
+      html += '<div class="ball" style="width:46px;height:46px;font-size:19px;background:linear-gradient(145deg,#d97706,#b45309);animation-delay:'+(i*240+di*80)+'ms;box-shadow:0 4px 10px rgba(217,119,6,.25),inset 0 1px 2px rgba(255,255,255,.35)">'+dg+'</div>';
     });
-    html += '</div><div style="margin-top:8px;font-size:10px;color:var(--t3);font-weight:800;letter-spacing:.08em">SET '+(i+1)+'</div></div>';
+    html += '</div><div style="margin-top:10px;font-size:10px;color:var(--t3);font-weight:800;letter-spacing:.08em">SET '+(i+1)+'</div></div>';
   });
   html += '</div></div>';
 
   // TOTO picks
   html += '<div class="card" style="margin-bottom:16px">';
-  html += '<div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("trophy",14)+'</div><div><h3>'+L('lucky.totoHeading','TOTO — 2 sets (6 main numbers)')+'</h3><small>'+L('lucky.totoSubheading','For the next TOTO draw')+' · '+d.picks.totoForDrawDate+'</small></div></div>';
+  html += '<div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("trophy",14)+'</div><div><h3>'+L('lucky.totoHeading','TOTO — 2 sets (6 main numbers)')+'</h3><small>'+L('lucky.totoSubheading',"For this week's TOTO draws (Mon / Thu)")+'</small></div></div>';
   d.picks.toto.forEach(function(set, i) {
     html += '<div style="display:flex;align-items:center;gap:14px;padding:12px 4px;'+(i===0?'border-bottom:1px solid var(--bl)':'')+'">';
     html += '<span style="font-size:10px;font-weight:800;color:var(--t3);width:46px;letter-spacing:.08em">SET '+(i+1)+'</span>';
@@ -571,15 +568,20 @@ function renderLuckyResult(d) {
   if (daily && daily.date) {
   html += '<div class="card" style="margin-bottom:16px">';
   html += '<div class="section-title"><div class="dot" style="background:#0891b211;color:var(--cy)">'+svgIcon("sparkle",14)+'</div><div><h3>'+L('lucky.todayHeading',"Today's Luck")+'</h3><small>'+L('lucky.todayDate','Today')+' · '+daily.date+' · '+L('lucky.dayAnimal','Day governed by')+' '+daily.dayAnimal+'</small></div></div>';
-  html += '<div class="grid g2" style="gap:10px;margin-top:6px">';
-  // Color
+
+  // Personal lucky number — the hero takeaway
+  if (daily.personalLuckyNumber) {
+    html += '<div style="text-align:center;padding:14px 0 18px;border-bottom:1px solid var(--bl);margin-bottom:14px">';
+    html += '<div style="font-size:10.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">'+L('lucky.personalNumber',"Your number today")+'</div>';
+    html += '<div style="font-size:56px;font-weight:800;font-family:var(--mo);color:var(--p);letter-spacing:.02em;line-height:1;text-shadow:0 2px 12px rgba(55,48,163,.18)">'+daily.personalLuckyNumber+'</div>';
+    html += '<div style="font-size:11px;color:var(--t3);margin-top:8px;font-weight:500">'+L('lucky.personalNumberHint','A single number (00–99) just for you, refreshed daily.')+'</div>';
+    html += '</div>';
+  }
+  // 3 cards (color, direction, hour). Day-animal already shown in section header — no duplicate.
+  html += '<div class="grid g3" style="gap:10px;margin-top:6px">';
   html += '<div class="daily-card"><div class="ico" style="background:'+daily.color.hex+'33"><div class="color-swatch" style="background:'+daily.color.hex+'"></div></div><div><div class="lab">'+L('lucky.todayColor','Lucky color')+'</div><div class="val">'+daily.color.name+'</div></div></div>';
-  // Direction
   html += '<div class="daily-card"><div class="ico" style="background:#3730a311;color:var(--p)">🧭</div><div><div class="lab">'+L('lucky.todayDirection','Lucky direction')+'</div><div class="val">'+daily.direction+'</div></div></div>';
-  // Hour
   html += '<div class="daily-card"><div class="ico" style="background:#7c3aed11;color:var(--vi)">⏰</div><div><div class="lab">'+L('lucky.todayHour','Auspicious hour')+'</div><div class="val">'+daily.luckyHour.label+'</div></div></div>';
-  // Day animal
-  html += '<div class="daily-card"><div class="ico" style="background:#d9770611;color:var(--amb)">🐉</div><div><div class="lab">'+L('lucky.dayAnimal','Day governed by')+'</div><div class="val">'+daily.dayAnimal+'</div></div></div>';
   html += '</div>';
   // Do / Avoid
   html += '<div class="grid g2" style="gap:10px;margin-top:10px">';
@@ -589,9 +591,19 @@ function renderLuckyResult(d) {
   html += '</div>';
   }   // end if daily
 
-  // Luck for this week (weekly narrative)
+  // Luck for this week — simplified: headline + one plain-English summary.
   html += '<div class="card"><div class="section-title"><div class="dot" style="background:#7c3aed11;color:var(--vi)">'+svgIcon("moon",14)+'</div><div><h3>'+L('lucky.weekHeading','Luck for this week')+'</h3></div></div>';
-  html += '<p style="font-size:13.5px;line-height:1.65;color:var(--t2)">'+d.reading+'</p>';
+  var reading = d.reading;
+
+  if (reading && reading.headline) {
+    html += '<div style="background:linear-gradient(135deg,#eef2ff,#fdf4ff);border-left:4px solid var(--p);border-radius:8px;padding:16px 20px;margin-bottom:12px"><div style="font-size:18px;font-weight:700;color:var(--p);line-height:1.4">'+reading.headline+'</div></div>';
+  }
+  if (reading && reading.summary) {
+    html += '<p style="font-size:14px;line-height:1.6;color:var(--t2);margin:0">'+reading.summary+'</p>';
+  } else if (typeof reading === 'string') {
+    html += '<p style="font-size:14px;line-height:1.6;color:var(--t2);margin:0">'+reading+'</p>';
+  }
+
   html += '</div>';
 
   return html;
