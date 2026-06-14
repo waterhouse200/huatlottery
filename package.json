@@ -13,10 +13,13 @@
     "scrape:floor:fourd": "node scraper/scrape-fourd.js --find-floor"
   },
   "dependencies": {
-    "better-sqlite3": "9.6.0",
+    "better-sqlite3": "^11.7.0",
     "cheerio": "^1.2.0",
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "lunar-javascript": "^1.7.7"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
