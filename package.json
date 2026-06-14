@@ -10,7 +10,9 @@
     "scrape:toto": "node scraper/scrape-toto.js",
     "scrape:fourd": "node scraper/scrape-fourd.js",
     "scrape:floor:toto": "node scraper/scrape-toto.js --find-floor",
-    "scrape:floor:fourd": "node scraper/scrape-fourd.js --find-floor"
+    "scrape:floor:fourd": "node scraper/scrape-fourd.js --find-floor",
+    "rebuild-sqlite": "npm rebuild better-sqlite3 --build-from-source",
+    "postinstall": "npm rebuild better-sqlite3 --build-from-source"
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",
