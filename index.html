@@ -188,6 +188,81 @@ input[type=number]::placeholder{font-size:15px}
 .color-swatch{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--bd),inset 0 1px 2px rgba(0,0,0,.1);flex-shrink:0}
 .lang-toggle .tab{padding:5px 11px;font-size:11px}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+
+/* ─── Mobile menu toggle (hidden on desktop) ─── */
+.menu-tog{display:none;align-items:center;gap:6px;background:var(--pp);border:1px solid #c7d2fe;cursor:pointer;padding:6px 10px 6px 8px;margin-right:6px;color:var(--p);border-radius:8px;transition:all .15s;font:700 11px 'Plus Jakarta Sans',sans-serif;letter-spacing:.04em}
+.menu-tog:hover,.menu-tog:active{background:#dde3ff;transform:scale(.97)}
+.menu-tog svg{width:18px;height:18px;display:block;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;fill:none}
+.menu-tog .lbl{display:inline-block}
+/* Attention pulse on first load — fades after 4s via JS-removed class */
+.menu-tog.attn{animation:menuPulse 1.4s ease-in-out infinite;box-shadow:0 0 0 0 rgba(55,48,163,.45)}
+@keyframes menuPulse{
+  0%   {box-shadow:0 0 0 0   rgba(55,48,163,.55)}
+  70%  {box-shadow:0 0 0 12px rgba(55,48,163,0)}
+  100% {box-shadow:0 0 0 0   rgba(55,48,163,0)}
+}
+
+/* ─── Sidebar backdrop overlay (mobile only) ─── */
+.sb-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99;animation:fadeIn .2s}
+
+/* ───────── Tablet & smaller (≤ 768px) ───────── */
+@media (max-width:768px){
+  html,body{overflow-x:hidden}
+  body{display:block}
+
+  /* Sidebar becomes a slide-in drawer */
+  .sb{position:fixed;top:0;left:0;bottom:0;width:260px;min-width:260px;transform:translateX(-100%);transition:transform .25s ease;z-index:100;will-change:transform}
+  .sb.open{transform:translateX(0);box-shadow:4px 0 30px rgba(0,0,0,.18)}
+  .sb-backdrop.show{display:block}
+
+  /* Main content takes full viewport */
+  .main{width:100%;height:100vh;height:100dvh}
+
+  /* Show hamburger */
+  .menu-tog{display:flex;align-items:center;justify-content:center}
+
+  /* Tighten topbar */
+  .topbar{padding:0 10px;height:52px;min-height:52px}
+  .lang-toggle{margin-right:6px !important}
+  .lang-toggle .tab{padding:4px 9px;font-size:10.5px}
+  .status{padding:3px 9px;font-size:10.5px}
+
+  /* Roomier content area but with sane padding */
+  .content{padding:18px 14px 36px}
+  .content>div{max-width:100%}
+
+  /* Force all hard-coded multi-column grids to stack */
+  .grid.g2,.grid.g3,.grid.g4{grid-template-columns:1fr !important}
+
+  /* Cards a bit tighter */
+  .card{padding:18px 16px;border-radius:11px}
+  h1{font-size:21px}
+  .desc{font-size:13px;margin-bottom:16px}
+}
+
+/* ───────── Phones (≤ 480px) — even tighter ───────── */
+@media (max-width:480px){
+  .content{padding:14px 11px 32px}
+  .card{padding:16px 13px}
+  h1{font-size:19.5px;letter-spacing:-.02em}
+  .desc{font-size:12.5px}
+  .topbar{padding:0 8px}
+  .status{padding:3px 8px;font-size:10px}
+  .lang-toggle .tab{padding:3px 8px;font-size:10px}
+
+  /* 49-number grid → 7 cols instead of 10 (each cell is more tappable) */
+  .numgrid{grid-template-columns:repeat(7,1fr) !important}
+
+  /* 5-column 4D prize pill grids → 3 cols on phones (4-digit numbers stay legible) */
+  [style*="grid-template-columns:repeat(5,1fr)"]{grid-template-columns:repeat(3,1fr) !important}
+
+  /* 7-day calendar bias grids → 4 cols (week wraps to 2 rows) */
+  [style*="grid-template-columns:repeat(7,1fr)"]{grid-template-columns:repeat(4,1fr) !important}
+
+  /* 12-column month grids → 4 cols */
+  [style*="grid-template-columns:repeat(12,1fr)"]{grid-template-columns:repeat(4,1fr) !important}
+}
+
 </style>
 </head>
 <body>
@@ -198,8 +273,13 @@ input[type=number]::placeholder{font-size:15px}
   </div>
   <nav id="nav"></nav>
 </aside>
+<div class="sb-backdrop" id="sbBackdrop" onclick="toggleSb(false)"></div>
 <div class="main">
   <div class="topbar">
+    <button class="menu-tog attn" id="menuTog" aria-label="Open menu" onclick="toggleSb()">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <span class="lbl">More</span>
+    </button>
     <div style="flex:1"></div>
     <div class="lang-toggle" style="display:flex;gap:4px;margin-right:14px">
       <button class="tab" id="langEn" onclick="setLang('en')">EN</button>
@@ -211,6 +291,41 @@ input[type=number]::placeholder{font-size:15px}
 </div>
 
 <script>
+// ═══ MOBILE DRAWER ═══════════════════════════════════════════
+// Slides the sidebar in/out on small viewports. Pass true/false to force a
+// state, or call with no args to toggle. The backdrop closes on click.
+function toggleSb(open) {
+  var sb = document.querySelector('.sb');
+  var bd = document.getElementById('sbBackdrop');
+  var tog = document.getElementById('menuTog');
+  if (!sb || !bd) return;
+  if (typeof open === 'undefined') open = !sb.classList.contains('open');
+  sb.classList.toggle('open', open);
+  bd.classList.toggle('show', open);
+  // Once user opens the drawer at least once, kill the pulse for good
+  if (open && tog) {
+    tog.classList.remove('attn');
+    try { localStorage.setItem('huat_menu_seen', '1'); } catch(e){}
+  }
+}
+// Esc key closes drawer
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') toggleSb(false);
+});
+// First-visit attention pulse: only show if user has never opened the menu.
+// Auto-stops after 4 seconds even if untouched, so it never becomes annoying.
+(function(){
+  var tog = document.getElementById('menuTog');
+  if (!tog) return;
+  var seen = false;
+  try { seen = localStorage.getItem('huat_menu_seen') === '1'; } catch(e){}
+  if (seen) {
+    tog.classList.remove('attn');
+  } else {
+    setTimeout(function(){ tog.classList.remove('attn'); }, 4000);
+  }
+})();
+
 // ═══ DATA ════════════════════════════════════════════════════
 // State populated by loadData() from real DB via /api/*. Renders check
 // DATA.ready and show a loading state if not yet hydrated.
@@ -291,6 +406,20 @@ function loadStrings(then) {
   }).catch(function() { if (then) then(); });
 }
 
+// Label helpers — Chinese reads as "第 1 组" / "第 1 号" rather than "SET 1" / "PICK 1"
+function setLabel(i) {
+  return LANG === 'zh' ? (L('prediction.setLabel','第') + ' ' + (i+1) + ' 组') : ('SET ' + (i+1));
+}
+function pickLabel(i) {
+  return LANG === 'zh' ? (L('prediction.pickLabel','号') + ' ' + (i+1)) : ('PICK ' + (i+1));
+}
+// Translate tier badge text — used by HOT/AVERAGE/COLD pills
+function tierLabel(tier) {
+  if (tier === 'HOT')     return L('common.hot','HOT').toUpperCase();
+  if (tier === 'COLD')    return L('common.cold','COLD').toUpperCase();
+  return L('common.average','AVERAGE').toUpperCase();
+}
+
 window.setLang = function(lang) {
   if (lang === LANG) return;
   LANG = lang;
@@ -303,6 +432,8 @@ function renderAll() {
   document.getElementById('langEn').className = 'tab' + (LANG==='en' ? ' active' : '');
   document.getElementById('langZh').className = 'tab' + (LANG==='zh' ? ' active' : '');
   document.getElementById('statusBadge').textContent = L('app.status', 'Huatlottery v1.0');
+  var menuLbl = document.querySelector('#menuTog .lbl');
+  if (menuLbl) menuLbl.textContent = L('common.menu', 'More');
   renderNav();
   renderPage();
 }
@@ -337,6 +468,8 @@ function renderNav() {
       resetLazyObserver();          // drop pending fetches from prev tab
       renderNav(); renderPage(); updateSEO(currentTab);
       window.scrollTo(0, 0);
+      // Close the mobile drawer after a tab pick
+      if (window.innerWidth <= 768) toggleSb(false);
       // GA4 custom event — which tabs do users actually use
       if (window.track) {
         window.track('tab_switched', { from: oldTab, to: currentTab });
@@ -473,7 +606,7 @@ function ballWithTier(num, count, ballColor, ballSize) {
   return '<div style="display:flex;flex-direction:column;align-items:center;gap:5px">' +
     makeBall(num, ballSize||40, ballColor||'var(--p)', 0) +
     (count != null ? '<span style="font-size:11px;color:var(--t2);font-weight:700;font-family:var(--mo)">'+count+'×</span>' : '') +
-    '<span style="padding:2px 8px;border-radius:5px;background:'+t.bg+';color:'+t.col+';font-size:9.5px;font-weight:800;letter-spacing:.05em">'+info.tier+'</span>' +
+    '<span style="padding:2px 8px;border-radius:5px;background:'+t.bg+';color:'+t.col+';font-size:9.5px;font-weight:800;letter-spacing:.05em">'+tierLabel(info.tier)+'</span>' +
   '</div>';
 }
 
@@ -511,18 +644,18 @@ function renderDashboard() {
   // Per-number 3-tier classification (HOT / AVERAGE / COLD)
   var tiers = DATA.totoStats.tiers || {};
   var TIER_STYLE = {
-    "HOT":     { label: "HOT",     color: "#dc2626", bg: "rgba(220,38,38,.12)" },
-    "AVERAGE": { label: "AVERAGE", color: "#6b7280", bg: "rgba(107,114,128,.08)" },
-    "COLD":    { label: "COLD",    color: "#0891b2", bg: "rgba(8,145,178,.10)" },
+    "HOT":     { label: tierLabel('HOT'),     color: "#dc2626", bg: "rgba(220,38,38,.12)" },
+    "AVERAGE": { label: tierLabel('AVERAGE'), color: "#6b7280", bg: "rgba(107,114,128,.08)" },
+    "COLD":    { label: tierLabel('COLD'),    color: "#0891b2", bg: "rgba(8,145,178,.10)" },
   };
-  h += '<div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;font-size:12.5px">';
+  h += '<div style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px 14px;font-size:12.5px">';
   function classifyRow(n, isAdditional) {
     var info = tiers[n] || { tier: "AVERAGE" };
     var st = TIER_STYLE[info.tier];
     var ballColor = isAdditional ? "var(--red)" : "var(--p)";
-    return '<div style="display:flex;align-items:center;gap:14px">'+
+    return '<div style="display:flex;align-items:center;gap:10px;min-width:0">'+
            makeBall(n, 30, ballColor, 0) +
-           '<span style="padding:4px 14px;border-radius:6px;background:'+st.bg+';color:'+st.color+';font-size:12px;font-weight:800;letter-spacing:.05em">'+st.label+'</span></div>';
+           '<span style="padding:4px 10px;border-radius:6px;background:'+st.bg+';color:'+st.color+';font-size:11.5px;font-weight:800;letter-spacing:.04em;flex-shrink:0">'+st.label+'</span></div>';
   }
   t.numbers.forEach(function(n){ h += classifyRow(n, false); });
   h += classifyRow(t.additional_num, true);
@@ -612,13 +745,13 @@ function renderTotoStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">';
   h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trend",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">Recent Trend</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('toto.recentTrend','Recent Trend')+'</h3>';
   h += '<div style="margin-left:auto;display:flex;gap:6px">';
   [50, 100, 200, 500].forEach(function(w) {
-    h += '<button class="tab'+(w===50?' active':'')+'" data-window="'+w+'" onclick="setRecentWindow('+w+')">Last '+w+'</button>';
+    h += '<button class="tab'+(w===50?' active':'')+'" data-window="'+w+'" onclick="setRecentWindow('+w+')">'+L('common.last','Last')+' '+w+'</button>';
   });
   h += '</div></div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">What\'s been hot lately? Click a window to compare different time spans.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.recentTrendDesc',"What's been hot lately? Click a window to compare different time spans.")+'</p>';
   h += '<div id="recentHotCold">'+loadingCard()+'</div></div>';
   setTimeout(function(){ loadRecent(50); }, 50);
 
@@ -628,9 +761,9 @@ function renderTotoStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">Monday vs Thursday</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('toto.monVsThu','Monday vs Thursday')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">TOTO draws happen on Mondays and Thursdays. Do certain numbers favor a specific draw day?</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.monVsThuDesc','TOTO draws happen on Mondays and Thursdays. Do certain numbers favor a specific draw day?')+'</p>';
   h += '<div id="dowCompare">'+loadingCard()+'</div></div>';
   setTimeout(loadDowCompare, 50);
 
@@ -638,9 +771,9 @@ function renderTotoStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#dc262611;color:var(--red);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("plus",30)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">Additional Number</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">'+L('toto.additionalNumber','Additional Number')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">The extra red ball — often ignored in stats. Here\'s how it has behaved on its own across 12 years.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.additionalNumberDesc',"The extra red ball — often ignored in stats. Here's how it has behaved on its own across 12 years.")+'</p>';
   h += '<div id="additionalStats">'+loadingCard()+'</div></div>';
   setTimeout(loadAdditional, 50);
 
@@ -648,9 +781,9 @@ function renderTotoStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">Year-by-Year</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('toto.yearByYear','Year-by-Year')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">The hottest and coldest number for each calendar year since Oct 2014.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.yearByYearDesc','The hottest and coldest number for each calendar year since Oct 2014.')+'</p>';
   h += '<div id="yearlyHot">'+loadingCard()+'</div></div>';
   setTimeout(loadYearlyHot, 50);
 
@@ -664,9 +797,9 @@ function renderTotoStats() {
     h += '<div class="card" style="padding:24px">';
     h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">';
     h += '<div style="background:#0891b211;color:var(--cy);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("chart",26)+'</div>';
-    h += '<h3 style="font-size:20px;font-weight:800;color:var(--cy);margin:0">Sum of 6 Numbers</h3>';
+    h += '<h3 style="font-size:20px;font-weight:800;color:var(--cy);margin:0">'+L('toto.sumOf6','Sum of 6 Numbers')+'</h3>';
     h += '</div>';
-    h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Add the 6 winning numbers. Which range is most common?</p>';
+    h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.sumOf6Desc','Add the 6 winning numbers. Which range is most common?')+'</p>';
     h += '<div style="display:flex;flex-direction:column;gap:6px">';
     buckets.forEach(function(b) {
       var pct = maxCount > 0 ? (b.count / maxCount) * 100 : 0;
@@ -683,19 +816,19 @@ function renderTotoStats() {
   h += '<div class="card" style="padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">';
   h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("activity",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">Even / Odd Split</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('toto.evenOdd','Even / Odd Split')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Split of all drawn numbers between even and odd.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.evenOddDesc','Split of all drawn numbers between even and odd.')+'</p>';
   // Big visual: two stacked rows
   h += '<div style="display:flex;flex-direction:column;gap:18px;padding:10px 0">';
   h += '<div style="text-align:center">';
   h += '<div style="font-size:48px;font-weight:800;color:var(--p);font-family:var(--mo);line-height:1">'+evenPct+'%</div>';
-  h += '<div style="font-size:13px;font-weight:700;color:var(--t2);margin-top:4px">Even &nbsp;·&nbsp; '+tE.toLocaleString()+' numbers</div>';
+  h += '<div style="font-size:13px;font-weight:700;color:var(--t2);margin-top:4px">'+L('toto.even','Even')+' &nbsp;·&nbsp; '+tE.toLocaleString()+' '+L('common.numbers','numbers')+'</div>';
   h += '</div>';
   h += '<div style="height:1px;background:var(--bl)"></div>';
   h += '<div style="text-align:center">';
   h += '<div style="font-size:48px;font-weight:800;color:var(--vi);font-family:var(--mo);line-height:1">'+oddPct+'%</div>';
-  h += '<div style="font-size:13px;font-weight:700;color:var(--t2);margin-top:4px">Odd &nbsp;·&nbsp; '+tO.toLocaleString()+' numbers</div>';
+  h += '<div style="font-size:13px;font-weight:700;color:var(--t2);margin-top:4px">'+L('toto.odd','Odd')+' &nbsp;·&nbsp; '+tO.toLocaleString()+' '+L('common.numbers','numbers')+'</div>';
   h += '</div>';
   h += '</div></div>';
 
@@ -705,9 +838,9 @@ function renderTotoStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">';
   h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">Best Number Combos</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('toto.bestCombos','Best Number Combos')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">The pairs (2 numbers) and triples (3 numbers) that have come out together the most in past draws.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.bestCombosDesc','The pairs (2 numbers) and triples (3 numbers) that have come out together the most in past draws.')+'</p>';
   h += '<div id="combosResult">'+loadingCard()+'</div>';
   h += '</div>';
 
@@ -718,14 +851,14 @@ function renderTotoStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#0891b211;color:var(--cy);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("chart",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--cy);margin:0">All 49 Numbers \u2014 Occurrence &amp; Gaps</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--cy);margin:0">'+L('toto.allNumbers','All 49 Numbers \u2014 Occurrence & Gaps')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">For each number: how many times it has come out, the average gap between appearances, and how many draws ago it last came out. Based on the <b>'+s.total_draws+' draws since 9 Oct 2014</b>.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.allNumbersDesc','For each number: how many times it has come out, the average gap between appearances, and how many draws ago it last came out. Based on the <b>{count} draws since 9 Oct 2014</b>.').replace('{count}', s.total_draws)+'</p>';
   h += '<div style="display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;font-size:11.5px;font-weight:600">';
-  h += '<span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(220,38,38,.14);vertical-align:middle;margin-right:4px"></span>HOT</span>';
-  h += '<span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(107,114,128,.08);vertical-align:middle;margin-right:4px"></span>AVERAGE</span>';
-  h += '<span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(8,145,178,.10);vertical-align:middle;margin-right:4px"></span>COLD</span>';
-  h += '<span style="color:var(--red)">red gap = overdue (current > 1.5\u00d7 avg)</span>';
+  h += '<span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(220,38,38,.14);vertical-align:middle;margin-right:4px"></span>'+tierLabel('HOT')+'</span>';
+  h += '<span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(107,114,128,.08);vertical-align:middle;margin-right:4px"></span>'+tierLabel('AVERAGE')+'</span>';
+  h += '<span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(8,145,178,.10);vertical-align:middle;margin-right:4px"></span>'+tierLabel('COLD')+'</span>';
+  h += '<span style="color:var(--red)">'+L('toto.redGapLegend','red gap = overdue (current > 1.5\u00d7 avg)')+'</span>';
   h += '</div>';
   h += '<div id="gapsTable">'+loadingCard()+'</div></div>';
   setTimeout(loadGaps, 50);
@@ -740,9 +873,9 @@ function renderTotoStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#dc262611;color:var(--red);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">Special &amp; Bonus Draws</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">'+L('toto.specialDraws','Special & Bonus Draws')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Every TOTO draw outside the regular Mon/Thu schedule — Chinese New Year Hongbao, National Day, year-end specials, and snowball/cascade roll-down draws.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.specialDrawsDesc','Every TOTO draw outside the regular Mon/Thu schedule — Chinese New Year Hongbao, National Day, year-end specials, and snowball/cascade roll-down draws.')+'</p>';
   h += '<div id="specialDraws">'+loadingCard()+'</div></div>';
   setTimeout(loadSpecialDraws, 50);
 
@@ -750,13 +883,21 @@ function renderTotoStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">';
   h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("sparkle",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">Festival Draw Analysis</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('toto.festivalDraws','Festival Draw Analysis')+'</h3>';
   h += '<select id="festivalTag" onchange="loadFestivalStats()" style="margin-left:auto;padding:7px 12px;border-radius:6px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);font-size:13px;font-weight:600">';
+  var FEST_LABEL = {
+    'Chinese New Year':    L('toto.festival.cny','Chinese New Year'),
+    'Snowball / Cascade':  L('toto.festival.snowball','Snowball / Cascade'),
+    'Year-end / New Year': L('toto.festival.yearEnd','Year-end / New Year'),
+    'National Day':        L('toto.festival.nationalDay','National Day'),
+    'Mid-Autumn':          L('toto.festival.midAutumn','Mid-Autumn'),
+    'All Special':         L('toto.festival.allSpecial','All Special')
+  };
   ['Chinese New Year','Snowball / Cascade','Year-end / New Year','National Day','Mid-Autumn','All Special'].forEach(function(t){
-    h += '<option value="'+t+'"'+(t==='Chinese New Year'?' selected':'')+'>'+t+'</option>';
+    h += '<option value="'+t+'"'+(t==='Chinese New Year'?' selected':'')+'>'+FEST_LABEL[t]+'</option>';
   });
   h += '</select></div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Look at just one event type. Are there numbers that show up more often in CNY Hongbao draws vs cascade draws vs regular?</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('toto.festivalDesc','Look at just one event type. Are there numbers that show up more often in CNY Hongbao draws vs cascade draws vs regular?')+'</p>';
   h += '<div id="festivalStats">'+loadingCard()+'</div></div>';
   setTimeout(loadFestivalStats, 60);
 
@@ -2657,174 +2798,187 @@ window.loadCooc = function() {
 
 function renderAlpha4D() {
   if (!DATA.ready) return loadingCard();
+  // Localized month / dow labels — used by every form below
+  var MONTH_NAMES = [
+    L('common.month.jan','Jan'), L('common.month.feb','Feb'), L('common.month.mar','Mar'), L('common.month.apr','Apr'),
+    L('common.month.may','May'), L('common.month.jun','Jun'), L('common.month.jul','Jul'), L('common.month.aug','Aug'),
+    L('common.month.sep','Sep'), L('common.month.oct','Oct'), L('common.month.nov','Nov'), L('common.month.dec','Dec')
+  ];
+  var DOW_NAMES = [
+    L('common.dow.mon','Mon'), L('common.dow.tue','Tue'), L('common.dow.wed','Wed'), L('common.dow.thu','Thu'),
+    L('common.dow.fri','Fri'), L('common.dow.sat','Sat'), L('common.dow.sun','Sun')
+  ];
+  var TIER_NAMES = {
+    first:   L('alpha4d.tier.first','first'),
+    second:  L('alpha4d.tier.second','second'),
+    third:   L('alpha4d.tier.third','third'),
+    starter: L('alpha4d.tier.starter','starter'),
+    consol:  L('alpha4d.tier.consol','consol')
+  };
   var h = '<h1>'+L('tabs.alpha4d','Alpha 4D Simulator')+'</h1>';
-  h += '<p class="desc">Quantitative number-selection lab. Filter, backtest, and identify candidates with mathematical edges.</p>';
+  h += '<p class="desc">'+L('alpha4d.desc','Quantitative number-selection lab. Filter, backtest, and identify candidates with mathematical edges.')+'</p>';
 
   // === Strategy Simulator — forward-only rolling pool ===
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">';
   h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("activity",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">Strategy Simulator &mdash; Live Forward Run</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('alpha4d.simulator','Strategy Simulator — Live Forward Run')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Rolling-pool backtest, draw-by-draw, no look-ahead. Configure the filter, click Run. Numbers enter the pool when their gap crosses <b>Gap Low</b>, exit when they hit (gap → 0) or exceed <b>Gap High</b>. Bets placed only on selected month + day-of-week draws. Lifetime tier minimums apply <b>at the moment of qualification</b>.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('alpha4d.simulatorDesc','Rolling-pool backtest, draw-by-draw, no look-ahead. Configure the filter, click Run. Numbers enter the pool when their gap crosses <b>Gap Low</b>, exit when they hit (gap → 0) or exceed <b>Gap High</b>. Bets placed only on selected month + day-of-week draws. Lifetime tier minimums apply <b>at the moment of qualification</b>.')+'</p>';
   // Form
   h += '<div style="background:var(--bg);padding:16px;border-radius:8px;margin-bottom:14px">';
   // Row 1: gap + start year
   h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:10px">';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em">Start Year</label><input type="number" id="ssStartYear" value="1986" min="1986" max="2026" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em">Gap Low</label><input type="number" id="ssGapLo" value="50" min="0" max="4000" step="10" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em">Gap High</label><input type="number" id="ssGapHi" value="1000" min="0" max="4000" step="10" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em">'+L('alpha4d.form.startYear','Start Year')+'</label><input type="number" id="ssStartYear" value="1986" min="1986" max="2026" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em">'+L('alpha4d.form.gapLow','Gap Low')+'</label><input type="number" id="ssGapLo" value="50" min="0" max="4000" step="10" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em">'+L('alpha4d.form.gapHigh','Gap High')+'</label><input type="number" id="ssGapHi" value="1000" min="0" max="4000" step="10" style="width:100%;font-size:13px;text-align:center"></div>';
   h += '</div>';
   // Row 2: months
-  h += '<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Months (any)</div>';
+  h += '<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">'+L('alpha4d.form.months','Months (any)')+'</div>';
   h += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
-  var mNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   for (var mi = 1; mi <= 12; mi++) {
     var chk = 'checked';  // all months by default — neutral
-    h += '<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t2);cursor:pointer"><input type="checkbox" class="ssMonth" value="'+mi+'" '+chk+'>'+mNames[mi-1]+'</label>';
+    h += '<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t2);cursor:pointer"><input type="checkbox" class="ssMonth" value="'+mi+'" '+chk+'>'+MONTH_NAMES[mi-1]+'</label>';
   }
   h += '</div></div>';
   // Row 3: DOWs
-  h += '<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Day of Week (any)</div>';
+  h += '<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">'+L('alpha4d.form.dow','Day of Week (any)')+'</div>';
   h += '<div style="display:flex;flex-wrap:wrap;gap:8px">';
-  var dNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   for (var di = 0; di < 7; di++) {
     // 4D runs Wed (2), Sat (5), Sun (6) — checked by default
     var chk = (di === 2 || di === 5 || di === 6) ? 'checked' : '';
-    h += '<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t2);cursor:pointer"><input type="checkbox" class="ssDow" value="'+di+'" '+chk+'>'+dNames[di]+'</label>';
+    h += '<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t2);cursor:pointer"><input type="checkbox" class="ssDow" value="'+di+'" '+chk+'>'+DOW_NAMES[di]+'</label>';
   }
   h += '</div></div>';
   // Row 4: lifetime tier filters
-  h += '<div><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">Lifetime tier minimums (at qualification)</div>';
+  h += '<div><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">'+L('alpha4d.form.tierMins','Lifetime tier minimums (at qualification)')+'</div>';
   h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px">';
-  h += '<div><label style="font-size:11px;color:var(--em);font-weight:600">Min 1st</label><input type="number" id="ssMinFirst" value="0" min="0" max="20" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:#ea580c;font-weight:600">Min 2nd</label><input type="number" id="ssMinSecond" value="0" min="0" max="20" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:#2563eb;font-weight:600">Min 3rd</label><input type="number" id="ssMinThird" value="0" min="0" max="20" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t2);font-weight:600">Min Top-3</label><input type="number" id="ssMinTop3" value="0" min="0" max="30" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:#4b5563;font-weight:600">Min Starter</label><input type="number" id="ssMinStarter" value="0" min="0" max="30" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:#0f172a;font-weight:600">Min Consol</label><input type="number" id="ssMinConsol" value="0" min="0" max="30" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--p);font-weight:600">Min Total Hits</label><input type="number" id="ssMinTotal" value="0" min="0" max="60" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--em);font-weight:600">'+L('alpha4d.form.minFirst','Min 1st')+'</label><input type="number" id="ssMinFirst" value="0" min="0" max="20" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:#ea580c;font-weight:600">'+L('alpha4d.form.minSecond','Min 2nd')+'</label><input type="number" id="ssMinSecond" value="0" min="0" max="20" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:#2563eb;font-weight:600">'+L('alpha4d.form.minThird','Min 3rd')+'</label><input type="number" id="ssMinThird" value="0" min="0" max="20" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t2);font-weight:600">'+L('alpha4d.form.minTop3','Min Top-3')+'</label><input type="number" id="ssMinTop3" value="0" min="0" max="30" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:#4b5563;font-weight:600">'+L('alpha4d.form.minStarter','Min Starter')+'</label><input type="number" id="ssMinStarter" value="0" min="0" max="30" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:#0f172a;font-weight:600">'+L('alpha4d.form.minConsol','Min Consol')+'</label><input type="number" id="ssMinConsol" value="0" min="0" max="30" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--p);font-weight:600">'+L('alpha4d.form.minTotal','Min Total Hits')+'</label><input type="number" id="ssMinTotal" value="0" min="0" max="60" style="width:100%;font-size:13px;text-align:center"></div>';
   h += '</div></div>';
   // Row 5: separate Big and Small stakes + stop-on-hit
   h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bl)">';
-  h += '<div><label style="font-size:11px;color:var(--em);font-weight:700;text-transform:uppercase;letter-spacing:.04em">Big Bet ($/draw)</label><input type="number" id="ssStakeBig" value="1" min="0" max="1000" step="1" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--vi);font-weight:700;text-transform:uppercase;letter-spacing:.04em">Small Bet ($/draw)</label><input type="number" id="ssStakeSmall" value="2" min="0" max="1000" step="1" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:5px">After a Hit</label>';
+  h += '<div><label style="font-size:11px;color:var(--em);font-weight:700;text-transform:uppercase;letter-spacing:.04em">'+L('alpha4d.form.bigStake','Big Bet ($/draw)')+'</label><input type="number" id="ssStakeBig" value="1" min="0" max="1000" step="1" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--vi);font-weight:700;text-transform:uppercase;letter-spacing:.04em">'+L('alpha4d.form.smallStake','Small Bet ($/draw)')+'</label><input type="number" id="ssStakeSmall" value="2" min="0" max="1000" step="1" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:5px">'+L('alpha4d.form.afterHit','After a Hit')+'</label>';
   h += '<div style="display:flex;gap:14px;font-size:12px">';
-  h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="radio" name="ssStopOnHit" value="1" checked> <span style="color:var(--t2)">Stop</span></label>';
-  h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="radio" name="ssStopOnHit" value="0"> <span style="color:var(--t2)">Continue</span></label>';
+  h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="radio" name="ssStopOnHit" value="1" checked> <span style="color:var(--t2)">'+L('alpha4d.form.stop','Stop')+'</span></label>';
+  h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="radio" name="ssStopOnHit" value="0"> <span style="color:var(--t2)">'+L('alpha4d.form.continue','Continue')+'</span></label>';
   h += '</div></div></div>';
-  h += '<div style="margin-top:8px;font-size:11.5px;color:var(--t3);font-style:italic">Big pays $2000/$1000/$500/$250/$60. Small pays $3000/$2000/$800/$0/$0. Combo (3rd column) = both bets placed (cost = Big+Small).</div>';
+  h += '<div style="margin-top:8px;font-size:11.5px;color:var(--t3);font-style:italic">'+L('alpha4d.form.payoutHint','Big pays $2000/$1000/$500/$250/$60. Small pays $3000/$2000/$800/$0/$0. Combo (3rd column) = both bets placed (cost = Big+Small).')+'</div>';
   // Run button
-  h += '<div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn btn-p" onclick="runStrategySimulator()" style="padding:10px 24px;font-size:14px;font-weight:700">▶ Run Simulator</button>';
-  h += '<span style="font-size:12px;color:var(--t3);font-style:italic">Forward-only · no look-ahead. Bet size multiplies all $; Continue keeps a number on the bet list after it hits (may catch 2nd hit on the same #).</span></div>';
+  h += '<div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn btn-p" onclick="runStrategySimulator()" style="padding:10px 24px;font-size:14px;font-weight:700">'+L('alpha4d.runSimulator','▶ Run Simulator')+'</button>';
+  h += '<span style="font-size:12px;color:var(--t3);font-style:italic">'+L('alpha4d.runHint','Forward-only · no look-ahead. Bet size multiplies all $; Continue keeps a number on the bet list after it hits (may catch 2nd hit on the same #).')+'</span></div>';
   h += '</div>';
   // Results container
-  h += '<div id="strategySimResults" style="min-height:60px"><div style="text-align:center;color:var(--t3);padding:24px;font-style:italic">Set parameters above and click Run.</div></div>';
+  h += '<div id="strategySimResults" style="min-height:60px"><div style="text-align:center;color:var(--t3);padding:24px;font-style:italic">'+L('alpha4d.simulatorEmpty','Set parameters above and click Run.')+'</div></div>';
   h += '</div>';
 
   // === Profitable Buckets — reverse-engineer winners ===
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">';
   h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">Profitable Buckets &mdash; Where Top-3 Wins Came From</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('alpha4d.buckets','Profitable Buckets — Where Top-3 Wins Came From')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">For every (number, draw) pair within the bet window, bucket by current gap. Counts how many 1st-3rd-prize wins came from each gap bucket. <b>Click a bucket row</b> to expand the winner list with point-in-time lifetime stats.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('alpha4d.bucketsDesc','For every (number, draw) pair within the bet window, bucket by current gap. Counts how many 1st-3rd-prize wins came from each gap bucket. <b>Click a bucket row</b> to expand the winner list with point-in-time lifetime stats.')+'</p>';
   // Form
   h += '<div style="background:var(--bg);padding:14px;border-radius:8px;margin-bottom:14px">';
   h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Start Year</label><input type="number" id="pbStartYear" value="1986" min="1986" max="2026" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Bucket Width</label><input type="number" id="pbBucketWidth" value="100" min="10" max="500" step="10" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Gap Min</label><input type="number" id="pbBucketMin" value="0" min="0" max="4000" step="50" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Gap Max</label><input type="number" id="pbBucketMax" value="3500" min="100" max="5000" step="50" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div style="display:flex;align-items:end"><button class="btn btn-p" style="width:100%" onclick="loadProfitableBuckets()">Analyze</button></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.startYear','Start Year')+'</label><input type="number" id="pbStartYear" value="1986" min="1986" max="2026" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.bucketWidth','Bucket Width')+'</label><input type="number" id="pbBucketWidth" value="100" min="10" max="500" step="10" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.gapMin','Gap Min')+'</label><input type="number" id="pbBucketMin" value="0" min="0" max="4000" step="50" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.gapMax','Gap Max')+'</label><input type="number" id="pbBucketMax" value="3500" min="100" max="5000" step="50" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div style="display:flex;align-items:end"><button class="btn btn-p" style="width:100%" onclick="loadProfitableBuckets()">'+L('common.analyze','Analyze')+'</button></div>';
   h += '</div>';
   // Tier checkboxes
-  h += '<div style="margin-top:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:5px">Count as "win" (any of):</div>';
+  h += '<div style="margin-top:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:5px">'+L('alpha4d.form.countAsWin','Count as "win" (any of):')+'</div>';
   h += '<div style="display:flex;gap:14px;font-size:12px;flex-wrap:wrap">';
   ['first','second','third','starter','consol'].forEach(function(tt){
     var chk = 'checked';  // all tiers by default
-    h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" class="pbTier" value="'+tt+'" '+chk+'> '+tt+'</label>';
+    h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" class="pbTier" value="'+tt+'" '+chk+'> '+TIER_NAMES[tt]+'</label>';
   });
   h += '</div></div>';
   // Months + DOWs (same as simulator)
-  h += '<div style="margin-top:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:5px">Months</div>';
+  h += '<div style="margin-top:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:5px">'+L('alpha4d.form.months','Months').replace(' (any)','')+'</div>';
   h += '<div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px">';
-  var pmNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   for (var pmi = 1; pmi <= 12; pmi++) {
     var chkM = 'checked';  // all months by default
-    h += '<label style="display:flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" class="pbMonth" value="'+pmi+'" '+chkM+'>'+pmNames[pmi-1]+'</label>';
+    h += '<label style="display:flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" class="pbMonth" value="'+pmi+'" '+chkM+'>'+MONTH_NAMES[pmi-1]+'</label>';
   }
   h += '</div></div>';
-  h += '<div style="margin-top:8px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:5px">Day of Week</div>';
+  h += '<div style="margin-top:8px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:5px">'+L('alpha4d.form.dow','Day of Week').replace(' (any)','')+'</div>';
   h += '<div style="display:flex;flex-wrap:wrap;gap:6px;font-size:11.5px">';
-  var pdNames = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   for (var pdi = 0; pdi < 7; pdi++) {
     // 4D runs Wed (2), Sat (5), Sun (6) — all three checked by default
     var chkD = (pdi === 2 || pdi === 5 || pdi === 6) ? 'checked' : '';
-    h += '<label style="display:flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" class="pbDow" value="'+pdi+'" '+chkD+'>'+pdNames[pdi]+'</label>';
+    h += '<label style="display:flex;align-items:center;gap:3px;cursor:pointer"><input type="checkbox" class="pbDow" value="'+pdi+'" '+chkD+'>'+DOW_NAMES[pdi]+'</label>';
   }
   h += '</div></div>';
   h += '</div>';
-  h += '<div id="profitableBuckets" style="min-height:60px"><div style="text-align:center;color:var(--t3);padding:24px;font-style:italic">Click Analyze to scan gap buckets.</div></div>';
+  h += '<div id="profitableBuckets" style="min-height:60px"><div style="text-align:center;color:var(--t3);padding:24px;font-style:italic">'+L('alpha4d.bucketsEmpty','Click Analyze to scan gap buckets.')+'</div></div>';
   h += '</div>';
 
   // === Month × DOW heatmap — robustness across time slices ===
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">';
   h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">Robustness Heatmap &mdash; Month &times; Bucket &amp; Day &times; Bucket</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('alpha4d.heatmap','Robustness Heatmap — Month × Bucket & Day × Bucket')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">For every (number, draw) pair, bucket by gap and group by month/day-of-week. Each cell shows top-3 hit rate vs baseline, with z-score. Helps test if the 2000-2200 signal is stable across slices or fragile to bucket-shift.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('alpha4d.heatmapDesc','For every (number, draw) pair, bucket by gap and group by month/day-of-week. Each cell shows top-3 hit rate vs baseline, with z-score. Helps test if the 2000-2200 signal is stable across slices or fragile to bucket-shift.')+'</p>';
   // Form
   h += '<div style="background:var(--bg);padding:14px;border-radius:8px;margin-bottom:14px">';
   h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px">';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Start Year</label><input type="number" id="bhStartYear" value="1986" min="1986" max="2026" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Bucket Width</label><input type="number" id="bhBucketWidth" value="100" min="50" max="500" step="50" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Gap Min</label><input type="number" id="bhBucketMin" value="0" min="0" max="3000" step="100" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Gap Max</label><input type="number" id="bhBucketMax" value="3000" min="500" max="5000" step="100" style="width:100%;font-size:13px;text-align:center"></div>';
-  h += '<div style="display:flex;align-items:end"><button class="btn btn-p" style="width:100%" onclick="loadBucketsByTime()">Generate Heatmap</button></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.startYear','Start Year')+'</label><input type="number" id="bhStartYear" value="1986" min="1986" max="2026" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.bucketWidth','Bucket Width')+'</label><input type="number" id="bhBucketWidth" value="100" min="50" max="500" step="50" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.gapMin','Gap Min')+'</label><input type="number" id="bhBucketMin" value="0" min="0" max="3000" step="100" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div><label style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.gapMax','Gap Max')+'</label><input type="number" id="bhBucketMax" value="3000" min="500" max="5000" step="100" style="width:100%;font-size:13px;text-align:center"></div>';
+  h += '<div style="display:flex;align-items:end"><button class="btn btn-p" style="width:100%" onclick="loadBucketsByTime()">'+L('alpha4d.heatmapGenerate','Generate Heatmap')+'</button></div>';
   h += '</div>';
-  h += '<div style="margin-top:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:5px">Tiers counted as "win"</div>';
+  h += '<div style="margin-top:10px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;margin-bottom:5px">'+L('alpha4d.form.tiersAsWin','Tiers counted as "win"')+'</div>';
   h += '<div style="display:flex;gap:14px;font-size:12px;flex-wrap:wrap">';
   ['first','second','third','starter','consol'].forEach(function(tt){
     var chk = 'checked';  // all tiers by default
-    h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" class="bhTier" value="'+tt+'" '+chk+'> '+tt+'</label>';
+    h += '<label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" class="bhTier" value="'+tt+'" '+chk+'> '+TIER_NAMES[tt]+'</label>';
   });
   h += '</div></div>';
   // Bet type + stake + coloring mode
   h += '<div style="margin-top:12px;padding:10px;background:var(--cd);border-radius:6px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">';
-  h += '<div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Cell P/L shows:</div>';
-  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhBetType" value="big" checked onchange="rerenderHeatmapPL()"> Big</label>';
-  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhBetType" value="small" onchange="rerenderHeatmapPL()"> Small</label>';
-  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhBetType" value="combo" onchange="rerenderHeatmapPL()"> Combo ($1 Big + $2 Small)</label>';
-  h += '<label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-left:auto"><span>Stake $</span><input type="number" id="bhStake" value="1" min="1" max="1000" step="1" onchange="rerenderHeatmapPL()" style="width:70px;font-size:13px;text-align:center"></label>';
+  h += '<div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.cellPLShows','Cell P/L shows:')+'</div>';
+  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhBetType" value="big" checked onchange="rerenderHeatmapPL()"> '+L('alpha4d.bet.big','Big')+'</label>';
+  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhBetType" value="small" onchange="rerenderHeatmapPL()"> '+L('alpha4d.bet.small','Small')+'</label>';
+  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhBetType" value="combo" onchange="rerenderHeatmapPL()"> '+L('alpha4d.bet.combo','Combo ($1 Big + $2 Small)')+'</label>';
+  h += '<label style="display:flex;align-items:center;gap:6px;font-size:12px;margin-left:auto"><span>'+L('alpha4d.form.stake','Stake $')+'</span><input type="number" id="bhStake" value="1" min="1" max="1000" step="1" onchange="rerenderHeatmapPL()" style="width:70px;font-size:13px;text-align:center"></label>';
   h += '</div>';
   // Coloring mode + threshold
   h += '<div style="margin-top:8px;padding:10px;background:var(--cd);border-radius:6px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">';
-  h += '<div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Color cells by:</div>';
-  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhColorMode" value="zscore" checked onchange="rerenderHeatmapPL()"> Z-score (statistical significance)</label>';
-  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhColorMode" value="threshold" onchange="rerenderHeatmapPL()"> Hit-rate vs threshold</label>';
-  h += '<label style="display:flex;align-items:center;gap:6px;font-size:12px"><span>Target hit-rate %</span><input type="number" id="bhThreshold" value="0.086" min="0" max="1" step="0.001" onchange="rerenderHeatmapPL()" style="width:80px;font-size:13px;text-align:center"></label>';
+  h += '<div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('alpha4d.form.colorBy','Color cells by:')+'</div>';
+  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhColorMode" value="zscore" checked onchange="rerenderHeatmapPL()"> '+L('alpha4d.form.colorZ','Z-score (statistical significance)')+'</label>';
+  h += '<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="radio" name="bhColorMode" value="threshold" onchange="rerenderHeatmapPL()"> '+L('alpha4d.form.colorThreshold','Hit-rate vs threshold')+'</label>';
+  h += '<label style="display:flex;align-items:center;gap:6px;font-size:12px"><span>'+L('alpha4d.form.targetHitRate','Target hit-rate %')+'</span><input type="number" id="bhThreshold" value="0.086" min="0" max="1" step="0.001" onchange="rerenderHeatmapPL()" style="width:80px;font-size:13px;text-align:center"></label>';
   h += '<span id="bhBreakevenHint" style="font-size:11px;color:var(--t3);font-style:italic"></span>';
   h += '</div>';
   h += '</div>';
-  h += '<div id="bucketsByTime" style="min-height:60px"><div style="text-align:center;color:var(--t3);padding:24px;font-style:italic">Click Generate Heatmap.</div></div>';
+  h += '<div id="bucketsByTime" style="min-height:60px"><div style="text-align:center;color:var(--t3);padding:24px;font-style:italic">'+L('alpha4d.heatmapEmpty','Click Generate Heatmap.')+'</div></div>';
   h += '</div>';
 
   // === Currently Dry Numbers — what to bet right now ===
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap">';
   h += '<div style="background:#dc262611;color:var(--red);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("target",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">Currently Dry Numbers &mdash; What to Bet Right Now</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">'+L('alpha4d.currentDry','Currently Dry Numbers — What to Bet Right Now')+'</h3>';
   h += '<div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap">';
-  h += '<label style="font-size:11.5px;color:var(--t2);font-weight:600">Gap Low:</label>';
+  h += '<label style="font-size:11.5px;color:var(--t2);font-weight:600">'+L('alpha4d.form.gapLow','Gap Low')+':</label>';
   h += '<input type="number" id="cdGapLo" value="2000" min="0" max="4000" step="50" style="width:80px;font-size:13px;text-align:center">';
-  h += '<label style="font-size:11.5px;color:var(--t2);font-weight:600">Gap High:</label>';
+  h += '<label style="font-size:11.5px;color:var(--t2);font-weight:600">'+L('alpha4d.form.gapHigh','Gap High')+':</label>';
   h += '<input type="number" id="cdGapHi" value="2200" min="0" max="4000" step="50" style="width:80px;font-size:13px;text-align:center">';
-  h += '<button class="btn btn-p" style="padding:6px 14px;font-size:12px" onclick="loadCurrentDry()">Refresh</button>';
+  h += '<button class="btn btn-p" style="padding:6px 14px;font-size:12px" onclick="loadCurrentDry()">'+L('common.refresh','Refresh')+'</button>';
   h += '</div></div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Numbers whose current gap (draws since last hit) falls inside your range. Sorted by gap. These are the numbers a "bet long-dry" strategy would play right now. Click any number to drill into its hit history.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('alpha4d.currentDryDesc','Numbers whose current gap (draws since last hit) falls inside your range. Sorted by gap. These are the numbers a "bet long-dry" strategy would play right now. Click any number to drill into its hit history.')+'</p>';
   h += '<div id="currentDry">'+loadingCard()+'</div></div>';
   lazyLoad('currentDry', loadCurrentDry);
 
@@ -2832,9 +2986,9 @@ function renderAlpha4D() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("activity",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">Steady Hitters &mdash; Small Wins Strategy</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('alpha4d.steady','Steady Hitters — Small Wins Strategy')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Numbers with frequent small wins. Theory: regular drips can sustain bets, less reliance on rare big prizes.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('alpha4d.steadyDesc','Numbers with frequent small wins. Theory: regular drips can sustain bets, less reliance on rare big prizes.')+'</p>';
   h += '<div id="steadyHitters">'+loadingCard()+'</div></div>';
   lazyLoad('steadyHitters', loadSteadyHitters);
 
@@ -3619,9 +3773,9 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">';
   h += '<div style="background:#dc262611;color:var(--red);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("flame",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">Top 10 Hot 4D Numbers</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">'+L('fourd.top10Hot','Top 10 Hot 4D Numbers')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Ranked by appearances in <b>any prize position</b> (23 per draw). Archive: <b>'+(dr.from||'—')+'</b> → <b>'+(dr.to||'—')+'</b> · '+s.total_draws.toLocaleString()+' draws.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.top10HotDesc','Ranked by appearances in <b>any prize position</b> (23 per draw). Archive: <b>{from}</b> → <b>{to}</b> · {count} draws.').replace('{from}', dr.from||'—').replace('{to}', dr.to||'—').replace('{count}', s.total_draws.toLocaleString())+'</p>';
   // 5 rows × 2 numbers each grid
   h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
   top10.forEach(function(it,i) {
@@ -3644,9 +3798,9 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">Repeat 1st Prize Winners</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('fourd.repeatWinners','Repeat 1st Prize Winners')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">4D numbers that have won 1st prize more than once across 40 years.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.repeatWinnersDesc','4D numbers that have won 1st prize more than once across 40 years.')+'</p>';
   h += '<div id="repeatWinners">'+loadingCard()+'</div>';
   h += '</div>';
   setTimeout(loadRepeatWinners, 50);
@@ -3655,15 +3809,15 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">$1 4D Simulator</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('fourd.dollarSim','$1 4D Simulator')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">If you\'d bet <b>$1 Big</b> on a number for every 4D draw, what would your profit be? Big-bet payouts: 1st <b>$2,000</b> \u00b7 2nd <b>$1,000</b> \u00b7 3rd <b>$490</b> \u00b7 starter <b>$250</b> \u00b7 consolation <b>$60</b>.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.dollarSimDesc',"If you'd bet <b>$1 Big</b> on a number for every 4D draw, what would your profit be? Big-bet payouts: 1st <b>$2,000</b> \u00b7 2nd <b>$1,000</b> \u00b7 3rd <b>$490</b> \u00b7 starter <b>$250</b> \u00b7 consolation <b>$60</b>.")+'</p>';
   h += '<div id="dollarSim">'+loadingCard()+'</div>';
   h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
-  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">CHECK YOUR OWN NUMBER</div>';
+  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn','CHECK YOUR OWN NUMBER')+'</div>';
   h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
   h += '<input type="text" id="simN" maxlength="4" placeholder="e.g. 1234" style="width:120px;font-family:var(--mo);font-size:18px;text-align:center">';
-  h += '<button class="btn btn-p" onclick="loadDollarSimLookup()">Simulate</button></div>';
+  h += '<button class="btn btn-p" onclick="loadDollarSimLookup()">'+L('fourd.simulate','Simulate')+'</button></div>';
   h += '<div id="simLookupResult" style="margin-top:14px"></div></div>';
   h += '</div>';
   lazyLoad('dollarSim', loadDollarSim);
@@ -3672,15 +3826,15 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">$1 iBet Simulator</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.ibetSim','$1 iBet Simulator')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">$1 iBet Big = bet on a 4-digit <b>set</b>, win if any permutation hits any prize. Payout divided by unique perms.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.ibetSimDesc','$1 iBet Big = bet on a 4-digit <b>set</b>, win if any permutation hits any prize. Payout divided by unique perms.')+'</p>';
   h += '<div id="ibetSim">'+loadingCard()+'</div>';
   h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
-  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">CHECK YOUR OWN 4 DIGITS</div>';
+  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn4digits','CHECK YOUR OWN 4 DIGITS')+'</div>';
   h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
   h += '<input type="text" id="ibetSimN" maxlength="4" placeholder="1234" style="width:140px;font-family:var(--mo);font-size:18px;text-align:center">';
-  h += '<button class="btn btn-p" onclick="loadIbetSimLookup()">Simulate iBet</button></div>';
+  h += '<button class="btn btn-p" onclick="loadIbetSimLookup()">'+L('fourd.simulateIbet','Simulate iBet')+'</button></div>';
   h += '<div id="ibetSimLookupResult" style="margin-top:14px"></div></div>';
   h += '</div>';
   lazyLoad('ibetSim', loadIbetSim);
@@ -3689,9 +3843,9 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">Year-by-Year Winners</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('fourd.yearlyWinners','Year-by-Year Winners')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">The single most-profitable number each year under $1 Big bet \u2014 the number that would have won the most over that year\'s draws.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.yearlyWinnersDesc',"The single most-profitable number each year under $1 Big bet \u2014 the number that would have won the most over that year's draws.")+'</p>';
   h += '<div id="yearlyWinners">'+loadingCard()+'</div></div>';
   lazyLoad('yearlyWinners', loadYearlyWinners);
 
@@ -3699,9 +3853,9 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trend",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">Yearly Regulars &mdash; Consistent Year-Over-Year</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('fourd.yearlyRegulars','Yearly Regulars — Consistent Year-Over-Year')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Numbers that hit in the most distinct years (a 4-hit year then 10-year drought counts the year <b>once</b> — eliminates cluster bias). Focus on high <b>year coverage %</b>, low <b>longest drought</b>, and good <b>recent 5/10y coverage</b>.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.yearlyRegularsDesc','Numbers that hit in the most distinct years (a 4-hit year then 10-year drought counts the year <b>once</b> — eliminates cluster bias). Focus on high <b>year coverage %</b>, low <b>longest drought</b>, and good <b>recent 5/10y coverage</b>.')+'</p>';
   h += '<div id="yearlyRegulars">'+loadingCard()+'</div></div>';
   lazyLoad('yearlyRegulars', loadYearlyRegulars);
 
@@ -3709,9 +3863,9 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">Calendar-Biased Numbers</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.calendarBias','Calendar-Biased Numbers')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Numbers whose historical prize hits cluster in specific months. <b style="color:var(--red)">Honest warning:</b> with 10,000 numbers × 23 windows tested, ~1,400 false positives are expected even by pure chance. Strong (z≥4) results are interesting but not proven edges — past clusters don\'t guarantee future hits. Use as curiosity, not strategy.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.calendarBiasDesc','Numbers whose historical prize hits cluster in specific months. <b style="color:var(--red)">Honest warning:</b> with 10,000 numbers × 23 windows tested, ~1,400 false positives are expected even by pure chance. Strong (z≥4) results are interesting but not proven edges — past clusters don\'t guarantee future hits. Use as curiosity, not strategy.')+'</p>';
   h += '<div id="calendarBias">'+loadingCard()+'</div></div>';
   lazyLoad('calendarBias', loadCalendarBias);
 
@@ -3719,9 +3873,9 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("chart",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">Digit Frequency &mdash; Single, Double, Triple, Quad</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('fourd.digitFreq','Digit Frequency — Single, Double, Triple, Quad')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">How often each digit 0–9 appears across <b>all 23 prize positions per draw</b> over the full archive. Single = raw digit %; Double (XX) = digit appearing as a pair (e.g. 11<b>22</b>); Triple (XXX); Quad (XXXX). Expected ≈ 10% / 4.83% / 0.36% / 0.01% each if random.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.digitFreqDesc','How often each digit 0–9 appears across <b>all 23 prize positions per draw</b> over the full archive. Single = raw digit %; Double (XX) = digit appearing as a pair (e.g. 11<b>22</b>); Triple (XXX); Quad (XXXX). Expected ≈ 10% / 4.83% / 0.36% / 0.01% each if random.')+'</p>';
   h += '<div id="classByYear">'+loadingCard()+'</div></div>';
   lazyLoad('classByYear', loadClassByYear);
 
@@ -3729,12 +3883,12 @@ function render4DStats() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">4D Anniversary Lookup</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('fourd.anniversary','4D Anniversary Lookup')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Pick any date. See every 4D draw on that month-day across all years.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.anniversaryDesc','Pick any date. See every 4D draw on that month-day across all years.')+'</p>';
   h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
   h += '<input type="date" id="anniversaryDate4d" style="flex:1;min-width:200px">';
-  h += '<button class="btn btn-p" onclick="loadAnniversary4d()">Look up</button></div>';
+  h += '<button class="btn btn-p" onclick="loadAnniversary4d()">'+L('common.lookup','Look up')+'</button></div>';
   h += '<div id="anniversaryResult4d" style="margin-top:14px"></div>';
   h += '</div>';
 
@@ -3835,18 +3989,18 @@ function renderHistory() {
   h += '<div id="histResults" style="margin-bottom:28px"></div>';
 
   // ═══ TOTO LOOKUP TOOLS — moved here from Alpha TOTO ═══════════════
-  h += '<h2 style="font-size:18px;font-weight:800;color:var(--t2);margin:32px 0 14px;border-top:2px solid var(--bd);padding-top:24px">More TOTO Lookups</h2>';
+  h += '<h2 style="font-size:18px;font-weight:800;color:var(--t2);margin:32px 0 14px;border-top:2px solid var(--bd);padding-top:24px">'+L('history.moreTotoLookups','More TOTO Lookups')+'</h2>';
 
   // Number Deep Dive
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("search",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">Number Deep Dive</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('toto.numberDeepDive','Number Deep Dive')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Pick any TOTO number (1-49). See first/last appearance, best month, best day-of-week, longest cold streak, and yearly breakdown.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('history.numberDeepDiveDesc','Pick any TOTO number (1-49). See first/last appearance, best month, best day-of-week, longest cold streak, and yearly breakdown.')+'</p>';
   h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="number" id="ndN" min="1" max="49" placeholder="1-49" style="width:90px">';
-  h += '<button class="btn btn-p" onclick="loadNumberDetail()">Look up</button></div>';
+  h += '<input type="number" id="ndN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:90px">';
+  h += '<button class="btn btn-p" onclick="loadNumberDetail()">'+L('common.lookup','Look up')+'</button></div>';
   h += '<div id="ndResult" style="margin-top:14px"></div>';
   h += '</div>';
 
@@ -3854,24 +4008,24 @@ function renderHistory() {
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#dc262611;color:var(--red);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("activity",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">Additional Partners</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">'+L('toto.additionalPartners','Additional Partners')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Pick a TOTO number 1-49. See which main numbers co-appeared when THIS was the additional (the +7th).</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('history.additionalPartnersDesc','Pick a TOTO number 1-49. See which main numbers co-appeared when THIS was the additional (the +7th).')+'</p>';
   h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="number" id="addPartnerN" min="1" max="49" placeholder="1-49" style="width:90px">';
-  h += '<button class="btn btn-p" onclick="loadAddPartners()">Look up</button></div>';
+  h += '<input type="number" id="addPartnerN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:90px">';
+  h += '<button class="btn btn-p" onclick="loadAddPartners()">'+L('common.lookup','Look up')+'</button></div>';
   h += '<div id="addPartnerResult" style="margin-top:14px"></div></div>';
 
   // TOTO Anniversary Lookup
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">TOTO Anniversary Lookup</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('toto.anniversaryLookup','TOTO Anniversary Lookup')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">Pick any date. See every TOTO draw on that month-day across all years.</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('history.totoAnniversaryDesc','Pick any date. See every TOTO draw on that month-day across all years.')+'</p>';
   h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
   h += '<input type="date" id="anniversaryDateToto" style="flex:1;min-width:200px">';
-  h += '<button class="btn btn-p" onclick="loadAnniversaryToto()">Look up</button></div>';
+  h += '<button class="btn btn-p" onclick="loadAnniversaryToto()">'+L('common.lookup','Look up')+'</button></div>';
   h += '<div id="anniversaryResultToto" style="margin-top:14px"></div></div>';
 
   return h;
@@ -3928,7 +4082,7 @@ function renderAiPicksResult(d) {
   html += '<div class="hero" style="margin-bottom:18px;padding:20px 24px"><div style="position:relative">';
   html += '<div style="font-size:10.5px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">'+L('prediction.weekOf','Week of')+'</div>';
   html += '<div style="font-size:18px;font-weight:800">'+fmtDMY(weekStart)+' &nbsp;\u2192&nbsp; '+fmtDMY(weekEnd)+'</div>';
-  html += '<div style="font-size:11.5px;opacity:.85;margin-top:6px">New picks every Monday. These hold until Sunday 23:59.</div>';
+  html += '<div style="font-size:11.5px;opacity:.85;margin-top:6px">'+L('prediction.weeklyNote','New picks every Monday. These hold until Sunday 23:59.')+'</div>';
   html += '</div></div>';
 
   // TOTO picks
@@ -3937,7 +4091,7 @@ function renderAiPicksResult(d) {
     html += '<div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("trophy",14)+'</div><div><h3>'+L('prediction.totoHeading','TOTO \u2014 3 sets')+'</h3></div></div>';
     d.toto.forEach(function(p, i) {
       html += '<div style="display:flex;align-items:center;gap:14px;padding:12px 4px;'+(i<d.toto.length-1?'border-bottom:1px solid var(--bl)':'')+'">';
-      html += '<span style="font-size:10px;font-weight:800;color:var(--t3);width:46px;letter-spacing:.08em">SET '+(i+1)+'</span>';
+      html += '<span style="font-size:10px;font-weight:800;color:var(--t3);min-width:46px;letter-spacing:.08em">'+setLabel(i)+'</span>';
       html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
       p.numbers.forEach(function(n, j) {
         html += '<div class="ball" style="width:42px;height:42px;font-size:16px;background:linear-gradient(145deg,#3730a3,#4f46e5);animation-delay:'+(i*400+j*70)+'ms;box-shadow:0 4px 10px rgba(55,48,163,.25),inset 0 1px 2px rgba(255,255,255,.35)">'+n+'</div>';
@@ -3958,7 +4112,7 @@ function renderAiPicksResult(d) {
       num.split('').forEach(function(dg, di) {
         html += '<div class="ball" style="width:46px;height:46px;font-size:19px;background:linear-gradient(145deg,#d97706,#b45309);animation-delay:'+(i*240+di*80)+'ms;box-shadow:0 4px 10px rgba(217,119,6,.25),inset 0 1px 2px rgba(255,255,255,.35)">'+dg+'</div>';
       });
-      html += '</div><div style="margin-top:10px;font-size:10px;color:var(--t3);font-weight:800;letter-spacing:.08em">PICK '+(i+1)+'</div></div>';
+      html += '</div><div style="margin-top:10px;font-size:10px;color:var(--t3);font-weight:800;letter-spacing:.08em">'+pickLabel(i)+'</div></div>';
     });
     html += '</div></div>';
   }
@@ -4123,7 +4277,7 @@ function renderLuckyResult(d) {
     String(num).split('').forEach(function(dg, di) {
       html += '<div class="ball" style="width:46px;height:46px;font-size:19px;background:linear-gradient(145deg,#d97706,#b45309);animation-delay:'+(i*240+di*80)+'ms;box-shadow:0 4px 10px rgba(217,119,6,.25),inset 0 1px 2px rgba(255,255,255,.35)">'+dg+'</div>';
     });
-    html += '</div><div style="margin-top:10px;font-size:10px;color:var(--t3);font-weight:800;letter-spacing:.08em">SET '+(i+1)+'</div></div>';
+    html += '</div><div style="margin-top:10px;font-size:10px;color:var(--t3);font-weight:800;letter-spacing:.08em">'+setLabel(i)+'</div></div>';
   });
   html += '</div></div>';
 
@@ -4132,7 +4286,7 @@ function renderLuckyResult(d) {
   html += '<div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("trophy",14)+'</div><div><h3>'+L('lucky.totoHeading','TOTO — 2 sets (6 main numbers)')+'</h3><small>'+L('lucky.totoSubheading',"For this week's TOTO draws (Mon / Thu)")+'</small></div></div>';
   d.picks.toto.forEach(function(set, i) {
     html += '<div style="display:flex;align-items:center;gap:14px;padding:12px 4px;'+(i===0?'border-bottom:1px solid var(--bl)':'')+'">';
-    html += '<span style="font-size:10px;font-weight:800;color:var(--t3);width:46px;letter-spacing:.08em">SET '+(i+1)+'</span>';
+    html += '<span style="font-size:10px;font-weight:800;color:var(--t3);min-width:46px;letter-spacing:.08em">'+setLabel(i)+'</span>';
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
     set.forEach(function(n, j) {
       html += '<div class="ball" style="width:42px;height:42px;font-size:16px;background:linear-gradient(145deg,#3730a3,#4f46e5);animation-delay:'+(i*400+j*70)+'ms;box-shadow:0 4px 10px rgba(55,48,163,.25),inset 0 1px 2px rgba(255,255,255,.35)">'+n+'</div>';
