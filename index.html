@@ -1201,7 +1201,7 @@ function loadDollarSim() {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
-    html += 'Simulated over <b>'+d.total_draws_scanned.toLocaleString()+' draws</b> — cost = $'+d.total_draws_scanned.toLocaleString()+' for $1/draw';
+    html += L('fourd.simulatedOverDraws','Simulated over <b>{draws} draws</b> — cost = ${draws} for $1/draw').replace(/\{draws\}/g, d.total_draws_scanned.toLocaleString());
     html += '</div>';
     function renderRow(x, color) {
       var hits = x.first + x.second + x.third + x.starter + x.consol;
@@ -1210,15 +1210,15 @@ function loadDollarSim() {
         '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:70px">'+x.number+'</span>'+
         '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:'+profitCol+';min-width:90px">'+(x.profit>=0?'+$':'-$')+Math.abs(x.profit).toLocaleString()+'</span>'+
         '<span style="font-size:12px;color:var(--t3);min-width:60px">'+x.roi_pct+'% ROI</span>'+
-        '<span style="font-size:12px;color:var(--t2);font-family:var(--mo)">1st:'+x.first+' · 2nd:'+x.second+' · 3rd:'+x.third+' · S:'+x.starter+' · C:'+x.consol+'</span>'+
-        '<span style="margin-left:auto;font-size:11.5px;color:var(--t3)">'+hits+' total hits</span>'+
+        '<span style="font-size:12px;color:var(--t2);font-family:var(--mo)">'+L('fourd.firstAbbr','1st')+':'+x.first+' · '+L('fourd.secondAbbr','2nd')+':'+x.second+' · '+L('fourd.thirdAbbr','3rd')+':'+x.third+' · S:'+x.starter+' · C:'+x.consol+'</span>'+
+        '<span style="margin-left:auto;font-size:11.5px;color:var(--t3)">'+hits+' '+L('fourd.totalHits','total hits')+'</span>'+
         '</div>';
     }
-    html += '<div style="font-size:12.5px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Top 5 Most Profitable</div>';
+    html += '<div style="font-size:12.5px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('fourd.top5MostProfitable','Top 5 Most Profitable')+'</div>';
     d.most_profitable.slice(0, 5).forEach(function(x){ html += renderRow(x); });
-    html += '<div style="font-size:12.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 10px">Top 5 Worst (most lost)</div>';
+    html += '<div style="font-size:12.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 10px">'+L('fourd.topWorst','TOP 5 WORST (MOST LOST)')+'</div>';
     d.least_profitable.slice(0, 5).forEach(function(x){ html += renderRow(x); });
-    html += '<div style="margin-top:14px;font-size:12px;color:var(--t3);font-style:italic">Past results — not a prediction. Future draws are independent, the same number won\'t necessarily keep winning.</div>';
+    html += '<div style="margin-top:14px;font-size:12px;color:var(--t3);font-style:italic">'+L('fourd.pastResultsDisclaimer',"Past results — not a prediction. Future draws are independent, the same number won't necessarily keep winning.")+'</div>';
     el.innerHTML = html;
   });
 }
@@ -1784,11 +1784,11 @@ function loadYearlyRegulars() {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var TIER = {
-      first:   { col: '#059669', label: '1st' },
-      second:  { col: '#ea580c', label: '2nd' },
-      third:   { col: '#2563eb', label: '3rd' },
-      starter: { col: '#4b5563', label: 'Start' },
-      consol:  { col: '#0f172a', label: 'Cons' },
+      first:   { col: '#059669', label: L('fourd.firstAbbr','1st') },
+      second:  { col: '#ea580c', label: L('fourd.secondAbbr','2nd') },
+      third:   { col: '#2563eb', label: L('fourd.thirdAbbr','3rd') },
+      starter: { col: '#4b5563', label: L('fourd.startAbbr','Start') },
+      consol:  { col: '#0f172a', label: L('fourd.consAbbr','Cons') },
     };
     function renderRow(x, rank, isIbet) {
       var profitCol = x.lifetime_profit >= 0 ? 'var(--em)' : 'var(--red)';
@@ -1801,19 +1801,19 @@ function loadYearlyRegulars() {
       html += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px">';
       html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--p);min-width:28px">#'+rank+'</span>';
       html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:90px">'+label+'</span>';
-      if (isIbet) html += '<span style="font-size:11px;color:var(--t3)">'+x.perms_count+' perms</span>';
-      html += '<span style="font-family:var(--mo);font-size:15px;font-weight:800;color:'+covCol+'">'+x.years_hit+'/'+d.total_years+' yrs ('+x.year_coverage_pct+'%)</span>';
+      if (isIbet) html += '<span style="font-size:11px;color:var(--t3)">'+x.perms_count+' '+L('fourd.perms','perms')+'</span>';
+      html += '<span style="font-family:var(--mo);font-size:15px;font-weight:800;color:'+covCol+'">'+x.years_hit+'/'+d.total_years+' '+L('fourd.yrsLabel','yrs')+' ('+x.year_coverage_pct+'%)</span>';
       html += '<span style="margin-left:auto;font-family:var(--mo);font-size:15px;font-weight:800;color:'+profitCol+'">'+(x.lifetime_profit>=0?'+$':'-$')+Math.abs(x.lifetime_profit).toLocaleString()+'</span>';
       html += '</div>';
       // Stats row
       html += '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">';
-      html += '<span style="color:var(--t3)">longest streak <b style="font-family:var(--mo);color:#059669;font-size:14px">'+x.longest_streak+'y</b></span>';
-      html += '<span style="color:var(--t3)">longest drought <b style="font-family:var(--mo);color:'+droughtCol+';font-size:14px">'+x.longest_drought+'y</b></span>';
-      html += '<span style="color:var(--t3)">avg gap <b style="font-family:var(--mo);color:var(--t2);font-size:14px">'+x.avg_year_gap+'y</b></span>';
-      html += '<span style="color:var(--t3)">recent 5y <b style="font-family:var(--mo);color:'+recentCol+';font-size:14px">'+x.recent_5y_coverage+'/5</b></span>';
-      html += '<span style="color:var(--t3)">recent 10y <b style="font-family:var(--mo);color:var(--em);font-size:14px">'+x.recent_10y_coverage+'/10</b></span>';
-      html += '<span style="color:var(--t3)">since last <b style="font-family:var(--mo);color:'+(x.years_since_last_hit<=1?'#059669':x.years_since_last_hit<=3?'#d97706':'#dc2626')+';font-size:14px">'+x.years_since_last_hit+'y</b></span>';
-      html += '<span style="margin-left:auto;color:var(--t3)">'+x.total_hits+' total hits</span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.longestStreak','longest streak')+' <b style="font-family:var(--mo);color:#059669;font-size:14px">'+x.longest_streak+'y</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.longestDrought','longest drought')+' <b style="font-family:var(--mo);color:'+droughtCol+';font-size:14px">'+x.longest_drought+'y</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.avgGap','avg gap')+' <b style="font-family:var(--mo);color:var(--t2);font-size:14px">'+x.avg_year_gap+'y</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.recent5y','recent 5y')+' <b style="font-family:var(--mo);color:'+recentCol+';font-size:14px">'+x.recent_5y_coverage+'/5</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.recent10y','recent 10y')+' <b style="font-family:var(--mo);color:var(--em);font-size:14px">'+x.recent_10y_coverage+'/10</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.sinceLast','since last')+' <b style="font-family:var(--mo);color:'+(x.years_since_last_hit<=1?'#059669':x.years_since_last_hit<=3?'#d97706':'#dc2626')+';font-size:14px">'+x.years_since_last_hit+'y</b></span>';
+      html += '<span style="margin-left:auto;color:var(--t3)">'+x.total_hits+' '+L('fourd.totalHits','total hits')+'</span>';
       html += '</div>';
       // Tier chips — shown for BOTH direct 4D and iBet
       html += '<div style="display:flex;gap:8px;flex-wrap:wrap;font-family:var(--mo);font-size:13px;font-weight:700;margin-bottom:6px">';
@@ -1854,13 +1854,15 @@ function loadYearlyRegulars() {
     }
     var html = '';
     html += '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
-    html += 'Across <b>'+d.total_years+' years</b> ('+d.year_range.from+'–'+d.year_range.to+'): <b>'+d.direct_4d.total_candidates.toLocaleString()+'</b> direct-4D candidates with ≥10 hits; <b>'+d.ibet.total_candidates.toLocaleString()+'</b> iBet sets with ≥20 hits.';
+    html += L('fourd.acrossYears','Across <b>{yrs} years ({from}-{to})</b>: <b>{direct}</b> direct-4D candidates with ≥10 hits; <b>{ibet}</b> iBet sets with ≥20 hits.')
+            .replace('{yrs}', d.total_years).replace('{from}', d.year_range.from).replace('{to}', d.year_range.to)
+            .replace('{direct}', d.direct_4d.total_candidates.toLocaleString()).replace('{ibet}', d.ibet.total_candidates.toLocaleString());
     html += '</div>';
     // Direct 4D section
-    html += '<div style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Direct 4D — best year-over-year regulars</div>';
+    html += '<div style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('fourd.directBestRegulars','Direct 4D — best year-over-year regulars')+'</div>';
     d.direct_4d.most_consistent.forEach(function(x, i) { html += renderRow(x, i+1, false); });
     // iBet section
-    html += '<div style="font-size:13px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px">iBet sets — most consistent across years</div>';
+    html += '<div style="font-size:13px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px">'+L('fourd.ibetBestRegulars','iBet — best year-over-year regulars')+'</div>';
     html += '<div style="font-size:12px;color:var(--t3);margin-bottom:10px;font-style:italic">All top iBet sets hit nearly every year, but profit is usually negative due to perm-division. Use this list to see <b>which digit-sets to avoid for iBet</b>.</div>';
     d.ibet.most_consistent.forEach(function(x, i) { html += renderRow(x, i+1, true); });
     el.innerHTML = html;
@@ -1873,11 +1875,11 @@ function loadSteadyHitters() {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var TIER = {
-      first:   { col: '#059669', label: '1st' },
-      second:  { col: '#ea580c', label: '2nd' },
-      third:   { col: '#2563eb', label: '3rd' },
-      starter: { col: '#4b5563', label: 'Start' },
-      consol:  { col: '#0f172a', label: 'Cons' },
+      first:   { col: '#059669', label: L('fourd.firstAbbr','1st') },
+      second:  { col: '#ea580c', label: L('fourd.secondAbbr','2nd') },
+      third:   { col: '#2563eb', label: L('fourd.thirdAbbr','3rd') },
+      starter: { col: '#4b5563', label: L('fourd.startAbbr','Start') },
+      consol:  { col: '#0f172a', label: L('fourd.consAbbr','Cons') },
     };
     function row(x, rank) {
       var profitCol = x.lifetime_profit >= 0 ? 'var(--em)' : 'var(--red)';
@@ -1887,19 +1889,19 @@ function loadSteadyHitters() {
       html += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px">';
       html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--em);min-width:28px">#'+rank+'</span>';
       html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:80px">'+x.number+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--t2)">'+x.total_hits+' hits ('+x.hits_per_year+'/yr)</span>';
-      html += '<span style="font-family:var(--mo);font-size:13px;color:var(--t3)">small='+x.small_hits_pct+'%</span>';
+      html += '<span style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--t2)">'+x.total_hits+' '+L('common.draws','hits').replace('draws','hits')+' ('+x.hits_per_year+'/yr)</span>';
+      html += '<span style="font-family:var(--mo);font-size:13px;color:var(--t3)">'+L('fourd.smallOnly','small-only')+'='+x.small_hits_pct+'%</span>';
       html += '<span style="margin-left:auto;font-family:var(--mo);font-size:15px;font-weight:800;color:'+profitCol+'">'+(x.lifetime_profit>=0?'+$':'-$')+Math.abs(x.lifetime_profit).toLocaleString()+'</span>';
       html += '</div>';
       // Gap stats row
       html += '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">';
-      html += '<span style="color:var(--t3)">median gap <b style="font-family:var(--mo);color:var(--em);font-size:14px">'+x.median_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">shortest <b style="font-family:var(--mo);color:var(--t2)">'+x.min_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">longest dry <b style="font-family:var(--mo);color:var(--red)">'+x.longest_gap+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.medianGap','median gap')+' <b style="font-family:var(--mo);color:var(--em);font-size:14px">'+x.median_gap+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.shortest','shortest')+' <b style="font-family:var(--mo);color:var(--t2)">'+x.min_gap+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.longestDry','longest dry')+' <b style="font-family:var(--mo);color:var(--red)">'+x.longest_gap+'</b></span>';
       var curCol = x.current_gap > x.median_gap * 2 ? 'var(--red)' : (x.current_gap > x.median_gap ? 'var(--amb)' : 'var(--em)');
-      html += '<span style="color:var(--t3)">current <b style="font-family:var(--mo);color:'+curCol+'">'+x.current_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">last hit <b style="font-family:var(--mo);color:var(--p)">'+x.last_hit_date+'</b> ('+(TIER[x.last_hit_tier]||{}).label+')</span>';
-      html += '<span style="margin-left:auto;color:var(--t3);font-size:11.5px">small-only profit <b style="color:'+smallCol+';font-family:var(--mo);font-size:13px">'+(x.profit_from_small_only>=0?'+$':'-$')+Math.abs(x.profit_from_small_only).toLocaleString()+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.current','current')+' <b style="font-family:var(--mo);color:'+curCol+'">'+x.current_gap+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.lastHit','last hit')+' <b style="font-family:var(--mo);color:var(--p)">'+x.last_hit_date+'</b> ('+(TIER[x.last_hit_tier]||{}).label+')</span>';
+      html += '<span style="margin-left:auto;color:var(--t3);font-size:11.5px">'+L('fourd.smallOnlyProfit','small-only profit')+' <b style="color:'+smallCol+';font-family:var(--mo);font-size:13px">'+(x.profit_from_small_only>=0?'+$':'-$')+Math.abs(x.profit_from_small_only).toLocaleString()+'</b></span>';
       html += '</div>';
       // Tier color chips
       html += '<div style="display:flex;gap:8px;flex-wrap:wrap;font-family:var(--mo);font-size:13px;font-weight:700;margin-bottom:6px">';
@@ -1912,9 +1914,10 @@ function loadSteadyHitters() {
       html += '</div>';
       // Gap distribution mini-bar — labels in DRAWS plus human time hint
       var maxBucket = Math.max(x.gap_buckets['<=50'], x.gap_buckets['51-150'], x.gap_buckets['151-300'], x.gap_buckets['301-700'], x.gap_buckets['700+']);
-      html += '<div style="margin-top:8px"><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Gap distribution (count of gaps in each draw-range)</div>';
+      var DRAWS_SUFFIX = L('fourd.drawsBucket','draws');
+      html += '<div style="margin-top:8px"><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">'+L('fourd.gapDistribution','Gap distribution (count of gaps in each draw-range)')+'</div>';
       html += '<div style="display:flex;align-items:flex-end;gap:4px;height:46px">';
-      [['≤50 draws','~≤4mo',x.gap_buckets['<=50'],'#059669'],
+      [['≤50 '+DRAWS_SUFFIX,'~≤4mo',x.gap_buckets['<=50'],'#059669'],
        ['51-150','4mo–1y',x.gap_buckets['51-150'],'#16a34a'],
        ['151-300','1–2y',x.gap_buckets['151-300'],'#ea580c'],
        ['301-700','2–4y',x.gap_buckets['301-700'],'#dc2626'],
@@ -1940,18 +1943,18 @@ function loadSteadyHitters() {
       html += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px">';
       html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--vi);min-width:28px">#'+rank+'</span>';
       html += '<span style="font-family:var(--mo);font-size:20px;font-weight:800;color:var(--tx);min-width:110px">'+label+'</span>';
-      html += '<span style="font-size:11px;color:var(--t3);background:var(--cd);padding:2px 7px;border-radius:10px">'+x.perms_count+' perms</span>';
+      html += '<span style="font-size:11px;color:var(--t3);background:var(--cd);padding:2px 7px;border-radius:10px">'+x.perms_count+' '+L('fourd.perms','perms')+'</span>';
       html += '<span style="font-family:var(--mo);font-size:12.5px;color:var(--t3)">e.g. '+x.example_perms.join(' · ')+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--t2)">'+x.total_hits+' hits ('+x.hits_per_year+'/yr)</span>';
+      html += '<span style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--t2)">'+x.total_hits+' '+L('common.draws','hits').replace('draws','hits')+' ('+x.hits_per_year+'/yr)</span>';
       html += '<span style="margin-left:auto;font-family:var(--mo);font-size:15px;font-weight:800;color:'+profitCol+'">'+(x.lifetime_profit>=0?'+$':'-$')+Math.abs(x.lifetime_profit).toLocaleString()+'</span>';
       html += '</div>';
       html += '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">';
-      html += '<span style="color:var(--t3)">median gap <b style="font-family:var(--mo);color:var(--vi);font-size:14px">'+x.median_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">longest dry <b style="font-family:var(--mo);color:var(--red)">'+x.longest_gap+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.medianGap','median gap')+' <b style="font-family:var(--mo);color:var(--vi);font-size:14px">'+x.median_gap+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.longestDry','longest dry')+' <b style="font-family:var(--mo);color:var(--red)">'+x.longest_gap+'</b></span>';
       var curCol = x.current_gap > x.median_gap * 2 ? 'var(--red)' : (x.current_gap > x.median_gap ? 'var(--amb)' : 'var(--em)');
-      html += '<span style="color:var(--t3)">current <b style="font-family:var(--mo);color:'+curCol+'">'+x.current_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">last hit <b style="font-family:var(--mo);color:var(--p)">'+x.last_hit_date+'</b> ('+(TIER[x.last_hit_tier]||{}).label+')</span>';
-      html += '<span style="margin-left:auto;color:var(--t3);font-size:11.5px">small-only iBet profit <b style="color:'+smallCol+';font-family:var(--mo);font-size:13px">'+(x.profit_from_small_only>=0?'+$':'-$')+Math.abs(x.profit_from_small_only).toLocaleString()+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.current','current')+' <b style="font-family:var(--mo);color:'+curCol+'">'+x.current_gap+'</b></span>';
+      html += '<span style="color:var(--t3)">'+L('fourd.lastHit','last hit')+' <b style="font-family:var(--mo);color:var(--p)">'+x.last_hit_date+'</b> ('+(TIER[x.last_hit_tier]||{}).label+')</span>';
+      html += '<span style="margin-left:auto;color:var(--t3);font-size:11.5px">'+L('fourd.smallOnlyProfit','small-only profit')+' <b style="color:'+smallCol+';font-family:var(--mo);font-size:13px">'+(x.profit_from_small_only>=0?'+$':'-$')+Math.abs(x.profit_from_small_only).toLocaleString()+'</b></span>';
       html += '</div>';
       // Tier chips
       html += '<div style="display:flex;gap:8px;flex-wrap:wrap;font-family:var(--mo);font-size:13px;font-weight:700;margin-bottom:6px">';
@@ -1964,9 +1967,10 @@ function loadSteadyHitters() {
       html += '</div>';
       // Gap distribution histogram (same as direct 4D row)
       var maxBucket = Math.max(x.gap_buckets['<=50'], x.gap_buckets['51-150'], x.gap_buckets['151-300'], x.gap_buckets['301-700'], x.gap_buckets['700+']);
-      html += '<div style="margin-top:8px"><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Gap distribution (count of gaps in each draw-range)</div>';
+      var DRAWS_SUFFIX = L('fourd.drawsBucket','draws');
+      html += '<div style="margin-top:8px"><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">'+L('fourd.gapDistribution','Gap distribution (count of gaps in each draw-range)')+'</div>';
       html += '<div style="display:flex;align-items:flex-end;gap:4px;height:46px">';
-      [['≤50 draws','~≤4mo',x.gap_buckets['<=50'],'#059669'],
+      [['≤50 '+DRAWS_SUFFIX,'~≤4mo',x.gap_buckets['<=50'],'#059669'],
        ['51-150','4mo–1y',x.gap_buckets['51-150'],'#16a34a'],
        ['151-300','1–2y',x.gap_buckets['151-300'],'#ea580c'],
        ['301-700','2–4y',x.gap_buckets['301-700'],'#dc2626'],
@@ -1989,16 +1993,16 @@ function loadSteadyHitters() {
     html += '</div>';
     // Compact legend
     html += '<div style="padding:10px 14px;background:rgba(55,48,163,.06);border-left:3px solid var(--p);border-radius:6px;margin-bottom:14px;font-size:12px;line-height:1.6;color:var(--t2)">';
-    html += '<div><b>Gap</b> = draws between hits (~156 draws/yr). <b>Median gap</b> = 50th-percentile. <b>Current gap</b>: green ok, amber overdue, red 2× median.</div>';
-    html += '<div><b>Small-only profit</b> = profit counting only starter+consol. <b>iBet</b> divides payouts by # unique permutations (4 distinct digits = 24 perms; doubles = 12 perms etc.).</div>';
+    html += '<div>'+L('fourd.gapsExplainer','<b>Gap</b> = draws between hits (~156 draws/yr). <b>Median gap</b> = 50th-percentile. <b>Current gap</b>: green ok, amber overdue, red 2× median.')+'</div>';
+    html += '<div>'+L('fourd.smallOnlyExplain','<b>Small-only profit</b> = profit counting only starter+consol. <b>iBet</b> divides payouts by # unique permutations (4 distinct digits = 24 perms; doubles = 12 perms etc.).')+'</div>';
     html += '</div>';
     // === DIRECT 4D — top 5 each ===
-    html += '<div style="font-size:13px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Direct 4D · Steadiest hitters — top 5 by lowest median gap</div>';
+    html += '<div style="font-size:13px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('fourd.steadyTopByMedianGap','Direct 4D · Steadiest hitters — top 5 by lowest median gap')+'</div>';
     d.steadiest.forEach(function(x, i) { html += row(x, i+1); });
     html += '<div style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px">Direct 4D · Most lifetime-profitable — top 5</div>';
     d.most_profitable.forEach(function(x, i) { html += row(x, i+1); });
     // === iBet — top 5 each ===
-    html += '<div style="font-size:13px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:24px 0 10px">iBet sets · Steadiest hitters — top 5 by lowest median gap</div>';
+    html += '<div style="font-size:13px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:24px 0 10px">'+L('fourd.steadyIbetByMedianGap','iBet · Steadiest hitters — top 5 by lowest median gap')+'</div>';
     if (d.ibet_steadiest && d.ibet_steadiest.length > 0) {
       d.ibet_steadiest.forEach(function(x, i) { html += ibetRow(x, i+1); });
     } else {
@@ -2020,10 +2024,14 @@ function loadCalendarBias() {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
-    html += '<b>'+d.total_candidates.toLocaleString()+'</b> numbers cleared z≥2. Sim assumes <b>$1 Big bet ONLY during cluster months</b> (you skip the rest of the year). Watch the "lucky-strike" warning — one $2,000 first prize covers 2,000 bets; if remove-biggest-hit profit turns negative, the apparent edge is a one-off, not a recurring pattern.';
+    html += L('fourd.calBiasIntro','<b>{count}</b> numbers cleared z≥2. Sim assumes <b>$1 Big bet ONLY during cluster months</b> (you skip the rest of the year). Watch the "lucky-strike" warning — one $2,000 first prize covers 2,000 bets; if remove-biggest-hit profit turns negative, the apparent edge is a one-off, not a recurring pattern.').replace('{count}', d.total_candidates.toLocaleString());
     html += '</div>';
-    var months = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var TIER_LABEL = { first:'1st', second:'2nd', third:'3rd', starter:'Starter', consol:'Consolation' };
+    var months = ['',
+      L('common.month.jan','Jan'),L('common.month.feb','Feb'),L('common.month.mar','Mar'),L('common.month.apr','Apr'),
+      L('common.month.may','May'),L('common.month.jun','Jun'),L('common.month.jul','Jul'),L('common.month.aug','Aug'),
+      L('common.month.sep','Sep'),L('common.month.oct','Oct'),L('common.month.nov','Nov'),L('common.month.dec','Dec')];
+    var monthsEN = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var TIER_LABEL = { first:L('fourd.firstAbbr','1st'), second:L('fourd.secondAbbr','2nd'), third:L('fourd.thirdAbbr','3rd'), starter:L('fourd.startAbbr','Start'), consol:L('fourd.consAbbr','Cons') };
     d.top.forEach(function(x, i) {
       var bigCol = x.big_profit_only_window >= 0 ? 'var(--em)' : 'var(--red)';
       var withoutBigCol = x.big_profit_without_biggest_hit >= 0 ? 'var(--em)' : 'var(--red)';
@@ -2039,10 +2047,12 @@ function loadCalendarBias() {
       html += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px">';
       html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--vi);min-width:28px">#'+(i+1)+'</span>';
       html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:80px">'+x.number+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--vi)">→ '+x.best_months.join('+')+'</span>';
-      html += '<span style="font-size:12px;color:var(--t2)"><b>'+x.hits_in_window+'</b>/'+x.total_hits+' hits ('+pctInCluster+'%) here</span>';
+      // Translate month names in best_months (backend returns English abbrevs)
+      var bestMonthsLocal = x.best_months.map(function(m){ var i = monthsEN.indexOf(m); return i>0 ? months[i] : m; });
+      html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--vi)">→ '+bestMonthsLocal.join('+')+'</span>';
+      html += '<span style="font-size:12px;color:var(--t2)">'+L('fourd.calBiasHitsHere','<b>{hits}</b>/{tot} hits ({pct}%) here').replace('{hits}', x.hits_in_window).replace('{tot}', x.total_hits).replace('{pct}', pctInCluster)+'</span>';
       if (x.last_cluster_hit) {
-        html += '<span style="font-size:11.5px;color:var(--t3)">last cluster hit: <b style="font-family:var(--mo);color:var(--p)">'+x.last_cluster_hit.date+'</b> ('+TIER_LABEL[x.last_cluster_hit.tier]+')</span>';
+        html += '<span style="font-size:11.5px;color:var(--t3)">'+L('fourd.calBiasLastHit','last cluster hit:')+' <b style="font-family:var(--mo);color:var(--p)">'+x.last_cluster_hit.date+'</b> ('+TIER_LABEL[x.last_cluster_hit.tier]+')</span>';
       }
       html += '<span style="margin-left:auto;font-family:var(--mo);font-size:13px;font-weight:800;color:'+zCol+'">z='+x.z_score+'</span>';
       html += '</div>';
@@ -2056,11 +2066,11 @@ function loadCalendarBias() {
 
       // Profit row — Big, Big without biggest hit, iBet
       html += '<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;margin-bottom:10px">';
-      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+bigCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">Big · cluster only</div><b style="color:'+bigCol+';font-family:var(--mo);font-size:15px">'+(x.big_profit_only_window>=0?'+$':'-$')+Math.abs(x.big_profit_only_window).toLocaleString()+'</b></div>';
-      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+withoutBigCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">Big · remove biggest hit</div><b style="color:'+withoutBigCol+';font-family:var(--mo);font-size:15px">'+(x.big_profit_without_biggest_hit>=0?'+$':'-$')+Math.abs(x.big_profit_without_biggest_hit).toLocaleString()+'</b></div>';
-      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+ibetCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">iBet ('+x.ibet_perms+' perms)</div><b style="color:'+ibetCol+';font-family:var(--mo);font-size:15px">'+(x.ibet_profit_only_window>=0?'+$':'-$')+Math.abs(x.ibet_profit_only_window).toLocaleString()+'</b></div>';
-      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;align-self:center"><span style="color:var(--t3);font-weight:600;font-size:11.5px">Recent cluster (last 10y):</span> <b style="font-family:var(--mo);color:'+(x.cluster_hits_recent_10y>0?'var(--em)':'var(--red)')+';font-size:13px">'+x.cluster_hits_recent_10y+'</b></div>';
-      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;align-self:center"><span style="color:var(--t3);font-weight:600;font-size:11.5px">Outside cluster:</span> <b style="font-family:var(--mo);color:var(--t2);font-size:13px">'+x.hits_outside+'/'+x.draws_outside.toLocaleString()+' draws</b></div>';
+      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+bigCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasBigCluster','BIG · CLUSTER ONLY')+'</div><b style="color:'+bigCol+';font-family:var(--mo);font-size:15px">'+(x.big_profit_only_window>=0?'+$':'-$')+Math.abs(x.big_profit_only_window).toLocaleString()+'</b></div>';
+      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+withoutBigCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasBigRemove','BIG · REMOVE BIGGEST HIT')+'</div><b style="color:'+withoutBigCol+';font-family:var(--mo);font-size:15px">'+(x.big_profit_without_biggest_hit>=0?'+$':'-$')+Math.abs(x.big_profit_without_biggest_hit).toLocaleString()+'</b></div>';
+      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+ibetCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasIbet','IBET ({n} PERMS)').replace('{n}', x.ibet_perms)+'</div><b style="color:'+ibetCol+';font-family:var(--mo);font-size:15px">'+(x.ibet_profit_only_window>=0?'+$':'-$')+Math.abs(x.ibet_profit_only_window).toLocaleString()+'</b></div>';
+      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;align-self:center"><span style="color:var(--t3);font-weight:600;font-size:11.5px">'+L('fourd.calBiasRecent10y','Recent cluster (last 10y):')+'</span> <b style="font-family:var(--mo);color:'+(x.cluster_hits_recent_10y>0?'var(--em)':'var(--red)')+';font-size:13px">'+x.cluster_hits_recent_10y+'</b></div>';
+      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;align-self:center"><span style="color:var(--t3);font-weight:600;font-size:11.5px">'+L('fourd.calBiasOutside','Outside cluster:')+'</span> <b style="font-family:var(--mo);color:var(--t2);font-size:13px">'+x.hits_outside+'/'+x.draws_outside.toLocaleString()+' '+L('fourd.calBiasDraws','draws')+'</b></div>';
       html += '</div>';
 
       // 12-month grid
@@ -2072,7 +2082,7 @@ function loadCalendarBias() {
         var col = inCluster ? 'var(--vi)' : (hits === 0 ? 'var(--t3)' : 'var(--t2)');
         var w = inCluster ? 800 : 600;
         html += '<div style="padding:5px;background:'+bg+';border-radius:4px;text-align:center">';
-        html += '<div style="font-size:9.5px;color:var(--t3);text-transform:uppercase">'+months[m+1].slice(0,3)+'</div>';
+        html += '<div style="font-size:9.5px;color:var(--t3);text-transform:uppercase">'+months[m+1]+'</div>';
         html += '<div style="font-size:14px;font-weight:'+w+';color:'+col+'">'+hits+'</div>';
         html += '</div>';
       }
@@ -2088,7 +2098,7 @@ function loadIbetSim() {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
-    html += 'Simulated over <b>'+d.total_draws_scanned.toLocaleString()+' draws</b> · <b>'+d.total_unique_sets.toLocaleString()+' iBet sets</b> ranked.';
+    html += L('fourd.simulatedOver','Simulated over <b>{draws} draws</b> · <b>{sets} iBet sets</b> ranked.').replace('{draws}', d.total_draws_scanned.toLocaleString()).replace('{sets}', d.total_unique_sets.toLocaleString());
     html += '</div>';
     // Match the $1 4D Simulator layout — single line per row
     function renderRow(x) {
@@ -2096,16 +2106,16 @@ function loadIbetSim() {
       var profitCol = x.profit >= 0 ? 'var(--em)' : 'var(--red)';
       return '<div style="display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--bg);border-left:3px solid '+profitCol+';border-radius:6px;margin-bottom:6px;flex-wrap:wrap">'+
         '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:70px">'+x.number+'</span>'+
-        '<span style="font-size:11px;color:var(--t3);background:var(--cd);padding:2px 7px;border-radius:10px">'+x.unique_perms+' perms</span>'+
+        '<span style="font-size:11px;color:var(--t3);background:var(--cd);padding:2px 7px;border-radius:10px">'+x.unique_perms+' '+L('fourd.perms','perms')+'</span>'+
         '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:'+profitCol+';min-width:90px">'+(x.profit>=0?'+$':'-$')+Math.abs(x.profit).toLocaleString()+'</span>'+
         '<span style="font-size:12px;color:var(--t3);min-width:60px">'+x.roi_pct+'% ROI</span>'+
-        '<span style="font-size:12px;color:var(--t2);font-family:var(--mo)">1st:'+x.first+' · 2nd:'+x.second+' · 3rd:'+x.third+' · S:'+x.starter+' · C:'+x.consol+'</span>'+
-        '<span style="margin-left:auto;font-size:11.5px;color:var(--t3)">'+hits+' perm hits · rev $'+(x.revenue||0).toLocaleString()+'</span>'+
+        '<span style="font-size:12px;color:var(--t2);font-family:var(--mo)">'+L('fourd.firstAbbr','1st')+':'+x.first+' · '+L('fourd.secondAbbr','2nd')+':'+x.second+' · '+L('fourd.thirdAbbr','3rd')+':'+x.third+' · S:'+x.starter+' · C:'+x.consol+'</span>'+
+        '<span style="margin-left:auto;font-size:11.5px;color:var(--t3)">'+hits+' '+L('fourd.permHits','perm hits')+' · '+L('fourd.revPrefix','rev')+' $'+(x.revenue||0).toLocaleString()+'</span>'+
         '</div>';
     }
-    html += '<div style="font-size:12.5px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Top 5 Most Profitable iBet Sets</div>';
+    html += '<div style="font-size:12.5px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('fourd.topProfitableIbet','TOP 5 MOST PROFITABLE IBET SETS')+'</div>';
     d.most_profitable.slice(0, 5).forEach(function(x){ html += renderRow(x); });
-    html += '<div style="font-size:12.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 10px">Top 5 Worst</div>';
+    html += '<div style="font-size:12.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 10px">'+L('fourd.topWorstShort','TOP 5 WORST')+'</div>';
     d.least_profitable.slice(0, 5).forEach(function(x){ html += renderRow(x); });
     html += '<div style="margin-top:14px;font-size:12px;color:var(--t3);font-style:italic">iBet sets are deduplicated by sorted digits — order doesn\'t matter (1234 = 4321 = same set).</div>';
     el.innerHTML = html;
@@ -2143,16 +2153,16 @@ function loadYearlyWinners() {
     var years = j.data.years;
     // Tier colors (chosen for clarity on dark/light backgrounds, readable for older eyes)
     var TIER = [
-      { label: '1st',     col: '#059669', key: 'first' },     // green
-      { label: '2nd',     col: '#ea580c', key: 'second' },    // orange
-      { label: '3rd',     col: '#2563eb', key: 'third' },     // blue
-      { label: 'Start',   col: '#4b5563', key: 'starter' },   // dark grey
-      { label: 'Cons',    col: '#0f172a', key: 'consol' },    // near-black
+      { label: L('fourd.firstAbbr','1st'),   col: '#059669', key: 'first' },     // green
+      { label: L('fourd.secondAbbr','2nd'),  col: '#ea580c', key: 'second' },    // orange
+      { label: L('fourd.thirdAbbr','3rd'),   col: '#2563eb', key: 'third' },     // blue
+      { label: L('fourd.startAbbr','Start'), col: '#4b5563', key: 'starter' },   // dark grey
+      { label: L('fourd.consAbbr','Cons'),   col: '#0f172a', key: 'consol' },    // near-black
     ];
     var html = '';
     // === Boxed legend at top ===
     html += '<div style="display:flex;gap:18px;flex-wrap:wrap;padding:12px 16px;background:var(--cd);border:1px solid var(--bd);border-radius:8px;margin-bottom:14px;font-size:14px;font-weight:700">';
-    html += '<span style="color:var(--t3);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;align-self:center">Legend</span>';
+    html += '<span style="color:var(--t3);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;align-self:center">'+L('fourd.legend','Legend')+'</span>';
     TIER.forEach(function(t) {
       html += '<span style="display:inline-flex;align-items:center;gap:6px"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:'+t.col+'"></span><span style="color:'+t.col+';font-family:var(--mo)">'+t.label+'</span></span>';
     });
@@ -2432,8 +2442,10 @@ function loadRecent(win) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div class="grid g2" style="gap:18px">';
-    [['Hottest in last '+d.window+' draws', d.hot, '#dc2626'],
-     ['Coldest in last '+d.window+' draws', d.cold, '#0891b2']].forEach(function(sec) {
+    var hotLbl  = L('toto.hottestInLast','Hottest in last {n} draws').replace('{n}', d.window);
+    var coldLbl = L('toto.coldestInLast','Coldest in last {n} draws').replace('{n}', d.window);
+    [[hotLbl, d.hot, '#dc2626'],
+     [coldLbl, d.cold, '#0891b2']].forEach(function(sec) {
       html += '<div><div style="font-size:12.5px;font-weight:800;color:'+sec[2]+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+sec[0]+'</div>';
       html += '<div style="display:flex;gap:14px;flex-wrap:wrap">';
       sec[1].forEach(function(n){ html += ballWithTier(n.number, n.count, sec[2], 42); });
@@ -2451,20 +2463,20 @@ function loadDowCompare() {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div class="grid g2" style="gap:18px">';
-    [['Monday draws', d.monday, 'var(--p)'],
-     ['Thursday draws', d.thursday, 'var(--vi)']].forEach(function(sec) {
-      var label = sec[0], info = sec[1], color = sec[2];
+    [[L('toto.monDraws','Monday draws'), d.monday, 'var(--p)', L('toto.hottestOnMon','HOTTEST ON MONDAY'), L('toto.coldestOnMon','COLDEST ON MONDAY')],
+     [L('toto.thuDraws','Thursday draws'), d.thursday, 'var(--vi)', L('toto.hottestOnThu','HOTTEST ON THURSDAY'), L('toto.coldestOnThu','COLDEST ON THURSDAY')]].forEach(function(sec) {
+      var label = sec[0], info = sec[1], color = sec[2], hotLbl = sec[3], coldLbl = sec[4];
       html += '<div style="padding:14px;background:var(--bg);border-radius:8px">';
       html += '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">';
       html += '<span style="font-size:13px;font-weight:800;color:'+color+';text-transform:uppercase;letter-spacing:.05em">'+label+'</span>';
-      html += '<span style="font-size:12px;color:var(--t3)">'+info.draws+' draws</span></div>';
+      html += '<span style="font-size:12px;color:var(--t3)">'+info.draws+' '+L('common.draws','draws')+'</span></div>';
       // Hot — with count + tier badge
-      html += '<div style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:8px">HOTTEST ON '+label.split(' ')[0].toUpperCase()+'</div>';
+      html += '<div style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:8px">'+hotLbl+'</div>';
       html += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">';
       info.hot.forEach(function(n){ html += ballWithTier(n.n, n.c, 'var(--red)', 36); });
       html += '</div>';
       // Cold — with count + tier badge
-      html += '<div style="font-size:11px;font-weight:800;color:var(--cy);margin-bottom:8px">COLDEST ON '+label.split(' ')[0].toUpperCase()+'</div>';
+      html += '<div style="font-size:11px;font-weight:800;color:var(--cy);margin-bottom:8px">'+coldLbl+'</div>';
       html += '<div style="display:flex;gap:10px;flex-wrap:wrap">';
       info.cold.forEach(function(n){ html += ballWithTier(n.n, n.c, 'var(--cy)', 36); });
       html += '</div>';
@@ -2487,8 +2499,16 @@ function loadSpecialDraws() {
       'Year-end / New Year': { col: '#7c3aed', bg: 'rgba(124,58,237,.12)' },
       'Snowball / Cascade': { col: '#6b7280', bg: 'rgba(107,114,128,.10)' },
     };
+    // English backend keys → localized display labels
+    var TAG_LABEL = {
+      'Chinese New Year':    L('toto.festival.cny','Chinese New Year'),
+      'National Day':        L('toto.festival.nationalDay','National Day'),
+      'Mid-Autumn':          L('toto.festival.midAutumn','Mid-Autumn'),
+      'Year-end / New Year': L('toto.festival.yearEnd','Year-end / New Year'),
+      'Snowball / Cascade':  L('toto.festival.snowball','Snowball / Cascade')
+    };
     var html = '<div style="font-size:13px;color:var(--t2);margin-bottom:14px;padding:10px 14px;background:var(--bg);border-radius:6px">';
-    html += '<b>'+d.total+' special draws</b> across the full archive — non-Mon/Thu schedule.';
+    html += L('toto.specialDrawsCount','<b>{count} special draws</b> across the full archive — non-Mon/Thu schedule.').replace('{count}', d.total);
     html += '</div>';
     // Group by tag
     var byTag = {};
@@ -2502,7 +2522,7 @@ function loadSpecialDraws() {
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">';
     Object.keys(byTag).sort().forEach(function(t) {
       var c = TAG_COL[t] || TAG_COL['Snowball / Cascade'];
-      html += '<span style="padding:5px 11px;border-radius:18px;background:'+c.bg+';color:'+c.col+';font-size:12px;font-weight:800;letter-spacing:.03em">'+t+' · '+byTag[t].length+'</span>';
+      html += '<span style="padding:5px 11px;border-radius:18px;background:'+c.bg+';color:'+c.col+';font-size:12px;font-weight:800;letter-spacing:.03em">'+(TAG_LABEL[t]||t)+' · '+byTag[t].length+'</span>';
     });
     html += '</div>';
     // List, newest first
@@ -2514,7 +2534,7 @@ function loadSpecialDraws() {
       html += '<span style="font-family:var(--mo);font-weight:800;color:var(--p);min-width:60px">#'+dr.draw_no+'</span>';
       html += '<span style="color:var(--t2);min-width:120px">'+dr.draw_date+' <span style="color:var(--t3);font-weight:600">('+dr.dow+')</span></span>';
       html += '<span style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+dr.numbers.join(' · ')+' <span style="color:var(--red)">+ '+dr.additional_num+'</span></span>';
-      html += '<span style="margin-left:auto;padding:3px 10px;border-radius:14px;background:'+c.bg+';color:'+c.col+';font-size:11px;font-weight:800">'+primaryTag+'</span>';
+      html += '<span style="margin-left:auto;padding:3px 10px;border-radius:14px;background:'+c.bg+';color:'+c.col+';font-size:11px;font-weight:800">'+(TAG_LABEL[primaryTag]||primaryTag)+'</span>';
       html += '</div>';
     });
     html += '</div>';
@@ -2530,26 +2550,36 @@ window.loadFestivalStats = function() {
   fetch('/api/toto/festival-stats?tag=' + encodeURIComponent(tag)).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error: '+(j.error||''); return; }
     var d = j.data;
+    // English backend tag → localized display label
+    var TAG_LABEL = {
+      'Chinese New Year':    L('toto.festival.cny','Chinese New Year'),
+      'National Day':        L('toto.festival.nationalDay','National Day'),
+      'Mid-Autumn':          L('toto.festival.midAutumn','Mid-Autumn'),
+      'Year-end / New Year': L('toto.festival.yearEnd','Year-end / New Year'),
+      'Snowball / Cascade':  L('toto.festival.snowball','Snowball / Cascade'),
+      'All Special':         L('toto.festival.allSpecial','All Special')
+    };
+    var tagLbl = TAG_LABEL[d.tag] || d.tag;
     var html = '';
     // Summary header
     html += '<div style="padding:12px 14px;background:var(--bg);border-radius:8px;margin-bottom:18px;font-size:13px;color:var(--t2)">';
-    html += '<b style="color:var(--amb)">'+d.tag+'</b> — <b>'+d.total_draws+' draws</b>';
+    html += '<b style="color:var(--amb)">'+tagLbl+'</b> — <b>'+d.total_draws+' '+L('common.draws','draws')+'</b>';
     if (d.earliest_date) html += ' &nbsp;·&nbsp; '+d.earliest_date+' → '+d.latest_date;
     if (d.total_draws < 10) {
-      html += ' <span style="color:var(--red);font-weight:700;margin-left:8px">⚠ tiny sample — results are noisy, not predictive</span>';
+      html += ' <span style="color:var(--red);font-weight:700;margin-left:8px">'+L('toto.tinySample','⚠ tiny sample — results are noisy, not predictive')+'</span>';
     }
     html += '</div>';
     if (d.total_draws === 0) {
-      html += '<p style="color:var(--t3);font-size:13px">No draws found for this category.</p>';
+      html += '<p style="color:var(--t3);font-size:13px">'+L('toto.noDrawsForCategory','No draws found for this category.')+'</p>';
       el.innerHTML = html; return;
     }
     // Top 6 most-drawn in this subset
     html += '<div class="grid g2" style="gap:18px">';
-    html += '<div><div style="font-size:12.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Most drawn in '+d.tag+'</div>';
+    html += '<div><div style="font-size:12.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('toto.mostDrawnIn','Most drawn in')+' '+tagLbl+'</div>';
     html += '<div style="display:flex;gap:12px;flex-wrap:wrap">';
     d.hot.forEach(function(n){ html += ballWithTier(n.n, n.c, 'var(--red)', 40); });
     html += '</div></div>';
-    html += '<div><div style="font-size:12.5px;font-weight:800;color:var(--cy);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Least drawn in '+d.tag+'</div>';
+    html += '<div><div style="font-size:12.5px;font-weight:800;color:var(--cy);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('toto.leastDrawnIn','Least drawn in')+' '+tagLbl+'</div>';
     html += '<div style="display:flex;gap:12px;flex-wrap:wrap">';
     d.cold.forEach(function(n){ html += ballWithTier(n.n, n.c, 'var(--cy)', 40); });
     html += '</div></div>';
@@ -2557,13 +2587,13 @@ window.loadFestivalStats = function() {
     // Never-appeared numbers
     if (d.never && d.never.length) {
       html += '<div style="margin-top:18px;padding:12px 14px;background:rgba(8,145,178,.08);border-left:3px solid var(--cy);border-radius:6px">';
-      html += '<div style="font-size:12px;font-weight:800;color:var(--cy);margin-bottom:6px">NEVER APPEARED IN '+d.tag.toUpperCase()+' ('+d.never.length+')</div>';
+      html += '<div style="font-size:12px;font-weight:800;color:var(--cy);margin-bottom:6px">'+L('toto.neverAppearedIn','Never appeared in')+' '+tagLbl+' ('+d.never.length+')</div>';
       html += '<div style="font-family:var(--mo);font-size:13px;color:var(--t2);line-height:1.6">'+d.never.join(', ')+'</div>';
       html += '</div>';
     }
     // Hottest additional in subset
     if (d.additional_hot && d.additional_hot.length && d.additional_hot[0].c > 0) {
-      html += '<div style="margin-top:18px"><div style="font-size:12.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Hottest additional (the +7) in '+d.tag+'</div>';
+      html += '<div style="margin-top:18px"><div style="font-size:12.5px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('toto.hottestAdditionalIn','Hottest additional (the +7) in')+' '+tagLbl+'</div>';
       html += '<div style="display:flex;gap:10px;flex-wrap:wrap">';
       d.additional_hot.slice(0,6).forEach(function(n){
         html += '<div style="display:flex;flex-direction:column;align-items:center;gap:4px">'+makeBall(n.n, 36, 'var(--red)', 0)+'<span style="font-size:11px;color:var(--t3);font-weight:700;font-family:var(--mo)">'+n.c+'×</span></div>';
@@ -2572,8 +2602,8 @@ window.loadFestivalStats = function() {
     }
     // Sum + even/odd row
     html += '<div style="margin-top:18px;display:flex;gap:14px;flex-wrap:wrap;font-size:13px">';
-    html += '<div style="padding:10px 14px;background:var(--bg);border-radius:6px"><span style="color:var(--t3);font-weight:600">Avg 6-number sum:</span> <b style="color:var(--tx);font-family:var(--mo)">'+d.sum_avg+'</b> <span style="color:var(--t3);font-size:11px">(range '+d.sum_min+'–'+d.sum_max+')</span></div>';
-    html += '<div style="padding:10px 14px;background:var(--bg);border-radius:6px"><span style="color:var(--t3);font-weight:600">Even / Odd:</span> <b style="color:var(--p)">'+d.even_pct+'%</b> / <b style="color:var(--vi)">'+d.odd_pct+'%</b></div>';
+    html += '<div style="padding:10px 14px;background:var(--bg);border-radius:6px"><span style="color:var(--t3);font-weight:600">'+L('toto.avgSum','Avg 6-number sum:')+'</span> <b style="color:var(--tx);font-family:var(--mo)">'+d.sum_avg+'</b> <span style="color:var(--t3);font-size:11px">('+L('toto.rangePrefix','range')+' '+d.sum_min+'–'+d.sum_max+')</span></div>';
+    html += '<div style="padding:10px 14px;background:var(--bg);border-radius:6px"><span style="color:var(--t3);font-weight:600">'+L('toto.evenOddLabel','Even / Odd:')+'</span> <b style="color:var(--p)">'+d.even_pct+'%</b> / <b style="color:var(--vi)">'+d.odd_pct+'%</b></div>';
     html += '</div>';
     el.innerHTML = html;
   });
@@ -2585,11 +2615,11 @@ function loadAdditional() {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div style="font-size:12.5px;color:var(--t2);margin-bottom:14px;padding:10px 14px;background:var(--bg);border-radius:6px">';
-    html += '<b>'+d.total_draws+' draws</b> · expected ≈ <b>'+d.avg_per_number+'×</b> per number if random';
+    html += L('toto.additionalSummary','<b>{count} draws</b> · expected ≈ <b>{avg}×</b> per number if random').replace('{count}', d.total_draws).replace('{avg}', d.avg_per_number);
     html += '</div>';
     html += '<div class="grid g2" style="gap:18px">';
-    [['Hottest Additional Number', d.hot, 'var(--red)'],
-     ['Coldest Additional Number', d.cold, 'var(--cy)']].forEach(function(sec) {
+    [[L('toto.hottestAdditional','Hottest Additional Number'), d.hot, 'var(--red)'],
+     [L('toto.coldestAdditional','Coldest Additional Number'), d.cold, 'var(--cy)']].forEach(function(sec) {
       html += '<div><div style="font-size:12.5px;font-weight:800;color:'+sec[2]+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+sec[0]+'</div>';
       html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
       sec[1].forEach(function(n){
@@ -2620,7 +2650,7 @@ function loadGaps() {
     // Cold streak record up top
     if (d.cold_streak_record) {
       html += '<div style="background:rgba(8,145,178,.08);border-left:3px solid var(--cy);border-radius:6px;padding:12px 14px;margin-bottom:14px;font-size:13.5px;color:var(--t2)">';
-      html += '<b style="color:var(--cy)">Longest cold streak record:</b> #'+d.cold_streak_record.number+' once went <b>'+d.cold_streak_record.longest_gap+' draws</b> without appearing.';
+      html += '<b style="color:var(--cy)">'+L('toto.longestColdRecord','Longest cold streak record:')+'</b> #'+d.cold_streak_record.number+' '+L('toto.onceWent','once went')+' <b>'+d.cold_streak_record.longest_gap+' '+L('common.draws','draws')+'</b> '+L('toto.drawsNoAppearance','without appearing')+'.';
       html += '</div>';
     }
     // Compact 7×7 grid — 49 numbers in natural order
@@ -2634,15 +2664,15 @@ function loadGaps() {
       // Row 1: Number ←→ Draws ago (inline, side by side)
       html += '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:4px;margin-bottom:4px">';
       html += '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:var(--tx);line-height:1">'+p.number+'</span>';
-      html += '<span style="font-size:11px;color:'+dueColor+';font-weight:700;font-family:var(--mo)">'+p.current_gap+'d ago</span>';
+      html += '<span style="font-size:11px;color:'+dueColor+';font-weight:700;font-family:var(--mo)">'+p.current_gap+L('toto.daysAgo','d ago')+'</span>';
       html += '</div>';
       // Row 2: TIER badge ←→ appearance count
       html += '<div style="display:flex;align-items:center;justify-content:space-between;font-size:10.5px;margin-bottom:2px">';
-      html += '<span style="font-weight:800;color:'+t.label+';letter-spacing:.04em">'+tier+'</span>';
+      html += '<span style="font-weight:800;color:'+t.label+';letter-spacing:.04em">'+tierLabel(tier)+'</span>';
       html += '<span style="font-weight:700;color:var(--p);font-family:var(--mo)">'+p.appearances+'×</span>';
       html += '</div>';
       // Row 3: footer — avg gap
-      html += '<div style="font-size:10px;color:var(--t3);line-height:1.2">avg '+p.avg_gap+'d</div>';
+      html += '<div style="font-size:10px;color:var(--t3);line-height:1.2">'+L('toto.avgPrefix','avg')+' '+p.avg_gap+'d</div>';
       html += '</div>';
     });
     html += '</div>';
@@ -2657,13 +2687,13 @@ function loadYearlyHot() {
     var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px">';
     j.data.years.forEach(function(y) {
       html += '<div style="padding:12px;background:var(--bg);border:1px solid var(--bd);border-radius:10px">';
-      html += '<div style="font-size:13px;font-weight:800;color:var(--vi);margin-bottom:8px">'+y.year+' &nbsp;<span style="color:var(--t3);font-weight:500;font-size:11px">('+y.draws+' draws)</span></div>';
+      html += '<div style="font-size:13px;font-weight:800;color:var(--vi);margin-bottom:8px">'+y.year+' &nbsp;<span style="color:var(--t3);font-weight:500;font-size:11px">('+y.draws+' '+L('common.draws','draws')+')</span></div>';
       html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
               makeBall(y.hottest.n, 28, "#dc2626", 0) +
-              '<span style="font-size:12px;color:var(--t2)">hottest · '+y.hottest.c+'×</span></div>';
+              '<span style="font-size:12px;color:var(--t2)">'+L('toto.hottestShort','hottest')+' · '+y.hottest.c+'×</span></div>';
       html += '<div style="display:flex;align-items:center;gap:8px">'+
               makeBall(y.coldest.n, 28, "#0891b2", 0) +
-              '<span style="font-size:12px;color:var(--t2)">coldest · '+y.coldest.c+'×</span></div>';
+              '<span style="font-size:12px;color:var(--t2)">'+L('toto.coldestShort','coldest')+' · '+y.coldest.c+'×</span></div>';
       html += '</div>';
     });
     html += '</div>';
@@ -2729,7 +2759,7 @@ function loadCombos() {
         s += '<div style="display:flex;gap:5px">';
         p.numbers.forEach(function(n){ s += makeBall(n, 30, color, 0); });
         s += '</div>';
-        s += '<span style="font-size:13.5px;color:var(--t2);margin-left:auto"><b style="color:var(--tx)">'+p.count+'×</b> together</span>';
+        s += '<span style="font-size:13.5px;color:var(--t2);margin-left:auto"><b style="color:var(--tx)">'+p.count+'×</b> '+L('toto.together','together')+'</span>';
         s += '</div>';
       });
       return s;
@@ -2743,14 +2773,14 @@ function loadCombos() {
 
     // PAIRS row
     html += '<div class="grid g2" style="gap:18px;margin-bottom:18px">';
-    html += '<div>'+header('Top 5 Pairs · most often together', 'var(--em)')+comboList(d.top_pairs, 'var(--p)')+'</div>';
-    html += '<div>'+header('Top 5 Pairs · least often together', 'var(--red)')+comboList(d.rare_pairs, 'var(--cy)')+'</div>';
+    html += '<div>'+header(L('toto.topPairsMost','Top 5 Pairs · most often together'), 'var(--em)')+comboList(d.top_pairs, 'var(--p)')+'</div>';
+    html += '<div>'+header(L('toto.topPairsLeast','Top 5 Pairs · least often together'), 'var(--red)')+comboList(d.rare_pairs, 'var(--cy)')+'</div>';
     html += '</div>';
 
     // TRIPLES row
     html += '<div class="grid g2" style="gap:18px">';
-    html += '<div>'+header('Top 5 Triples · most often together', 'var(--em)')+comboList(d.top_triples, 'var(--p)')+'</div>';
-    html += '<div>'+header('Top 5 Triples · least often together', 'var(--red)')+comboList(d.rare_triples, 'var(--cy)')+'</div>';
+    html += '<div>'+header(L('toto.topTriplesMost','Top 5 Triples · most often together'), 'var(--em)')+comboList(d.top_triples, 'var(--p)')+'</div>';
+    html += '<div>'+header(L('toto.topTriplesLeast','Top 5 Triples · least often together'), 'var(--red)')+comboList(d.rare_triples, 'var(--cy)')+'</div>';
     html += '</div>';
 
     out.innerHTML = html;
@@ -3384,13 +3414,13 @@ window.loadCurrentDry = function() {
       var html = '';
       // Summary banner
       html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px">';
-      html += '<div style="padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--red)"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">In Range</div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--red)">'+d.candidates.length+'</div><div style="font-size:11px;color:var(--t2);margin-top:3px">numbers between gap '+lo+' &amp; '+hi+'</div></div>';
+      html += '<div style="padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--red)"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('fourd.inRange','In Range')+'</div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--red)">'+d.candidates.length+'</div><div style="font-size:11px;color:var(--t2);margin-top:3px">'+L('fourd.numsBetweenGap','numbers between gap {lo} & {hi}').replace('{lo}', lo).replace('{hi}', hi)+'</div></div>';
       var topN = d.candidates.filter(function(c){ return c.top3_count >= 1; }).length;
-      html += '<div style="padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--em)"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">≥1 Top-3 lifetime</div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--em)">'+topN+'</div><div style="font-size:11px;color:var(--t2);margin-top:3px">have won 1st/2nd/3rd before</div></div>';
+      html += '<div style="padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--em)"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('fourd.top3Lifetime','≥1 Top-3 lifetime')+'</div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--em)">'+topN+'</div><div style="font-size:11px;color:var(--t2);margin-top:3px">'+L('fourd.haveWonTop3','have won 1st/2nd/3rd before')+'</div></div>';
       var firstN = d.candidates.filter(function(c){ return c.first_count >= 1; }).length;
-      html += '<div style="padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--p)"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">≥1 First-prize lifetime</div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--p)">'+firstN+'</div><div style="font-size:11px;color:var(--t2);margin-top:3px">have won 1st before</div></div>';
+      html += '<div style="padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--p)"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('fourd.firstLifetime','≥1 First-prize lifetime')+'</div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--p)">'+firstN+'</div><div style="font-size:11px;color:var(--t2);margin-top:3px">'+L('fourd.haveWonFirst','have won 1st before')+'</div></div>';
       var totalCost = d.candidates.length;
-      html += '<div style="padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--amb)"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">Cost per draw</div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--amb)">$'+totalCost+'</div><div style="font-size:11px;color:var(--t2);margin-top:3px">$1 Big on each</div></div>';
+      html += '<div style="padding:12px;background:var(--bg);border-radius:8px;border-left:4px solid var(--amb)"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase">'+L('fourd.costPerDraw','Cost per draw')+'</div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--amb)">$'+totalCost+'</div><div style="font-size:11px;color:var(--t2);margin-top:3px">'+L('fourd.bigOnEach','$1 Big on each')+'</div></div>';
       html += '</div>';
       if (d.candidates.length === 0) {
         html += '<div style="text-align:center;color:var(--t3);padding:30px;font-style:italic">No numbers currently in this gap range. Try widening it.</div>';
@@ -3967,12 +3997,12 @@ function loadRepeatWinners() {
   fetch('/api/fourd/repeat-winners').then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
-    var html = '<div style="font-size:12.5px;color:var(--t2);margin-bottom:12px">Out of '+d.unique_winners.toLocaleString()+' unique 1st-prize winners over '+d.total_draws_scanned.toLocaleString()+' draws, <b>'+d.repeat_winners_count.toLocaleString()+' numbers have won 2 or more times</b>.</div>';
+    var html = '<div style="font-size:12.5px;color:var(--t2);margin-bottom:12px">'+L('fourd.repeatWinnersSummary','Out of {unique} unique 1st-prize winners over {total} draws, <b>{repeat} numbers have won 2 or more times</b>.').replace('{unique}', d.unique_winners.toLocaleString()).replace('{total}', d.total_draws_scanned.toLocaleString()).replace('{repeat}', d.repeat_winners_count.toLocaleString())+'</div>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">';
     d.top_15.forEach(function(r,i){
       html += '<div style="padding:10px 12px;background:var(--bg);border:1px solid var(--bd);border-radius:8px;text-align:center">';
       html += '<div style="font-family:var(--mo);font-size:18px;font-weight:800;color:var(--amb);letter-spacing:.05em">'+r.number+'</div>';
-      html += '<div style="font-size:11px;color:var(--em);font-weight:700;margin-top:4px">won '+r.wins+' times</div>';
+      html += '<div style="font-size:11px;color:var(--em);font-weight:700;margin-top:4px">'+L('fourd.wonTimes','won {n} times').replace('{n}', r.wins)+'</div>';
       html += '</div>';
     });
     html += '</div>';
