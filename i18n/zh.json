@@ -218,7 +218,20 @@
     "haveWonFirst":        "曾中过头奖",
     "costPerDraw":         "每期成本",
     "bigOnEach":           "每号 $1 大字",
-    "yrsCount":            "{n}/{tot} 年"
+    "yrsCount":            "{n}/{tot} 年",
+    "digitOverall":        "{from}–{to} 总览",
+    "digitOverallStats":   "{draws} 期 · {prizes} 个中奖号码 · {digits} 位数字已扫描",
+    "digitNone":           "无：",
+    "digitDouble":         "双连：",
+    "digitTriple":         "三连：",
+    "digitQuad":           "四连：",
+    "digitSingle":         "单数字",
+    "digitDoubleXX":       "双连 XX",
+    "digitTripleXXX":      "三连 XXX",
+    "digitQuadXXXX":       "四连 XXXX",
+    "expectedRandom":      "若纯随机预期每个 <b>{pct}%</b>。",
+    "hottestColon":        "最热：",
+    "coldestColon":        "最冷："
   },
   "alpha4d": {
     "desc":                "量化选号实验室。筛选、回测、找出具有数学优势的候选号码。",

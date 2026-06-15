@@ -218,7 +218,20 @@
     "haveWonFirst":        "have won 1st before",
     "costPerDraw":         "COST PER DRAW",
     "bigOnEach":           "$1 Big on each",
-    "yrsCount":            "{n}/{tot} yrs"
+    "yrsCount":            "{n}/{tot} yrs",
+    "digitOverall":        "{from}–{to} Overall",
+    "digitOverallStats":   "{draws} draws · {prizes} prize numbers · {digits} digits scanned",
+    "digitNone":           "None:",
+    "digitDouble":         "Double:",
+    "digitTriple":         "Triple:",
+    "digitQuad":           "Quad:",
+    "digitSingle":         "Single digit",
+    "digitDoubleXX":       "Double XX",
+    "digitTripleXXX":      "Triple XXX",
+    "digitQuadXXXX":       "Quad XXXX",
+    "expectedRandom":      "Expected <b>{pct}%</b> each if random.",
+    "hottestColon":        "Hottest:",
+    "coldestColon":        "Coldest:"
   },
   "alpha4d": {
     "desc":                "Quantitative number-selection lab. Filter, backtest, and identify candidates with mathematical edges.",
