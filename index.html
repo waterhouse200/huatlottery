@@ -1130,9 +1130,9 @@ function loadClassByYear() {
       html += '</div>';
       var topD = arr[0], botD = arr[arr.length - 1];
       html += '<div style="font-size:11px;color:var(--t3);margin-top:8px;padding-top:8px;border-top:1px solid var(--bl);line-height:1.5">';
-      html += 'Expected <b style="font-family:var(--mo)">'+expected+'%</b> each if random.<br>';
-      html += '<span style="color:#dc2626">Hottest: <b style="font-family:var(--mo)">'+fmt(topD.d)+'</b> ('+topD.p+'%)</span> · ';
-      html += '<span style="color:#0891b2">Coldest: <b style="font-family:var(--mo)">'+fmt(botD.d)+'</b> ('+botD.p+'%)</span>';
+      html += L('fourd.expectedRandom','Expected <b>{pct}%</b> each if random.').replace('{pct}', expected)+'<br>';
+      html += '<span style="color:#dc2626">'+L('fourd.hottestColon','Hottest:')+' <b style="font-family:var(--mo)">'+fmt(topD.d)+'</b> ('+topD.p+'%)</span> · ';
+      html += '<span style="color:#0891b2">'+L('fourd.coldestColon','Coldest:')+' <b style="font-family:var(--mo)">'+fmt(botD.d)+'</b> ('+botD.p+'%)</span>';
       html += '</div>';
       return html;
     }
@@ -1140,21 +1140,21 @@ function loadClassByYear() {
     // === Single overall card — compact 4-column grid ===
     var html = '<div style="padding:18px;background:linear-gradient(135deg,rgba(55,48,163,.06),rgba(8,145,178,.06));border-radius:10px">';
     html += '<div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px">';
-    html += '<span style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em">'+overall.year_range.from+'–'+overall.year_range.to+' Overall</span>';
-    html += '<span style="font-size:12.5px;color:var(--t2);font-family:var(--mo)">'+overall.total_draws.toLocaleString()+' draws · '+overall.total_prizes.toLocaleString()+' prize numbers · '+overall.total_digits.toLocaleString()+' digits scanned</span>';
+    html += '<span style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em">'+L('fourd.digitOverall','{from}–{to} Overall').replace('{from}', overall.year_range.from).replace('{to}', overall.year_range.to)+'</span>';
+    html += '<span style="font-size:12.5px;color:var(--t2);font-family:var(--mo)">'+L('fourd.digitOverallStats','{draws} draws · {prizes} prize numbers · {digits} digits scanned').replace('{draws}', overall.total_draws.toLocaleString()).replace('{prizes}', overall.total_prizes.toLocaleString()).replace('{digits}', overall.total_digits.toLocaleString())+'</span>';
     html += '</div>';
     html += '<div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px;font-size:12.5px">';
-    html += '<div><span style="color:var(--t3);font-weight:600">None:</span> <b style="font-family:var(--mo);color:var(--tx)">'+overall.none_pct+'%</b></div>';
-    html += '<div><span style="color:var(--t3);font-weight:600">Double:</span> <b style="font-family:var(--mo);color:var(--cy)">'+overall.double_pct+'%</b></div>';
-    html += '<div><span style="color:var(--t3);font-weight:600">Triple:</span> <b style="font-family:var(--mo);color:var(--amb)">'+overall.triple_pct+'%</b></div>';
-    html += '<div><span style="color:var(--t3);font-weight:600">Quad:</span> <b style="font-family:var(--mo);color:var(--red)">'+overall.quad_pct+'%</b></div>';
+    html += '<div><span style="color:var(--t3);font-weight:600">'+L('fourd.digitNone','None:')+'</span> <b style="font-family:var(--mo);color:var(--tx)">'+overall.none_pct+'%</b></div>';
+    html += '<div><span style="color:var(--t3);font-weight:600">'+L('fourd.digitDouble','Double:')+'</span> <b style="font-family:var(--mo);color:var(--cy)">'+overall.double_pct+'%</b></div>';
+    html += '<div><span style="color:var(--t3);font-weight:600">'+L('fourd.digitTriple','Triple:')+'</span> <b style="font-family:var(--mo);color:var(--amb)">'+overall.triple_pct+'%</b></div>';
+    html += '<div><span style="color:var(--t3);font-weight:600">'+L('fourd.digitQuad','Quad:')+'</span> <b style="font-family:var(--mo);color:var(--red)">'+overall.quad_pct+'%</b></div>';
     html += '</div>';
     // 4 compact frequency tables, side by side
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px">';
-    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Single digit</div>'+digitTable(overall.digit_pct, 10, function(d){return d;})+'</div>';
-    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Double XX</div>'+digitTable(overall.double_pct_per_digit, 4.83, function(d){return ''+d+d;})+'</div>';
-    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Triple XXX</div>'+digitTable(overall.triple_pct_per_digit, 0.36, function(d){return ''+d+d+d;})+'</div>';
-    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Quad XXXX</div>'+digitTable(overall.quad_pct_per_digit, 0.01, function(d){return ''+d+d+d+d;})+'</div>';
+    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">'+L('fourd.digitSingle','Single digit')+'</div>'+digitTable(overall.digit_pct, 10, function(d){return d;})+'</div>';
+    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">'+L('fourd.digitDoubleXX','Double XX')+'</div>'+digitTable(overall.double_pct_per_digit, 4.83, function(d){return ''+d+d;})+'</div>';
+    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">'+L('fourd.digitTripleXXX','Triple XXX')+'</div>'+digitTable(overall.triple_pct_per_digit, 0.36, function(d){return ''+d+d+d;})+'</div>';
+    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">'+L('fourd.digitQuadXXXX','Quad XXXX')+'</div>'+digitTable(overall.quad_pct_per_digit, 0.01, function(d){return ''+d+d+d+d;})+'</div>';
     html += '</div>';
     html += '</div>';
 
