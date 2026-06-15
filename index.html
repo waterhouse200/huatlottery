@@ -75,6 +75,24 @@
 }
 </script>
 
+<!-- Google Analytics 4 — measures pageviews, sessions, tab engagement, geography -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6WNQ6L7XKQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-6WNQ6L7XKQ', {
+    // Per-tab page_view events fire via track() in app code, so don't double-count
+    send_page_view: true,
+    // Useful Singapore-tuned settings
+    cookie_flags: 'SameSite=None;Secure',
+  });
+  // Small helper exposed globally so app code can fire custom events.
+  window.track = function(eventName, params) {
+    try { gtag('event', eventName, params || {}); } catch (e) {}
+  };
+</script>
+
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--p:#3730a3;--pl:#4f46e5;--pp:#eef2ff;--red:#dc2626;--amb:#d97706;--em:#059669;--cy:#0891b2;--vi:#7c3aed;--bg:#f4f5f7;--cd:#fff;--bd:#e2e4e9;--bl:#f0f1f3;--tx:#1a1d26;--t2:#5c6070;--t3:#9196a6;--mo:'IBM Plex Mono',monospace}
@@ -304,10 +322,16 @@ function renderNav() {
   }).join('');
   navEl.querySelectorAll('.nav-btn').forEach(function(btn) {
     btn.onclick = function() {
+      var oldTab = currentTab;
       currentTab = btn.dataset.tab;
       resetLazyObserver();          // drop pending fetches from prev tab
       renderNav(); renderPage(); updateSEO(currentTab);
       window.scrollTo(0, 0);
+      // GA4 custom event — which tabs do users actually use
+      if (window.track) {
+        window.track('tab_switched', { from: oldTab, to: currentTab });
+        window.track('page_view', { page_title: document.title, page_path: '/?tab=' + currentTab });
+      }
     };
   });
 }
@@ -2919,6 +2943,7 @@ window.loadQ1History = function() {
 
 window.runStrategySimulator = function() {
   var el = document.getElementById('strategySimResults'); if (!el) return;
+  if (window.track) window.track('simulator_run', { kind: 'strategy_4d' });
   function vals(cls) {
     var out = [];
     document.querySelectorAll('input.'+cls+':checked').forEach(function(i){ out.push(i.value); });
@@ -3970,6 +3995,7 @@ window.setHistGame = function(g) {
 window.doHistSearch = function() {
   var q = document.getElementById("histQ").value.trim();
   if (!q) return;
+  if (window.track) window.track('number_searched', { game: histGame, length: q.length });
   var resEl = document.getElementById("histResults");
   resEl.innerHTML = loadingCard();
   var url = '/api/' + (histGame === '4d' ? 'fourd' : 'toto') + '/search?number=' + encodeURIComponent(q);
