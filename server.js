@@ -132,7 +132,7 @@ function getSortedDigits(num) { return num.split("").sort().join(""); }
 
 // ─── API ROUTES ──────────────────────────────────────────────
 
-app.get("/api/latest", (req, res) => {
+app.get("/api/latest", cache.withCache((req, res) => {
   try {
     const t = db.prepare("SELECT * FROM toto_draws ORDER BY draw_no DESC LIMIT 1").get();
     const f = db.prepare("SELECT * FROM fourd_draws ORDER BY draw_no DESC LIMIT 1").get();
@@ -153,7 +153,7 @@ app.get("/api/latest", (req, res) => {
 
     res.json({ success: true, data: { toto: formatTotoRow(t), fourd } });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 app.get("/api/toto/draws", (req, res) => {
   try {
@@ -165,7 +165,7 @@ app.get("/api/toto/draws", (req, res) => {
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
-app.get("/api/toto/stats", (req, res) => {
+app.get("/api/toto/stats", cache.withCache((req, res) => {
   try {
     // CRITICAL: only count draws from the strict 6/49 era (post-9-Oct-2014).
     // Before that, Singapore TOTO was 6/45 (numbers 46-49 didn't exist) or
@@ -225,7 +225,7 @@ app.get("/api/toto/stats", (req, res) => {
       sum_analysis: { average: avg, min: sums.length ? Math.min(...sums) : 0, max: sums.length ? Math.max(...sums) : 0, buckets: Object.entries(bk).map(([r, c]) => ({ range: r, count: c })).sort((a, b) => parseInt(a.range) - parseInt(b.range)) },
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 app.get("/api/toto/search", (req, res) => {
   try {
@@ -276,7 +276,7 @@ app.get("/api/fourd/search", (req, res) => {
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
-app.get("/api/fourd/stats", (req, res) => {
+app.get("/api/fourd/stats", cache.withCache((req, res) => {
   try {
     const rows = db.prepare("SELECT * FROM fourd_draws ORDER BY draw_no DESC").all();
     const totalDraws = rows.length;
@@ -324,7 +324,7 @@ app.get("/api/fourd/stats", (req, res) => {
       top10_hot: top10, top10_date_range: top10Range, exact_match: exact, perm_match: perm,
     }});
   } catch (err) { console.error(err); res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── This month vs all-time ─────────────────────────────────────────
 app.get("/api/toto/current-month", (req, res) => {
@@ -379,7 +379,7 @@ app.get("/api/toto/additional-partners", (req, res) => {
 });
 
 // ─── Festival draws ─────────────────────────────────────────────────
-app.get("/api/festival", (req, res) => {
+app.get("/api/festival", cache.withCache((req, res) => {
   try {
     const key = req.query.festival;
     if (!key) {
@@ -415,7 +415,7 @@ app.get("/api/festival", (req, res) => {
       fourd: fourdRows,
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── Lunar date lookup ──────────────────────────────────────────────
 app.get("/api/lunar-lookup", (req, res) => {
@@ -1108,7 +1108,7 @@ app.get("/api/fourd/digit-positions", (req, res) => {
 // Scans ALL 23 prize positions (1st + 2nd + 3rd + 10 starter + 10 consolation)
 // per draw, not just the 1st prize. This gives a real "is digit 3 trending"
 // signal because there are 23 numbers/draw × 4 digits = 92 digits to sample.
-app.get("/api/fourd/class-by-year", (req, res) => {
+app.get("/api/fourd/class-by-year", cache.withCache((req, res) => {
   try {
     const rows = db.prepare(
       "SELECT draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws WHERE draw_date IS NOT NULL"
@@ -1213,10 +1213,10 @@ app.get("/api/fourd/class-by-year", (req, res) => {
     };
     res.json({ success: true, data: { overall: overallSummary, years } });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── 4D palindromes (1221, 4334, etc.) ──────────────────────────────
-app.get("/api/fourd/palindromes", (req, res) => {
+app.get("/api/fourd/palindromes", cache.withCache((req, res) => {
   try {
     const rows = db.prepare(
       "SELECT draw_no, draw_date, first_prize, second_prize, third_prize FROM fourd_draws"
@@ -1235,14 +1235,14 @@ app.get("/api/fourd/palindromes", (req, res) => {
       third_prize:  { count: thirdHits.length,  pct: Math.round(thirdHits.length/rows.length*1000)/10,  recent: thirdHits.slice(-5).reverse() },
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── 4D repeat winners (numbers that won 1st prize >1 time) ─────────
 // ─── Dry-Spell Distribution Analyzer ──────────────────────────────────
 // For every gap-bucket: hazard rate (P(hit | still dry)), average payout,
 // per-bucket ROI if you only bet in that bucket. Reveals which gap ranges
 // are profitable to bet — the bucket where most numbers "turn into winners".
-app.get("/api/fourd/dry-distribution", (req, res) => {
+app.get("/api/fourd/dry-distribution", cache.withCache((req, res) => {
   try {
     const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
     const HOUSE_EDGE_PCT = 34.1;
@@ -1346,7 +1346,7 @@ app.get("/api/fourd/dry-distribution", (req, res) => {
       },
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── Alpha filter — step-by-step filter for currently actionable numbers ──
 app.get("/api/fourd/alpha-filter", (req, res) => {
@@ -4179,14 +4179,25 @@ app.get("/api/admin/scrape-status", (req, res) => {
 function warmupCache() {
   const http = require("http");
   const endpoints = [
-    "/api/fourd/profitable-buckets",
-    "/api/fourd/buckets-by-time",
-    "/api/fourd/yearly-regulars",
-    "/api/fourd/steady-hitters",
-    "/api/fourd/calendar-bias",
+    // Dashboard / landing-page fires these on every initial load
+    "/api/latest",
+    "/api/fourd/stats",
+    "/api/toto/stats",
+    // 4D Stats tab
     "/api/fourd/dollar-sim",
     "/api/fourd/ibet-sim",
     "/api/fourd/repeat-winners",
+    "/api/fourd/yearly-regulars",
+    "/api/fourd/calendar-bias",
+    "/api/fourd/class-by-year",
+    "/api/fourd/palindromes",
+    "/api/fourd/dry-distribution",
+    // Simulator tab
+    "/api/fourd/profitable-buckets",
+    "/api/fourd/buckets-by-time",
+    "/api/fourd/steady-hitters",
+    // Lucky tab
+    "/api/festival",
   ];
   console.log("[warmup] starting — " + endpoints.length + " endpoints to cache");
   let i = 0;
