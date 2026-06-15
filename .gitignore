@@ -22,3 +22,6 @@ notebooks/
 # Claude Code local project state
 .claude/
 analysis/_cache/
+
+# Server-side cache (rebuilt at runtime)
+cache/
