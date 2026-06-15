@@ -4,6 +4,7 @@ const path = require("path");
 const { getDb, initSchema } = require("./db");
 const { getLuckyNumbers } = require("./lib/lucky");
 const autoScrape = require("./lib/auto-scrape");
+const cache = require("./lib/cache");
 const { pickLang, dict } = require("./i18n");
 const { Lunar, Solar } = require("lunar-javascript");
 
@@ -1759,6 +1760,11 @@ app.get("/api/fourd/strategy-simulator", (req, res) => {
 // point-in-time lifetime tier counts to enable backward analysis.
 app.get("/api/fourd/profitable-buckets", (req, res) => {
   try {
+    const data = cache.compute(req, () => doProfitableBuckets(req));
+    return res.json({ success: true, data });
+  } catch (err) { return res.status(500).json({ success: false, error: err.message }); }
+});
+function doProfitableBuckets(req) {
     const bucketWidth = Math.max(10, parseInt(req.query.bucket_width || "100", 10));
     const bucketMin   = parseInt(req.query.bucket_min || "0",    10);
     const bucketMax   = parseInt(req.query.bucket_max || "3500", 10);
@@ -1941,7 +1947,7 @@ app.get("/api/fourd/profitable-buckets", (req, res) => {
     const totalsByTier = { first:0, second:0, third:0, starter:0, consol:0 };
     for (const w of allWinners) totalsByTier[w.tier]++;
 
-    res.json({ success: true, data: {
+    return {
       params: { bucket_width: bucketWidth, bucket_min: bucketMin, bucket_max: bucketMax,
                 months, dows, tiers, start_year: startYear },
       buckets,
@@ -1957,15 +1963,14 @@ app.get("/api/fourd/profitable-buckets", (req, res) => {
         top_hit_rate_bucket: topHitRateBucket ? { lo: topHitRateBucket.lo, hi: topHitRateBucket.hi, rate: topHitRateBucket.target_rate_pct } : null,
       },
       payouts: { big: BIG, small: SMALL, combo: COMBO },
-    }});
-  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+    };
+}
 
 // ─── Buckets-by-Time — month × bucket and DOW × bucket heatmaps ──────
 // For every draw, for every number with prior history, increments counters
 // keyed by (month, bucket) and (DOW, bucket). Surfaces whether the
 // 2000-2200 signal is consistent across months/DOWs or driven by a slice.
-app.get("/api/fourd/buckets-by-time", (req, res) => {
+app.get("/api/fourd/buckets-by-time", cache.withCache((req, res) => {
   try {
     const bucketWidth = Math.max(10, parseInt(req.query.bucket_width || "100", 10));
     const bucketMin   = parseInt(req.query.bucket_min || "0",    10);
@@ -2120,7 +2125,7 @@ app.get("/api/fourd/buckets-by-time", (req, res) => {
       by_dow:   dowOut,
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── Slice Detail — drill into a specific (months, dows, gap range) cell ─
 // Returns every winning bet that matches the slice + per-year aggregation.
@@ -2899,7 +2904,7 @@ app.get("/api/fourd/dry-spell-backtest", (req, res) => {
 // prize tier). High year-coverage % = the number "keeps coming back". A
 // 4-hit year with 5-year drought after counts the year ONCE, not 4× — this
 // prevents the metric from being skewed by clusters.
-app.get("/api/fourd/yearly-regulars", (req, res) => {
+app.get("/api/fourd/yearly-regulars", cache.withCache((req, res) => {
   try {
     const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
     const rows = db.prepare(
@@ -3044,7 +3049,7 @@ app.get("/api/fourd/yearly-regulars", (req, res) => {
       },
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── Steady Hitters — "small wins cover everything" analysis ──────────
 // For each number, compute hit cadence (median gap), longest dry spell,
@@ -3054,7 +3059,7 @@ app.get("/api/fourd/yearly-regulars", (req, res) => {
 // don't eat profit. Honest framing: this is variance reduction, not
 // edge — lottery is still memoryless, but a steady-hitter pattern
 // historically had lower swings than chasing a 1st prize.
-app.get("/api/fourd/steady-hitters", (req, res) => {
+app.get("/api/fourd/steady-hitters", cache.withCache((req, res) => {
   try {
     const MIN_HITS = parseInt(req.query.min_hits || "15", 10);
     const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
@@ -3225,7 +3230,7 @@ app.get("/api/fourd/steady-hitters", (req, res) => {
       ibet_most_profitable: ibetMostProfitable,
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── Calendar-Bias Hunter ─────────────────────────────────────────────
 // For each 4-digit number with ≥ MIN_HITS lifetime appearances, find its
@@ -3235,7 +3240,7 @@ app.get("/api/fourd/steady-hitters", (req, res) => {
 // HONEST CAVEAT: with 5,493 draws and 10,000 numbers, most "biases" we find
 // will be noise. We only return numbers where the bias is unlikely to be
 // random (chi-square or simple Z-score above threshold).
-app.get("/api/fourd/calendar-bias", (req, res) => {
+app.get("/api/fourd/calendar-bias", cache.withCache((req, res) => {
   try {
     const MIN_HITS = parseInt(req.query.min_hits || "12", 10);
     const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
@@ -3364,14 +3369,14 @@ app.get("/api/fourd/calendar-bias", (req, res) => {
       top: results.slice(0, 10),
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── $1 Big-Bet Simulator ─────────────────────────────────────────────
 // For each 4-digit number 0000-9999: if you bet $1 (Big) on it for every
 // single 4D draw in the archive, how much would you have won?
 // SG Pools $1 Big payouts: 1st $2000, 2nd $1000, 3rd $490, starter $250,
 // consolation $60 per hit.
-app.get("/api/fourd/dollar-sim", (req, res) => {
+app.get("/api/fourd/dollar-sim", cache.withCache((req, res) => {
   try {
     const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
     const rows = db.prepare(
@@ -3409,7 +3414,7 @@ app.get("/api/fourd/dollar-sim", (req, res) => {
       least_profitable: results.slice(-10).reverse(),
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // Year-by-year $1 Big-bet profit for a specific number
 app.get("/api/fourd/dollar-sim-yearly", (req, res) => {
@@ -3562,7 +3567,7 @@ function simulateIbet(num, rows, PAY) {
   };
 }
 
-app.get("/api/fourd/ibet-sim", (req, res) => {
+app.get("/api/fourd/ibet-sim", cache.withCache((req, res) => {
   try {
     const PAY = { first: 2000, second: 1000, third: 500, starter: 250, consol: 60 };
     const rows = db.prepare(
@@ -3586,7 +3591,7 @@ app.get("/api/fourd/ibet-sim", (req, res) => {
       least_profitable: results.slice(-10).reverse(),
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 app.get("/api/fourd/ibet-sim-lookup", (req, res) => {
   try {
@@ -3760,7 +3765,7 @@ app.get("/api/fourd/ending-digit", (req, res) => {
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
-app.get("/api/fourd/repeat-winners", (req, res) => {
+app.get("/api/fourd/repeat-winners", cache.withCache((req, res) => {
   try {
     const rows = db.prepare(
       "SELECT first_prize, draw_no, draw_date FROM fourd_draws ORDER BY draw_no ASC"
@@ -3782,7 +3787,7 @@ app.get("/api/fourd/repeat-winners", (req, res) => {
       top_15: repeats.slice(0, 15),
     }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
-});
+}));
 
 // ─── Best Combos: top number pairs and triples that came out together ─
 // Returns the most frequently co-occurring 2-number and 3-number sets in
