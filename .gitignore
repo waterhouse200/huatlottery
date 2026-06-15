@@ -23,5 +23,28 @@ notebooks/
 .claude/
 analysis/_cache/
 
+# Exploratory analysis — local-only, not committed to GitHub.
+# Only the files needed by analysis/serve.py (production weekly picker)
+# are tracked. Everything else stays on the local Mac.
+analysis/combo_sweep.py
+analysis/deep_combo_search.py
+analysis/elimination_search.py
+analysis/fourd_patterns.py
+analysis/markov_test.py
+analysis/ml_test.py
+analysis/pattern_explorer.py
+analysis/rigorous_elimination.py
+analysis/unorthodox_sweep.py
+analysis/compare_eras.py
+analysis/eda.py
+analysis/combined.py
+analysis/sweep.py
+analysis/run_all.py
+analysis/features.py
+analysis/rules/extra_rules.py
+analysis/rules/gap_due.py
+analysis/rules/hot_cold.py
+analysis/rules/unorthodox.py
+
 # Server-side cache (rebuilt at runtime)
 cache/
