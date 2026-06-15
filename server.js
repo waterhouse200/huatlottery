@@ -4157,6 +4157,44 @@ app.get("/api/admin/scrape-status", (req, res) => {
   res.json({ success: true, status: autoScrape.status() });
 });
 
+// Pre-warm cache: fire each heavy endpoint internally after server.listen()
+// so the cache is hot before any real user arrives. Sequential to avoid
+// CPU/memory pressure on Render's free tier (512MB).
+function warmupCache() {
+  const http = require("http");
+  const endpoints = [
+    "/api/fourd/profitable-buckets",
+    "/api/fourd/buckets-by-time",
+    "/api/fourd/yearly-regulars",
+    "/api/fourd/steady-hitters",
+    "/api/fourd/calendar-bias",
+    "/api/fourd/dollar-sim",
+    "/api/fourd/ibet-sim",
+    "/api/fourd/repeat-winners",
+  ];
+  console.log("[warmup] starting — " + endpoints.length + " endpoints to cache");
+  let i = 0;
+  function next() {
+    if (i >= endpoints.length) {
+      console.log("[warmup] complete");
+      return;
+    }
+    const url = endpoints[i++];
+    const t0 = Date.now();
+    http.get(`http://localhost:${PORT}${url}`, (res) => {
+      res.on("data", () => {});
+      res.on("end", () => {
+        console.log(`[warmup] ${url} cached in ${Date.now() - t0}ms`);
+        setImmediate(next);
+      });
+    }).on("error", (err) => {
+      console.warn(`[warmup] ${url} failed:`, err.message);
+      setImmediate(next);
+    });
+  }
+  next();
+}
+
 // Start
 app.listen(PORT, () => {
   const tc = db.prepare("SELECT COUNT(*) AS cnt FROM toto_draws").get().cnt;
@@ -4170,6 +4208,9 @@ app.listen(PORT, () => {
   } else {
     console.log("[auto-scrape] disabled (AUTO_SCRAPE=0)");
   }
+
+  // Background warmup — runs sequentially, doesn't block startup
+  setTimeout(warmupCache, 2000);
 });
 
 process.on("SIGINT", () => { db.close(); process.exit(0); });
