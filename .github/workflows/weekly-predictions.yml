@@ -1,0 +1,47 @@
+name: Weekly AI predictions
+
+on:
+  schedule:
+    # Sunday 10:00 PM SGT (14:00 UTC) — picks ready by Monday morning visitors
+    - cron: '0 14 * * 0'
+  workflow_dispatch:          # Allow manual trigger via Actions tab
+
+permissions:
+  contents: write             # Bot commits + pushes the DB update
+
+concurrency:
+  group: predictions
+  cancel-in-progress: false
+
+jobs:
+  predict:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install production deps only (no jupyter/matplotlib)
+        run: pip install --no-cache-dir numpy pandas scipy pyarrow
+
+      - name: Generate weekly picks
+        run: python -m analysis.serve
+
+      - name: Commit and push if DB updated
+        run: |
+          git config user.name  "Huatlottery Bot"
+          git config user.email "bot@huatlottery.local"
+          git add huatlottery.db
+          if git diff --staged --quiet; then
+            echo "No new picks — DB unchanged."
+          else
+            WEEK=$(date -u +%Y-%m-%d)
+            git commit -m "chore(predictions): weekly auto-update for week ${WEEK}"
+            git push
+          fi
