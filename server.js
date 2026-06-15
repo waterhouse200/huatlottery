@@ -5,6 +5,7 @@ const { getDb, initSchema } = require("./db");
 const { getLuckyNumbers } = require("./lib/lucky");
 const autoScrape = require("./lib/auto-scrape");
 const cache = require("./lib/cache");
+const compression = require("compression");
 const { pickLang, dict } = require("./i18n");
 const { Lunar, Solar } = require("lunar-javascript");
 
@@ -91,6 +92,21 @@ app.get("/sitemap.xml", (req, res) => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.join("\n")}
 </urlset>`);
+});
+
+// gzip/brotli compression — cuts 316KB HTML to ~35KB, huge speed win
+app.use(compression({ level: 6, threshold: 1024 }));
+
+// Aggressive caching for HTML and static assets — browsers re-use without
+// re-fetching for 5 min (HTML) / 1 day (assets), drops repeat-visit load
+// to near-zero network time.
+app.use((req, res, next) => {
+  if (req.path === "/" || req.path.endsWith(".html")) {
+    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300");
+  } else if (req.path.match(/\.(css|js|png|jpg|svg|woff2?|ico)$/)) {
+    res.setHeader("Cache-Control", "public, max-age=86400");
+  }
+  next();
 });
 
 app.use(express.static(path.join(__dirname)));
