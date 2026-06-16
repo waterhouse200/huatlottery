@@ -8,7 +8,7 @@ const cache = require("./lib/cache");
 const compression = require("compression");
 const { pickLang, dict } = require("./i18n");
 const { Lunar, Solar } = require("lunar-javascript");
-const { createLabRouter, makeTrackPageView } = require("./routes/lab");
+const { createLabRouter, makeTrackPageView, createDwellRouter } = require("./routes/lab");
 
 // Convert a lunar (year, month, day) to a solar YYYY-MM-DD string.
 function solarFromLunar(year, month, day) {
@@ -116,7 +116,8 @@ app.use((req, res, next) => {
 // into lab mode without needing a hosts-file entry.
 const db = getDb();
 initSchema(db);
-const labRouter   = createLabRouter(db);
+const labRouter     = createLabRouter(db);
+const dwellRouter   = createDwellRouter(db);
 const trackPageView = makeTrackPageView(db);
 
 app.use((req, _res, next) => {
@@ -130,6 +131,11 @@ app.use((req, _res, next) => {
   if (!req._isLab) trackPageView(req);
   next();
 });
+
+// Dwell beacon endpoint — mounted on the main app because beacons come
+// from huatlottery.com (not lab). It writes to the same lab_dwell table
+// that the lab dashboard reads from.
+app.use(dwellRouter);
 
 // All lab.* requests are handled by the lab router; everything else falls
 // through to the main app below.

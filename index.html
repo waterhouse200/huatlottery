@@ -291,6 +291,57 @@ input[type=number]::placeholder{font-size:15px}
 </div>
 
 <script>
+// ═══ DWELL-TIME TRACKING ═════════════════════════════════════
+// Measures how long visitors spend on each tab + their full session.
+// Sent as a single beacon on pagehide / visibilitychange→hidden so it
+// reliably fires even when the user closes the tab. Capped client-side
+// so an open-and-forgotten tab can't skew averages.
+var __DWELL = {
+  sessionStart: Date.now(),
+  tabStart:     Date.now(),
+  currentTab:   null,           // set after currentTab init below
+  tabTimes:     {},             // { tabName: totalMs }
+  sent:         false,          // beacon is idempotent — only send once
+};
+function __dwellAccumulate() {
+  var tab = __DWELL.currentTab;
+  if (!tab) return;
+  var dt = Date.now() - __DWELL.tabStart;
+  if (dt < 200 || dt > 1800000) { __DWELL.tabStart = Date.now(); return; }
+  __DWELL.tabTimes[tab] = (__DWELL.tabTimes[tab] || 0) + dt;
+  __DWELL.tabStart = Date.now();
+}
+function __dwellOnTabSwitch(newTab) {
+  __dwellAccumulate();
+  __DWELL.currentTab = newTab;
+}
+function __dwellBeacon() {
+  if (__DWELL.sent) return;
+  __dwellAccumulate();
+  var payload = {
+    sessionMs: Math.min(Date.now() - __DWELL.sessionStart, 7200000),
+    tabs: __DWELL.tabTimes,
+  };
+  // Skip empty / instant-bounce sessions
+  if (payload.sessionMs < 500) return;
+  __DWELL.sent = true;
+  try {
+    var body = JSON.stringify(payload);
+    var blob = new Blob([body], { type: "application/json" });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon("/api/lab/dwell", blob);
+    } else {
+      // Fallback for old browsers — fire-and-forget fetch with keepalive
+      fetch("/api/lab/dwell", { method: "POST", body: body,
+        headers: { "Content-Type": "application/json" }, keepalive: true });
+    }
+  } catch (e) { /* never let analytics break the page */ }
+}
+window.addEventListener("pagehide", __dwellBeacon);
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "hidden") __dwellBeacon();
+});
+
 // ═══ MOBILE DRAWER ═══════════════════════════════════════════
 // Slides the sidebar in/out on small viewports. Pass true/false to force a
 // state, or call with no args to toggle. The backdrop closes on click.
@@ -454,6 +505,7 @@ function getTabs() {
 }
 
 var currentTab = "dashboard";
+__DWELL.currentTab = currentTab;     // dwell starts measuring dashboard time
 var navEl = document.getElementById("nav");
 var contentEl = document.getElementById("content");
 
@@ -465,6 +517,7 @@ function renderNav() {
     btn.onclick = function() {
       var oldTab = currentTab;
       currentTab = btn.dataset.tab;
+      __dwellOnTabSwitch(currentTab);  // capture time spent on prev tab
       resetLazyObserver();          // drop pending fetches from prev tab
       renderNav(); renderPage(); updateSEO(currentTab);
       window.scrollTo(0, 0);
