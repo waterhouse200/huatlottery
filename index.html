@@ -13,6 +13,10 @@
 <link rel="canonical" href="https://huatlottery.com/">
 <meta name="theme-color" content="#3730a3">
 <meta name="application-name" content="Huatlottery">
+
+<!-- Favicon: inline SVG of the 4-circle clover brand mark (same as sidebar) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='8' cy='8' r='3.5' fill='%233730a3'/%3E%3Ccircle cx='16' cy='8' r='3.5' fill='%234f46e5'/%3E%3Ccircle cx='8' cy='16' r='3.5' fill='%234f46e5'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%237c3aed'/%3E%3Cpath d='M13 13 Q 18 16 22 22' stroke='%237c3aed' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='8' cy='8' r='3.5' fill='%233730a3'/%3E%3Ccircle cx='16' cy='8' r='3.5' fill='%234f46e5'/%3E%3Ccircle cx='8' cy='16' r='3.5' fill='%234f46e5'/%3E%3Ccircle cx='16' cy='16' r='3.5' fill='%237c3aed'/%3E%3Cpath d='M13 13 Q 18 16 22 22' stroke='%237c3aed' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 <meta http-equiv="Content-Language" content="en-SG">
 <meta name="geo.region" content="SG">
 <meta name="geo.placename" content="Singapore">
@@ -439,6 +443,18 @@ function makeBall(n, size, color, delay) {
   return '<div class="ball" style="width:'+size+'px;height:'+size+'px;font-size:'+(size*0.38)+'px;background:'+color+';animation-delay:'+(delay||0)+'ms;box-shadow:0 4px 10px rgba(0,0,0,.18),inset 0 -4px 8px rgba(0,0,0,.20),inset 0 4px 8px rgba(255,255,255,.30)">'+n+'</div>';
 }
 
+// Returns the localized 3-letter day name for an ISO date like 2026-06-11.
+// Uses common.dow.* keys which already exist in en.json + zh.json so EN gives
+// "Wed" and 中文 gives "周三". Returns '' on bad input — never throws.
+function dayOfWeek(iso) {
+  if (!iso) return '';
+  var d = new Date(iso + 'T00:00:00');
+  if (isNaN(d.getTime())) return '';
+  var keys = ['sun','mon','tue','wed','thu','fri','sat'];
+  var k = keys[d.getDay()];
+  return L('common.dow.' + k, k.charAt(0).toUpperCase() + k.slice(1));
+}
+
 // ═══ i18n ════════════════════════════════════════════════════
 var LANG = (localStorage.getItem('huat_lang')) || ((navigator.language||'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
 var STRINGS = null;     // dictionary loaded async
@@ -685,7 +701,10 @@ function renderDashboard() {
   h += '<div style="font-size:22px;font-weight:800;color:var(--p);letter-spacing:.04em">TOTO</div>';
   h += '</div>';
   h += '<div style="font-family:var(--mo);font-size:36px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+t.draw_no+'</div>';
-  h += '<div style="font-size:16px;color:var(--t2);font-weight:600">'+t.draw_date+'</div>';
+  h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">'+
+       '<span>'+t.draw_date+'</span>'+
+       '<span style="font-size:12.5px;font-weight:700;color:var(--p);background:#3730a311;padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(t.draw_date)+'</span>'+
+       '</div>';
 
   // Balls \u2014 bigger, 6 purple + red additional
   h += '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:18px 0">';
@@ -721,7 +740,10 @@ function renderDashboard() {
   h += '<div style="font-size:22px;font-weight:800;color:var(--amb);letter-spacing:.04em">4D</div>';
   h += '</div>';
   h += '<div style="font-family:var(--mo);font-size:36px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+f.draw_no+'</div>';
-  h += '<div style="font-size:16px;color:var(--t2);font-weight:600">'+f.draw_date+'</div>';
+  h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">'+
+       '<span>'+f.draw_date+'</span>'+
+       '<span style="font-size:12.5px;font-weight:700;color:var(--amb);background:#d9770611;padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(f.draw_date)+'</span>'+
+       '</div>';
 
   // Top 3 prizes \u2014 same size, with top-3 archive hit count beside each
   var top3 = f.top3_counts || {};
@@ -2770,17 +2792,21 @@ function runAnniversary(inputId, outputId, game) {
       html += '<p style="font-size:12.5px;color:var(--t3)">No '+(game==='toto'?'TOTO':'4D')+' draws on that date in our archive.</p>';
     } else if (game === 'toto') {
       rows.slice(0, 20).forEach(function(r){
-        html += '<div style="padding:7px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:13px;align-items:center">'+
+        var dow = dayOfWeek(r.draw_date);
+        html += '<div style="padding:7px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:13px;align-items:center;flex-wrap:wrap">'+
                 '<span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span>'+
                 '<span style="color:var(--t2);min-width:100px">'+r.draw_date+'</span>'+
+                (dow?'<span style="font-size:11px;font-weight:700;color:var(--p);background:#3730a311;padding:1px 7px;border-radius:4px">'+dow+'</span>':'')+
                 '<span style="font-weight:600">'+r.numbers.join(' · ')+(r.additional_num?' + '+r.additional_num:'')+'</span>'+
                 '</div>';
       });
     } else {
       rows.slice(0, 20).forEach(function(r){
-        html += '<div style="padding:7px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:13px;align-items:center">'+
+        var dow = dayOfWeek(r.draw_date);
+        html += '<div style="padding:7px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:13px;align-items:center;flex-wrap:wrap">'+
                 '<span style="font-weight:700;color:var(--amb);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span>'+
                 '<span style="color:var(--t2);min-width:100px">'+r.draw_date+'</span>'+
+                (dow?'<span style="font-size:11px;font-weight:700;color:var(--amb);background:#d9770611;padding:1px 7px;border-radius:4px">'+dow+'</span>':'')+
                 '<span style="font-weight:700;font-family:var(--mo);font-size:15px">'+r.first_prize+'</span>'+
                 '<span style="font-size:11.5px;color:var(--t3)">2nd '+r.second_prize+' · 3rd '+r.third_prize+'</span>'+
                 '</div>';
@@ -4254,12 +4280,14 @@ window.doHistSearch = function() {
       html += '<p style="font-size:12.5px;color:var(--t3)">'+L('history.noMatches','No matches.')+'</p>';
     } else if (histGame === '4d') {
       rows.slice(0,30).forEach(function(r) {
-        html += '<div style="padding:8px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:12.5px;align-items:center"><span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span><span style="color:var(--t2);min-width:90px">'+r.draw_date+'</span><span style="font-weight:600">'+r.prizes.join(', ')+'</span></div>';
+        var dow = dayOfWeek(r.draw_date);
+        html += '<div style="padding:8px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:12.5px;align-items:center;flex-wrap:wrap"><span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span><span style="color:var(--t2);min-width:90px">'+r.draw_date+'</span><span style="font-size:11px;font-weight:700;color:var(--amb);background:#d9770611;padding:1px 7px;border-radius:4px">'+dow+'</span><span style="font-weight:600">'+r.prizes.join(', ')+'</span></div>';
       });
     } else {
       rows.slice(0,30).forEach(function(r) {
         var nums = [r.num1, r.num2, r.num3, r.num4, r.num5, r.num6].filter(function(n){return n!=null;}).join(', ');
-        html += '<div style="padding:8px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:12.5px;align-items:center"><span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span><span style="color:var(--t2);min-width:90px">'+(r.draw_date||'—')+'</span><span style="font-weight:600">'+nums+(r.additional_num?' + '+r.additional_num:'')+'</span></div>';
+        var dow = dayOfWeek(r.draw_date);
+        html += '<div style="padding:8px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:12.5px;align-items:center;flex-wrap:wrap"><span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span><span style="color:var(--t2);min-width:90px">'+(r.draw_date||'—')+'</span>'+(dow?'<span style="font-size:11px;font-weight:700;color:var(--p);background:#3730a311;padding:1px 7px;border-radius:4px">'+dow+'</span>':'')+'<span style="font-weight:600">'+nums+(r.additional_num?' + '+r.additional_num:'')+'</span></div>';
       });
     }
     html += '</div>';
