@@ -285,7 +285,7 @@ input[type=number]::placeholder{font-size:15px}
       <button class="tab" id="langEn" onclick="setLang('en')">EN</button>
       <button class="tab" id="langZh" onclick="setLang('zh')">中文</button>
     </div>
-    <div class="status" id="statusBadge">Huatlottery v1.0</div>
+    <div class="status" id="statusBadge">Huatlottery v1.1</div>
   </div>
   <div class="content" id="content"></div>
 </div>
@@ -482,7 +482,7 @@ window.setLang = function(lang) {
 function renderAll() {
   document.getElementById('langEn').className = 'tab' + (LANG==='en' ? ' active' : '');
   document.getElementById('langZh').className = 'tab' + (LANG==='zh' ? ' active' : '');
-  document.getElementById('statusBadge').textContent = L('app.status', 'Huatlottery v1.0');
+  document.getElementById('statusBadge').textContent = L('app.status', 'Huatlottery v1.1');
   var menuLbl = document.querySelector('#menuTog .lbl');
   if (menuLbl) menuLbl.textContent = L('common.menu', 'More');
   renderNav();
