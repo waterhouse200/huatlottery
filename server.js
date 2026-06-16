@@ -8,6 +8,7 @@ const cache = require("./lib/cache");
 const compression = require("compression");
 const { pickLang, dict } = require("./i18n");
 const { Lunar, Solar } = require("lunar-javascript");
+const { createLabRouter, makeTrackPageView } = require("./routes/lab");
 
 // Convert a lunar (year, month, day) to a solar YYYY-MM-DD string.
 function solarFromLunar(year, month, day) {
@@ -109,10 +110,32 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(express.static(path.join(__dirname)));
-
+// ─── Lab subdomain routing (lab.huatlottery.com) ───────────────────────
+// Hostname check happens before the static handler so lab.* never serves
+// the public index.html. For local testing, `?_lab=1` flips a request
+// into lab mode without needing a hosts-file entry.
 const db = getDb();
 initSchema(db);
+const labRouter   = createLabRouter(db);
+const trackPageView = makeTrackPageView(db);
+
+app.use((req, _res, next) => {
+  const host = (req.hostname || "").toLowerCase();
+  req._isLab = host.startsWith("lab.") || req.query._lab === "1";
+  next();
+});
+
+// Page-view tracking — only counts hits to the PUBLIC site, never lab itself
+app.use((req, _res, next) => {
+  if (!req._isLab) trackPageView(req);
+  next();
+});
+
+// All lab.* requests are handled by the lab router; everything else falls
+// through to the main app below.
+app.use((req, res, next) => req._isLab ? labRouter(req, res, next) : next());
+
+app.use(express.static(path.join(__dirname)));
 
 function parseFourdRow(row) {
   if (!row) return null;
