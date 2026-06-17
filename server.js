@@ -88,18 +88,21 @@ Sitemap: ${SITE_URL}/sitemap.xml
 });
 
 app.get("/sitemap.xml", (req, res) => {
+  // SPA — all ?tab=… URLs serve the same index.html, so listing them creates
+  // duplicate-canonical errors in Search Console. One canonical URL keeps it
+  // clean; Google still ranks individual tabs because the meta tags update
+  // per-tab client-side.
+  //
+  // Guard against malformed SITE_URL — if the env var is missing the colon
+  // (e.g. "https//..."), strip and rebuild so the sitemap is always valid
+  // regardless of how someone typed it on Render.
+  const cleanUrl = SITE_URL.replace(/^https?:?\/\/?/, "").replace(/\/$/, "");
+  const base = `https://${cleanUrl}`;
   const today = new Date().toISOString().slice(0, 10);
-  const tabs = ["dashboard","fourd","toto","alpha4d","history","prediction","lucky","mynumbers"];
-  const urls = [`<url><loc>${SITE_URL}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`]
-    .concat(tabs.map(t => {
-      const priority = (t === "fourd" || t === "toto" || t === "dashboard") ? "0.9" : "0.7";
-      const freq     = (t === "fourd" || t === "toto" || t === "dashboard") ? "daily" : "weekly";
-      return `<url><loc>${SITE_URL}/?tab=${t}</loc><lastmod>${today}</lastmod><changefreq>${freq}</changefreq><priority>${priority}</priority></url>`;
-    }));
   res.type("application/xml").send(
 `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.join("\n")}
+<url><loc>${base}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
 </urlset>`);
 });
 
