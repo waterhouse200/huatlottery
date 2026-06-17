@@ -111,6 +111,30 @@ function initLabSchema(db) {
     try { db.exec(`ALTER TABLE lab_pageviews ADD COLUMN ${def}`); }
     catch (e) { if (!/duplicate column/i.test(e.message)) throw e; }
   }
+  // One-time backfill cleanup — remove any uptime-monitor pings that
+  // slipped into the table before we started filtering at insert time.
+  // Idempotent — re-running once table is clean is a no-op.
+  try {
+    db.exec(`
+      DELETE FROM lab_pageviews WHERE ua IS NOT NULL AND (
+        ua LIKE '%UptimeRobot%'  OR ua LIKE '%StatusCake%'    OR
+        ua LIKE '%Pingdom%'      OR ua LIKE '%BetterStack%'   OR
+        ua LIKE '%BetterUptime%' OR ua LIKE '%Site24x7%'      OR
+        ua LIKE '%HetrixTools%'  OR ua LIKE '%updown.io%'     OR
+        ua LIKE '%Freshping%'    OR ua LIKE '%Cronitor%'      OR
+        ua LIKE '%healthchecks.io%'
+      );
+    `);
+  } catch (_) { /* table may not have ua column yet on very-first init */ }
+}
+
+// ─── Uptime / monitoring detection ───────────────────────────────────
+// These ping every few minutes to keep Render's free tier warm. They
+// have zero analytical value — recording them would inflate the bot tile
+// and pollute the recent-views table. We skip the insert entirely.
+function isUptimeCheck(ua) {
+  if (!ua) return false;
+  return /uptimerobot|statuscake|pingdom|betterstack|betteruptime|site24x7|hetrixtools|updown\.io|freshping|cronitor|healthchecks\.io|^uptime$/i.test(ua);
 }
 
 // ─── User-agent parser ──────────────────────────────────────────────
@@ -224,9 +248,11 @@ function makeTrackPageView(db) {
     try {
       if (req.method !== "GET") return;
       if (req.path !== "/" && !req.path.endsWith(".html")) return;
+      const ua  = (req.headers["user-agent"] || "").slice(0, 200) || null;
+      // Skip uptime monitors entirely — no DB row, no clutter
+      if (isUptimeCheck(ua)) return;
       const tab = (req.query && req.query.tab) ? String(req.query.tab).slice(0, 24) : null;
       const ref = (req.headers.referer || req.headers.referrer || "").slice(0, 200) || null;
-      const ua  = (req.headers["user-agent"] || "").slice(0, 200) || null;
       const lang = (req.headers["accept-language"] || "").slice(0, 40) || null;
       const ip = (req.headers["x-forwarded-for"] || req.ip || "").split(",")[0].trim();
       const ipHash = ip ? crypto.createHash("sha256").update(ip + SECRET).digest("hex").slice(0, 16) : null;
@@ -250,7 +276,11 @@ function computeDashboard(db) {
 
   // Total counters
   const total   = q(`SELECT COUNT(*) AS n FROM lab_pageviews WHERE ${HUMAN}`).get().n;
-  const today   = q(`SELECT COUNT(*) AS n FROM lab_pageviews WHERE ${HUMAN} AND date(ts,'localtime') = date('now','localtime')`).get().n;
+  // All day-of-week / "today" computations use Singapore Time so the
+  // dashboard matches what you'd expect in SGT, not the Render server's
+  // UTC clock. SQLite's "'+8 hours'" modifier shifts the timestamp; we
+  // never store SGT (still UTC under the hood), just compute it on read.
+  const today   = q(`SELECT COUNT(*) AS n FROM lab_pageviews WHERE ${HUMAN} AND date(ts,'+8 hours') = date('now','+8 hours')`).get().n;
   const last7   = q(`SELECT COUNT(*) AS n FROM lab_pageviews WHERE ${HUMAN} AND ts >= datetime('now','-7 days')`).get().n;
   const last30  = q(`SELECT COUNT(*) AS n FROM lab_pageviews WHERE ${HUMAN} AND ts >= datetime('now','-30 days')`).get().n;
   const uniqAll = q(`SELECT COUNT(DISTINCT ip_hash) AS n FROM lab_pageviews WHERE ${HUMAN} AND ip_hash IS NOT NULL`).get().n;
@@ -266,9 +296,9 @@ function computeDashboard(db) {
     GROUP BY tab ORDER BY n DESC LIMIT 10
   `).all();
 
-  // 14-day pageview + unique-visitor history
+  // 14-day pageview + unique-visitor history (days bucketed in SGT)
   const days = q(`
-    SELECT date(ts,'localtime') AS day,
+    SELECT date(ts,'+8 hours') AS day,
            COUNT(*) AS views,
            COUNT(DISTINCT ip_hash) AS uniques
     FROM lab_pageviews
@@ -350,7 +380,7 @@ function computeDashboard(db) {
   const visitorDays = q(`
     SELECT days_active, COUNT(*) AS n
     FROM (
-      SELECT ip_hash, COUNT(DISTINCT date(ts,'localtime')) AS days_active
+      SELECT ip_hash, COUNT(DISTINCT date(ts,'+8 hours')) AS days_active
       FROM lab_pageviews
       WHERE is_bot = 0 AND ts >= datetime('now','-30 days') AND ip_hash IS NOT NULL
       GROUP BY ip_hash
@@ -463,6 +493,22 @@ function flagEmoji(code) {
 }
 function pct(n, total) { return total ? Math.round(n / total * 1000) / 10 : 0; }
 
+// Convert a SQLite UTC timestamp ("YYYY-MM-DD HH:MM:SS") to "MM-DD HH:MM"
+// in Singapore Time. Used in the dashboard's Last-20-views table so the
+// times you see match your wall clock, not the Render server's UTC.
+function fmtSGT(ts) {
+  if (!ts) return "—";
+  const utc = new Date(ts.replace(" ", "T") + "Z");  // mark as UTC for parsing
+  if (isNaN(utc.getTime())) return ts;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Singapore",
+    month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(utc);
+  const p = (t) => parts.find(x => x.type === t).value;
+  return `${p("month")}-${p("day")} ${p("hour")}:${p("minute")}`;
+}
+
 // Render a duration in a human-friendly way: "23s", "1m 47s", "12m 03s"
 function fmtDuration(ms) {
   if (!ms || ms < 1000) return ms ? Math.round(ms) + "ms" : "—";
@@ -547,7 +593,7 @@ function dashboardPage(d, labQ) {
     const flag = flagEmoji(r.country_code);
     const botBadge = r.is_bot ? '<span class="pill" style="background:#7c2d12;color:#fed7aa">bot</span>' : '';
     return `<tr>
-      <td><span class="pill">${r.ts.slice(5, 16).replace("T", " ")}</span></td>
+      <td><span class="pill">${fmtSGT(r.ts)}</span></td>
       <td>${flag} ${escapeHtml(r.country_code || "")}</td>
       <td>${escapeHtml(r.tab || "(landing)")}</td>
       <td>${escapeHtml(r.device || "—")}</td>
@@ -663,7 +709,7 @@ function dashboardPage(d, labQ) {
       <h2>Last 20 views</h2>
       <div class="card" style="padding:0;overflow-x:auto">
         ${recentRows ? `<table>
-          <thead><tr><th>Time</th><th>Geo</th><th>Tab</th><th>Device</th><th>Browser</th><th></th></tr></thead>
+          <thead><tr><th>Time (SGT)</th><th>Geo</th><th>Tab</th><th>Device</th><th>Browser</th><th></th></tr></thead>
           <tbody>${recentRows}</tbody>
         </table>` : `<div class="empty">No views recorded yet.</div>`}
       </div>
