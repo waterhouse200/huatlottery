@@ -686,6 +686,21 @@ function createLabRouter(db) {
   // Parse url-encoded body (login form) — local to lab to avoid affecting main app
   router.use(express.urlencoded({ extended: false }));
 
+  // Tell every search engine to ignore everything on this subdomain.
+  // Sent as an HTTP header on every response — works for non-HTML responses
+  // too (redirects, JSON, etc.) where the <meta> tag can't reach.
+  router.use((req, res, next) => {
+    res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+    next();
+  });
+
+  // Subdomain-specific robots.txt that blocks all crawlers. Must be served
+  // BEFORE the auth gate or crawlers see a login-redirect instead of the
+  // Disallow directive (and might keep trying).
+  router.get("/robots.txt", (req, res) => {
+    res.type("text/plain").send("User-agent: *\nDisallow: /\n");
+  });
+
   // Preserve the local-testing flag across redirects. On prod, hostname
   // is `lab.huatlottery.com` so this returns ""; on localhost where we
   // route via `?_lab=1`, we have to carry it forward or the next request

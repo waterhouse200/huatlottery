@@ -70,6 +70,14 @@ app.use(express.json());
 const SITE_URL = process.env.SITE_URL || "https://huatlottery.com";
 
 app.get("/robots.txt", (req, res) => {
+  // Lab subdomain — block all crawlers. Same hostname check used by the
+  // lab router below; this just needs to fire earlier so the public
+  // robots.txt below never reaches lab.* requests.
+  const host = (req.hostname || "").toLowerCase();
+  const isLab = host.startsWith("lab.") || req.query._lab === "1";
+  if (isLab) {
+    return res.type("text/plain").send("User-agent: *\nDisallow: /\n");
+  }
   res.type("text/plain").send(
 `User-agent: *
 Allow: /
