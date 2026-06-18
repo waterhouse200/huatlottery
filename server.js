@@ -66,11 +66,12 @@ app.use(express.json());
 // ── Self-healing scraper ── catch up on web traffic, independent of GitHub's
 // (flaky) scheduled cron. Throttled to ≤1 run / 5 min, fire-and-forget, and
 // catchUp() can never throw — so it never blocks or affects a response.
-// Off unless ENABLE_SELFHEAL=1. Set POLLER_SELF_PUSH=1 + GH_TOKEN to persist to git.
-if (process.env.ENABLE_SELFHEAL === "1") {
+// ON by default (pure code, no config). Set DISABLE_SELFHEAL=1 to switch off.
+// Optional: POLLER_SELF_PUSH=1 + GH_TOKEN to also persist captures to git.
+if (process.env.DISABLE_SELFHEAL !== "1") {
   const { catchUp } = require("./scraper/auto");
   app.use((req, _res, next) => { catchUp().catch(() => {}); next(); });
-  console.log("[selfheal] enabled — traffic-driven catch-up active");
+  console.log("[selfheal] active — traffic-driven catch-up (no setup needed)");
 }
 
 // Serve ALL static files from this directory (including index.html)
