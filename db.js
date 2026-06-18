@@ -52,6 +52,22 @@ function initSchema(db) {
 
     CREATE INDEX IF NOT EXISTS idx_fourd_draw_date ON fourd_draws(draw_date DESC);
     CREATE INDEX IF NOT EXISTS idx_fourd_draw_no   ON fourd_draws(draw_no   DESC);
+
+    ---------------------------------------------------------------
+    -- Next-draw sentinel (one row per game). Read from Singapore Pools'
+    -- pregenerated next-draw file. next_draw_at is the exact SGT moment
+    -- the upcoming draw is scheduled — always AHEAD of "now" when caught up.
+    -- The poller arms at next_draw_at and stops once next_draw_no is captured.
+    ---------------------------------------------------------------
+    CREATE TABLE IF NOT EXISTS next_draws (
+      game           TEXT PRIMARY KEY,          -- 'toto' | 'fourd'
+      next_draw_no   INTEGER,                   -- latest result_no + 1
+      next_draw_date TEXT,                       -- ISO date (SGT)
+      next_draw_time TEXT,                        -- HH:MM (SGT, 24h)
+      next_draw_at   TEXT,                        -- ISO 8601 w/ +08:00 — the exact moment
+      raw            TEXT,                        -- raw "Mon, 22 Jun 2026, 6.30pm"
+      updated_at     TEXT DEFAULT (datetime('now'))
+    );
   `);
 }
 
