@@ -116,7 +116,10 @@ async function tick(game) {
   const nextNo = latest.draw_no + 1;
   const sentinelChanged = upsertSentinel(game, nextNo, next);
   if (inserted > 0 || sentinelChanged) checkpoint();  // fold WAL into .db only when something changed
-  if (inserted > 0) gitPush(`chore(scrape): ${game} +${inserted} → #${dbMax}`); // self-push only in persistent mode
+  if (inserted > 0) {
+    try { require("../lib/cache").clear(); log("cache", "cleared — new draw shows immediately"); } catch (e) { /* optional */ }
+    gitPush(`chore(scrape): ${game} +${inserted} → #${dbMax}`); // self-push only in persistent mode
+  }
   log(game, `dbMax=${dbMax} published=${latest.draw_no} next=#${nextNo} @ ${next?.at || "?"} ${inserted ? `(+${inserted})` : "(no change)"}`);
   return { dbMax, nextNo, nextAt: next?.at || null, inserted };
 }
