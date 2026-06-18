@@ -296,27 +296,7 @@ input[type=number]::placeholder{font-size:15px}
   </div>
   <div class="content" id="content"></div>
 
-  <footer id="siteFooter" style="max-width:980px;margin:44px auto 0;padding:24px 18px 56px;border-top:1px solid var(--bd);color:var(--t3);font-size:12.5px;line-height:1.65">
-    <div style="font-weight:800;color:var(--t2);font-size:13px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">Disclaimer &amp; Responsible Play</div>
-    <p style="margin:0 0 10px">
-      <b>For education and entertainment purposes only.</b> Huatlottery is an independent, non-commercial project built to explore and visualise publicly available lottery data. Nothing on this website constitutes gambling, betting, financial, or investment advice, and nothing here is a recommendation, tip, prediction, or guarantee of any outcome. All numbers, statistics, trends, "hot/cold" indicators, charts, simulations, and "lucky number" features are provided purely for general interest and amusement.
-    </p>
-    <p style="margin:0 0 10px">
-      Lottery draws are games of <b>pure chance</b>. Every draw is random and statistically independent — past results do <b>not</b> influence future draws, and no pattern, system, algorithm, model, or tool (including anything presented on this site) can improve your odds of winning or reliably predict any result. Please do not treat any information here as a method to gain an edge or to "beat" the lottery; mathematically, no such edge exists.
-    </p>
-    <p style="margin:0 0 10px">
-      Results are compiled from public sources for reference and may contain errors, omissions, or delays. Always verify against the <b>official Singapore Pools</b> results before relying on any figure. This site is <b>not affiliated with, endorsed by, or connected to Singapore Pools</b> or any official lottery operator. Use of this website, and any decisions you make, are entirely at your own discretion and risk; the creators accept no liability for any loss arising from its use.
-    </p>
-    <p style="margin:0 0 16px">
-      Gambling is intended for persons of <b>legal age only</b>. If you choose to play, please play responsibly: only ever spend what you can comfortably afford to lose, decide on a budget and time limit in advance, never borrow money to gamble, and never chase your losses. Gambling should be a form of entertainment — never a way to make money, solve financial problems, or cope with stress.
-    </p>
-    <div style="background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">
-      <div style="font-weight:800;color:var(--t2);margin-bottom:6px">🫂 Struggling to control gambling? You are not alone.</div>
-      <p style="margin:0">
-        If you, or someone you care about, are finding it difficult to control gambling behaviour, please reach out for professional help — support is free, confidential, and available 24 hours. In Singapore, contact the <b>National Council on Problem Gambling (NCPG)</b> helpline at <b style="color:var(--p);font-family:var(--mo)">1800-6-668-668</b>, or visit <a href="https://www.ncpg.org.sg" target="_blank" rel="noopener" style="color:var(--p);font-weight:700">ncpg.org.sg</a>. If you are outside Singapore, please contact your local problem-gambling helpline or a qualified healthcare professional. Reaching out early is a sign of strength.
-      </p>
-    </div>
-  </footer>
+  <footer id="siteFooter" style="max-width:980px;margin:44px auto 0;padding:18px 18px 40px;border-top:1px solid var(--bd);text-align:center;font-size:11.5px;color:var(--t3);line-height:1.6">For education &amp; entertainment only — not gambling advice. <a href="/?tab=disclaimer" style="color:var(--p);font-weight:700;white-space:nowrap">Disclaimer &amp; Responsible Play &rarr;</a></footer>
 </div>
 
 <script>
@@ -531,18 +511,31 @@ function renderAll() {
   renderFooter();
 }
 
-// Bilingual disclaimer footer — filled from i18n strings so it switches with the
-// EN/中文 toggle. If strings aren't loaded, the static English footer stays as fallback.
+// Slim footer: one small line + a link to the full Disclaimer view. Switches with
+// the EN/中文 toggle; the static English line stays as a no-JS fallback.
 function renderFooter() {
   var el = document.getElementById('siteFooter');
   if (!el || !STRINGS || !STRINGS.footer) return;
   var f = STRINGS.footer;
-  var h = '<div style="font-weight:800;color:var(--t2);font-size:13px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">'+(f.title||'')+'</div>';
-  ['p1','p2','p3','p4'].forEach(function(k,i){ h += '<p style="margin:0 0 '+(i===3?'16':'10')+'px">'+(f[k]||'')+'</p>'; });
-  h += '<div style="background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:14px 16px">';
-  h += '<div style="font-weight:800;color:var(--t2);margin-bottom:6px">'+(f.helpTitle||'')+'</div>';
-  h += '<p style="margin:0">'+(f.help||'')+'</p></div>';
-  el.innerHTML = h;
+  el.innerHTML = (f.short || 'For education & entertainment only — not gambling advice.')
+    + ' <a href="/?tab=disclaimer" onclick="event.preventDefault();showDisclaimer();" style="color:var(--p);font-weight:700;white-space:nowrap">'
+    + (f.title || 'Disclaimer & Responsible Play') + ' &rarr;</a>';
+}
+
+// Navigate to the full Disclaimer view (not in the main nav; via footer / ?tab=disclaimer).
+window.showDisclaimer = function() {
+  currentTab = 'disclaimer';
+  renderNav(); renderPage(); updateSEO('disclaimer'); window.scrollTo(0, 0);
+};
+
+// Full Disclaimer & Responsible Play page (bilingual, from i18n strings).
+function renderDisclaimer() {
+  var f = (STRINGS && STRINGS.footer) || {};
+  var h = '<h1>' + (f.title || 'Disclaimer & Responsible Play') + '</h1>';
+  h += '<div class="card" style="line-height:1.75;font-size:14px;color:var(--t2)">';
+  ['p1','p2','p3','p4'].forEach(function(k){ h += '<p style="margin:0 0 14px">' + (f[k] || '') + '</p>'; });
+  h += '<p style="margin:16px 0 0;color:var(--t3)">' + (f.help || '') + '</p></div>';
+  return h;
 }
 
 // ═══ NAVIGATION ══════════════════════════════════════════════
@@ -649,6 +642,7 @@ function renderPage() {
   else if (currentTab === "research") html += renderResearch();
   else if (currentTab === "prediction") html += renderPrediction();
   else if (currentTab === "lucky") html += renderLucky();
+  else if (currentTab === "disclaimer") html += renderDisclaimer();
   html += '</div>';
   contentEl.innerHTML = html;
   bindEvents();
