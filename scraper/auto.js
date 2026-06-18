@@ -158,6 +158,28 @@ function start() {
   for (const game of GAMES) scheduleNext(game);
 }
 
+// ── Self-healing lazy catch-up ──────────────────────────────────────
+// Call this freely (e.g. on every web request). It runs at most once per
+// throttle window, backfills any missed draw for BOTH games, and NEVER
+// throws or blocks — so it can't affect the site. This is the safety net
+// for when GitHub's scheduler doesn't fire: the next visitor heals the data.
+let _lastCatchUp = 0;
+const CATCHUP_THROTTLE_MS = 5 * 60 * 1000;
+async function catchUp() {
+  const now = Date.now();
+  if (now - _lastCatchUp < CATCHUP_THROTTLE_MS) return { skipped: "throttled" };
+  _lastCatchUp = now;
+  try {
+    if (!db) { db = getDb(); initSchema(db); }
+    const out = {};
+    for (const game of GAMES) out[game] = await safeTick(game); // safeTick already swallows errors
+    return out;
+  } catch (e) {
+    console.warn(`[auto:catchUp] ${ts()} ${e.message}`);
+    return { error: e.message };
+  }
+}
+
 // CLI: `node scraper/auto.js --once`  → run one tick per game and exit (test/backfill, no timers)
 if (require.main === module) {
   db = getDb(); initSchema(db);
@@ -168,4 +190,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { start, tick, safeTick };
+module.exports = { start, tick, safeTick, catchUp };
