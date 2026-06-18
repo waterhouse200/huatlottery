@@ -1,53 +1,55 @@
-name: Daily Singapore Pools scrape
+name: Auto scrape (TOTO + 4D, event-driven)
 
 on:
   schedule:
-    # 8 PM SGT (12:00 UTC) daily — after all draws close
-    - cron: '0 12 * * *'
-    # 10 PM SGT (14:00 UTC) safety retry in case the first run hit a fetch error
-    - cron: '0 14 * * *'
-  workflow_dispatch:          # Allow manual trigger from the GitHub Actions tab
+    # Draw window — every 5 min, 6:00–11:55pm SGT (10:00–15:55 UTC).
+    # Covers the 6.30pm draws plus delayed big draws. auto.js is page-driven
+    # (reads SP's own "Next Draw" date/time) so it self-decides whether to act.
+    - cron: '*/5 10-15 * * *'
+    # Safety net — twice an hour, all day — for odd-time special draws and to
+    # backfill anything missed. Each run is a fast no-op when already caught up.
+    - cron: '17,47 * * * *'
+  workflow_dispatch:          # manual trigger from the Actions tab
 
 permissions:
-  contents: write             # Needed for the bot to commit + push DB updates
+  contents: write             # bot commits + pushes the updated DB
 
 concurrency:
   group: scrape
-  cancel-in-progress: false   # Don't kill a running scrape if a second cron fires
+  cancel-in-progress: false
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
 
-      - name: Install deps
-        run: npm ci
+      - run: npm ci
 
-      - name: Scrape newest 10 4D draws
-        run: npm run scrape:fourd -- --count 10
+      # Page-driven: reads latest published draw + SP's "Next Draw" date for
+      # both games, backfills any gap (gap ≥ 1), refreshes the sentinel.
+      - name: Auto scrape (TOTO + 4D)
+        run: node scraper/auto.js --once
 
-      - name: Scrape newest 10 TOTO draws
-        run: npm run scrape:toto -- --count 10
-
-      - name: Commit and push if DB updated
+      # Commit ONLY when the DB actually changed (a new draw, or the next-draw
+      # sentinel advanced). The sentinel is change-detecting, so idle ticks are
+      # no-ops and never commit.
+      - name: Commit & push if updated
         run: |
           git config user.name  "Huatlottery Bot"
           git config user.email "bot@huatlottery.local"
           git add huatlottery.db
           if git diff --staged --quiet; then
-            echo "No new draws — nothing to commit."
+            echo "No change — nothing to commit."
           else
-            COUNT_4D=$(sqlite3 huatlottery.db "SELECT COUNT(*) FROM fourd_draws")
-            COUNT_TOTO=$(sqlite3 huatlottery.db "SELECT COUNT(*) FROM toto_draws")
-            git commit -m "chore(scrape): daily update $(date -u +%Y-%m-%d) — 4D=${COUNT_4D} TOTO=${COUNT_TOTO}"
+            TOTO=$(sqlite3 huatlottery.db "SELECT COUNT(*) FROM toto_draws")
+            FOURD=$(sqlite3 huatlottery.db "SELECT COUNT(*) FROM fourd_draws")
+            git commit -m "chore(scrape): $(date -u +%Y-%m-%dT%H:%MZ) — 4D=${FOURD} TOTO=${TOTO}"
             git push
           fi
