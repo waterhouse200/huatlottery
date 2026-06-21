@@ -24,7 +24,8 @@ const GAMES = ["toto", "fourd"];
 const TABLE = { toto: "toto_draws", fourd: "fourd_draws" };
 const PARSE = { toto: parseToto, fourd: parseFourd };
 
-const RETRY_MS = 5 * 60 * 1000;          // poll cadence once armed
+const RETRY_MS = 5 * 60 * 1000;          // poll cadence once armed (retry every 5 min until result is out)
+const SCRAPE_OFFSET_MS = 60 * 1000;      // start 1 min AFTER SP's stated draw time (dynamic, shifts with the draw)
 const MAX_TIMER_MS = 6 * 60 * 60 * 1000; // re-evaluate idle wait at least every 6h
 const REPO = path.join(__dirname, "..");
 
@@ -129,9 +130,11 @@ async function safeTick(game) {
   catch (e) { log(game, `tick error: ${e.message}`); return { dbMax: getMax(game), nextNo: null, nextAt: null, inserted: 0 }; }
 }
 
-// arm a timer for the exact draw moment, then poll until captured
+// arm a timer for SP's stated draw time + 1 min, then poll every 5 min until captured.
+// nextAt is read live each cycle from SP's "Next Draw" line, so this shifts automatically
+// with special/big draws (different day or time) — never a hardcoded clock.
 function arm(game, targetNo, nextAt) {
-  const at = nextAt ? Date.parse(nextAt) : NaN;
+  const at = nextAt ? Date.parse(nextAt) + SCRAPE_OFFSET_MS : NaN;  // draw time + 1 min
   if (isNaN(at)) { setTimeout(() => scheduleNext(game), MAX_TIMER_MS); return; }  // unknown → re-check in 6h
   const delay = at - Date.now();
   if (delay > MAX_TIMER_MS) { log(game, `idle ${Math.round(delay / 3.6e6)}h until draw`); setTimeout(() => scheduleNext(game), MAX_TIMER_MS); return; }
