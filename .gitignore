@@ -48,3 +48,6 @@ analysis/rules/unorthodox.py
 
 # Server-side cache (rebuilt at runtime)
 cache/
+
+# Local poller logs
+logs/
