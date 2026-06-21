@@ -96,10 +96,22 @@ function gitPush(message) {
     execSync("git add huatlottery.db", { cwd: REPO });
     try { execSync("git diff --staged --quiet", { cwd: REPO }); return; } catch { /* has changes */ }
     execSync(`git -c user.name="Huatlottery Bot" -c user.email="bot@huatlottery.local" commit -m ${JSON.stringify(message)}`, { cwd: REPO });
-    if (process.env.GH_TOKEN) {
-      const remote = `https://x-access-token:${process.env.GH_TOKEN}@github.com/waterhouse200/huatlottery.git`;
-      execSync(`git push ${remote} HEAD:main`, { cwd: REPO, stdio: "ignore" });
+    // Push with a token if provided (CI), else cached creds (local osxkeychain).
+    const pushCmd = process.env.GH_TOKEN
+      ? `git push https://x-access-token:${process.env.GH_TOKEN}@github.com/waterhouse200/huatlottery.git HEAD:main`
+      : `git push origin HEAD:main`;
+    try {
+      execSync(pushCmd, { cwd: REPO, stdio: "ignore" });
       log("git", `pushed: ${message}`);
+    } catch {
+      // Remote moved (the cloud Action or predictions job pushed first). Adopt remote
+      // and reopen the DB; the next tick re-detects any still-missing draw and re-pushes
+      // (scraping is idempotent), so the poller and Action coexist without binary conflicts.
+      log("git", "push rejected (remote moved) — syncing to remote, will retry next tick");
+      execSync("git fetch origin", { cwd: REPO });
+      execSync("git reset --hard origin/main", { cwd: REPO });
+      try { db.close(); } catch { /* */ }
+      db = getDb(); initSchema(db);
     }
   } catch (e) { console.warn(`[auto:git] ${ts()} push failed: ${e.message}`); }
 }
