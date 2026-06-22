@@ -39,11 +39,17 @@ jobs:
         run: |
           git config user.name  "Huatlottery Bot"
           git config user.email "bot@huatlottery.local"
-          git add huatlottery.db
-          if git diff --staged --quiet; then
-            echo "No new picks — DB unchanged."
-          else
-            WEEK=$(date -u +%Y-%m-%d)
-            git commit -m "chore(predictions): weekly auto-update for week ${WEEK}"
-            git push
-          fi
+          # Resilient push: the scrape Action and the local poller also push the
+          # binary DB to main. On a non-fast-forward reject, sync to latest main and
+          # regenerate (serve is deterministic per week), then retry — so a push race
+          # can never fail the run.
+          for attempt in 1 2 3; do
+            git add huatlottery.db
+            if git diff --staged --quiet; then echo "No new picks — DB unchanged."; exit 0; fi
+            git commit -m "chore(predictions): weekly auto-update $(date -u +%Y-%m-%d)"
+            if git push; then echo "pushed (attempt ${attempt})"; exit 0; fi
+            echo "push rejected — syncing to latest main + regenerating (attempt ${attempt})"
+            git fetch origin && git reset --hard origin/main
+            python -m analysis.serve
+          done
+          echo "::error::could not push predictions after 3 attempts"; exit 1
