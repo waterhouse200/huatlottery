@@ -13,6 +13,7 @@ Or with explicit week anchor:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 import sqlite3
@@ -145,10 +146,20 @@ def main() -> None:
             print(f"invalid date: {week_of}", file=sys.stderr)
             sys.exit(2)
     else:
-        week_of = iso_monday(date.today()).isoformat()
+        # This job runs Sunday night to prep the UPCOMING week's picks. But
+        # iso_monday(Sunday) returns the Monday that is *ending* today (6 days
+        # back), which labels picks for the week that just finished. Advance a
+        # week on Sundays so the picks are for the upcoming Mon–Sun draws.
+        today = date.today()
+        monday = iso_monday(today)
+        if today.weekday() == 6:  # Sunday
+            monday += timedelta(days=7)
+        week_of = monday.isoformat()
 
-    # Use stable seed derived from week_of so re-running same week gives same picks
-    seed = int.from_bytes(week_of.encode(), "little") & 0xFFFFFFFF
+    # Stable seed derived from the FULL week_of (sha256) so re-running the same
+    # week gives the same picks, but every week differs. (The old little-endian
+    # &0xFFFFFFFF only kept the first 4 chars "2026", so every 2026 week was identical.)
+    seed = int.from_bytes(hashlib.sha256(week_of.encode()).digest()[:4], "big")
 
     print(f"Generating AI picks for week of {week_of} (seed={seed})…")
 
