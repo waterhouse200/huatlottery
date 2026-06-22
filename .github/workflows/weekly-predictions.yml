@@ -25,7 +25,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-          cache: 'pip'
+          # No pip cache: we install 4 wheels with --no-cache-dir, so caching saves
+          # nothing — and there's no requirements file to key it, which made the
+          # "Post Setup Python" cache-save step fail every run (false failure alerts).
 
       - name: Install production deps only (no jupyter/matplotlib)
         run: pip install --no-cache-dir numpy pandas scipy pyarrow
