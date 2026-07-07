@@ -66,7 +66,7 @@
       "name": "Huatlottery",
       "url": "https://huatlottery.com/",
       "logo": "https://huatlottery.com/og-image.png",
-      "description": "Free Singapore Pools 4D and TOTO results aggregator with statistical analysis."
+      "description": "Free Singapore & Malaysia 4D and TOTO results aggregator (Singapore Pools, Magnum, Sports Toto, Da Ma Cai) with statistics and past-results archive."
     },
     {
       "@type": "WebApplication",
@@ -4608,6 +4608,17 @@ function renderLuckyResult(d) {
 
 // ═══ INIT ════════════════════════════════════════════════════
 // Private back-door: ?tab=research lets the owner reach the hidden tab.
+// Clean SEO paths → tab/operator (server renders these; the SPA hydrates the right view)
+var PATH_ROUTES = {
+  '/singapore-4d-results':   { tab:'fourd', statop:'sg4d' },
+  '/singapore-toto-results': { tab:'toto' },
+  '/magnum-4d-result':       { tab:'fourd', statop:'magnum' },
+  '/sports-toto-4d-result':  { tab:'fourd', statop:'sportstoto' },
+  '/da-ma-cai-result':       { tab:'fourd', statop:'damacai' },
+  '/malaysia-4d-results':    { tab:'others' }
+};
+var _pathRoute = PATH_ROUTES[location.pathname.replace(/\/$/, '') || '/'];
+if (_pathRoute) { currentTab = _pathRoute.tab; if (_pathRoute.statop) currentStatOp = _pathRoute.statop; }
 var initialTab = new URLSearchParams(location.search).get('tab');
 if (initialTab) currentTab = initialTab;
 // operator for the Results view: URL ?op= wins, else remembered, else default

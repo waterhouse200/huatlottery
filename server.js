@@ -186,6 +186,50 @@ app.use(dwellRouter);
 // through to the main app below.
 app.use((req, res, next) => req._isLab ? labRouter(req, res, next) : next());
 
+// ══ SEO: server-render distinct, crawlable pages per keyword target ══════════
+// Each route gets its own <title>/description/canonical + real result content in the
+// HTML (not just JS), so Google indexes them as separate pages instead of one SPA.
+const _fs = require("fs");
+let _seoHtml = null;
+const seoBase = () => (_seoHtml = _seoHtml || _fs.readFileSync(path.join(__dirname, "index.html"), "utf8"));
+const _esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const _DOW = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const _MON = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+function seoDate(iso){ if(!iso) return ""; const p=iso.split("-").map(Number); const dt=new Date(Date.UTC(p[0],p[1]-1,p[2])); return _DOW[dt.getUTCDay()]+", "+p[2]+" "+_MON[p[1]-1]+" "+p[0]; }
+function seoGrid(label, arr){ if(!arr||!arr.length) return ""; return "<h3>"+label+"</h3><p>"+arr.map(_esc).join(", ")+"</p>"; }
+function sg4dBlock(){ const r=db.prepare("SELECT * FROM fourd_draws ORDER BY draw_no DESC LIMIT 1").get(); if(!r) return ""; const p=parseFourdRow(r);
+  return "<h1>Singapore 4D Results Today</h1><p>Latest Singapore Pools 4D result — Draw #"+p.draw_no+", "+seoDate(p.draw_date)+".</p><h2>Winning Numbers</h2><p>1st Prize <b>"+p.first_prize+"</b>, 2nd Prize <b>"+p.second_prize+"</b>, 3rd Prize <b>"+p.third_prize+"</b>.</p>"+seoGrid("Starter Prizes",p.starter_prizes)+seoGrid("Consolation Prizes",p.consolation_prizes); }
+function totoBlock(){ const r=db.prepare("SELECT * FROM toto_draws ORDER BY draw_no DESC LIMIT 1").get(); if(!r) return ""; const t=formatTotoRow(r);
+  return "<h1>Singapore TOTO Results Today</h1><p>Latest Singapore Pools TOTO result — Draw #"+t.draw_no+", "+seoDate(t.draw_date)+".</p><h2>Winning Numbers</h2><p>"+(t.numbers||[]).join(", ")+" — Additional Number "+t.additional_num+".</p>"; }
+function myBlock(op, name){ const r=db.prepare("SELECT * FROM my_draws WHERE operator=? ORDER BY draw_date DESC LIMIT 1").get(op); if(!r) return ""; const p=parseMyRow(r);
+  return "<h1>"+name+" 4D Result Today</h1><p>Latest "+name+" 4D result — "+seoDate(p.draw_date)+".</p><h2>Winning Numbers</h2><p>1st Prize <b>"+p.first_prize+"</b>, 2nd Prize <b>"+p.second_prize+"</b>, 3rd Prize <b>"+p.third_prize+"</b>.</p>"+seoGrid("Special Prizes",p.special_prizes)+seoGrid("Consolation Prizes",p.consolation_prizes); }
+const _seoLinks = '<p>More live results on Huatlottery: <a href="/singapore-4d-results">Singapore 4D</a>, <a href="/singapore-toto-results">Singapore TOTO</a>, <a href="/magnum-4d-result">Magnum 4D</a>, <a href="/sports-toto-4d-result">Sports Toto</a>, <a href="/da-ma-cai-result">Da Ma Cai</a>, <a href="/malaysia-4d-results">Malaysia 4D</a>.</p>';
+const SEO_PAGES = {
+  "/":                       { title:"4D & TOTO Results Today — Singapore & Malaysia | Huatlottery", desc:"Live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Latest winning numbers, jackpots and past results.", block:()=> sg4dBlock()+totoBlock()+_seoLinks },
+  "/singapore-4d-results":   { title:"Singapore 4D Results Today — Live Winning Numbers | Huatlottery", desc:"Today's Singapore Pools 4D results and winning numbers — 1st, 2nd, 3rd, Starter and Consolation prizes. Live draws Wed, Sat & Sun.", block:()=> sg4dBlock()+_seoLinks },
+  "/singapore-toto-results": { title:"Singapore TOTO Results Today — Winning Numbers | Huatlottery", desc:"Today's Singapore Pools TOTO winning numbers and additional number. Live TOTO draws every Monday and Thursday.", block:()=> totoBlock()+_seoLinks },
+  "/magnum-4d-result":       { title:"Magnum 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Magnum 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes. Live Malaysia 4D draws.", block:()=> myBlock("magnum","Magnum")+_seoLinks },
+  "/sports-toto-4d-result":  { title:"Sports Toto 4D Result Today — Winning Numbers | Huatlottery", desc:"Today's Sports Toto 4D result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sportstoto","Sports Toto")+_seoLinks },
+  "/da-ma-cai-result":       { title:"Da Ma Cai 1+3D Result Today — Winning Numbers | Huatlottery", desc:"Today's Da Ma Cai (1+3D) result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("damacai","Da Ma Cai")+_seoLinks },
+  "/malaysia-4d-results":    { title:"Malaysia 4D Results Today — Magnum, Sports Toto, Da Ma Cai | Huatlottery", desc:"Live Malaysia 4D results — Magnum, Sports Toto and Da Ma Cai winning numbers, plus 5D, 6D, Lotto and jackpots.", block:()=> myBlock("magnum","Magnum")+myBlock("sportstoto","Sports Toto")+myBlock("damacai","Da Ma Cai")+_seoLinks },
+};
+function serveSeo(routePath, res){
+  const cfg = SEO_PAGES[routePath]; if(!cfg) return false;
+  const canon = "https://huatlottery.com" + routePath;
+  let html = seoBase()
+    .replace(/<title>[\s\S]*?<\/title>/, () => "<title>"+cfg.title+"</title>")
+    .replace(/(<meta name="description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
+    .replace(/(<link rel="canonical" href=")[^"]*(">)/, (m,a,b)=> a+canon+b)
+    .replace(/(<meta property="og:title" content=")[^"]*(">)/, (m,a,b)=> a+cfg.title+b)
+    .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
+    .replace('<div class="content" id="content"></div>', () => '<div class="content" id="content">'+cfg.block()+'</div>');
+  res.setHeader("Content-Type","text/html; charset=utf-8");
+  res.setHeader("Cache-Control","public, max-age=300");
+  res.send(html);
+  return true;
+}
+Object.keys(SEO_PAGES).forEach((rp) => app.get(rp, (req, res) => { try { if(!serveSeo(rp,res)) res.status(404).end(); } catch(e){ res.status(500).end(); } }));
+
 app.use(express.static(path.join(__dirname)));
 
 function parseFourdRow(row) {
