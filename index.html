@@ -598,7 +598,8 @@ window.openCookieSettings = function(){ showCookieBanner(); };
 function initCookieConsent(){
   var c=null; try { c = localStorage.getItem('huat_cookie_consent'); } catch(e){}
   window.__cookieConsent = c;
-  if (!c) setTimeout(showCookieBanner, 700);
+  // Consent banner disabled for now (per request). Re-enable with:
+  //   if (!c) setTimeout(showCookieBanner, 700);
 }
 
 // ═══ NAVIGATION ══════════════════════════════════════════════
