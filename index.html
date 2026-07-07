@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <!-- Primary SEO -->
-<title>Singapore 4D Results & TOTO Winners — Huatlottery</title>
-<meta name="description" content="Free Singapore Pools 4D results and TOTO winning numbers. Live 4D Singapore draws (Wed/Sat/Sun), TOTO Singapore results (Mon/Thu), Quick Pick generator, historical winners archive since 1986.">
-<meta name="keywords" content="4D result, TOTO results, Singapore Pools, Quick Pick result, 4D Singapore, TOTO Singapore, 4D winner, TOTO winner, Singapore 4D results today, TOTO winning numbers, lottery results Singapore, 4D draw, TOTO draw">
+<title>4D & TOTO Results — Singapore & Malaysia | Huatlottery</title>
+<meta name="description" content="Free live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Winning numbers, jackpots, past-results archive, statistics & Quick Pick — Singapore and Malaysia.">
+<meta name="keywords" content="4D result, TOTO results, Singapore Pools, Magnum 4D, Sports Toto, Da Ma Cai, 4D Malaysia, Magnum result, Sports Toto result, Da Ma Cai result, 4D Singapore, TOTO Singapore, Sabah 88, Cash Sweep, Sandakan 4D, 6D, 5D, Star Toto, Power Toto, Supreme Toto, 4D winning numbers today, lottery results Singapore Malaysia">
 <meta name="author" content="Huatlottery">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
 <link rel="canonical" href="https://huatlottery.com/">
@@ -27,8 +27,8 @@
 <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Huatlottery">
-<meta property="og:title" content="Singapore 4D Results & TOTO Winners — Huatlottery">
-<meta property="og:description" content="Live Singapore Pools 4D and TOTO results. Historical winning numbers since 1986. Free Quick Pick generator and statistics.">
+<meta property="og:title" content="4D & TOTO Results — Singapore & Malaysia | Huatlottery">
+<meta property="og:description" content="Live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Winning numbers, jackpots, past results archive & statistics.">
 <meta property="og:locale" content="en_SG">
 <meta property="og:url" content="https://huatlottery.com/">
 <meta property="og:image" content="https://huatlottery.com/og-image.png">
@@ -52,8 +52,8 @@
       "@id": "https://huatlottery.com/#website",
       "url": "https://huatlottery.com/",
       "name": "Huatlottery",
-      "description": "Singapore 4D and TOTO results, statistics, and Quick Pick generator.",
-      "inLanguage": "en-SG",
+      "description": "Singapore & Malaysia 4D and TOTO results, statistics, and Quick Pick generator — Singapore Pools, Magnum, Sports Toto, Da Ma Cai.",
+      "inLanguage": "en",
       "potentialAction": {
         "@type": "SearchAction",
         "target": "https://huatlottery.com/?tab=history&q={search_term_string}",
@@ -88,6 +88,9 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
+  // Consent Mode v2 — deny ad/analytics storage by default until the user accepts (PDPA + AdSense)
+  gtag('consent', 'default', { ad_storage: 'denied', analytics_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied', wait_for_update: 500 });
+  try { if (localStorage.getItem('huat_cookie_consent') === 'accepted') gtag('consent', 'update', { ad_storage: 'granted', analytics_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted' }); } catch (e) {}
   gtag('config', 'G-6WNQ6L7XKQ', {
     // Per-tab page_view events fire via track() in app code, so don't double-count
     send_page_view: true,
@@ -121,7 +124,11 @@ body{display:flex}
 .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,var(--p),var(--pl));display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px #3730a340;flex-shrink:0}
 .logo svg{width:18px;height:18px}
 .ltitle{font-size:15px;font-weight:800;letter-spacing:-.02em}.ltitle b{color:var(--p)}.lsub{font-size:9.5px;color:var(--t3);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
-.sb nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px}
+.sb nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;min-height:0}
+/* Regional legal disclaimer pinned to the bottom of the sidebar (flexbox mt-auto pattern) */
+#sidebar-legal-footer{margin-top:auto;flex-shrink:0;border-top:1px solid var(--bd);padding:13px 16px}
+#sidebar-legal-footer a{font-size:12px;color:var(--t3);text-decoration:none;transition:color .15s}
+#sidebar-legal-footer a:hover{color:var(--t2)}
 .nav-btn{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:var(--t2);font:500 13px 'Plus Jakarta Sans',sans-serif;width:100%;text-align:left;transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s;position:relative}
 .nav-btn:hover{transform:translateX(2px) scale(1.02);box-shadow:0 2px 10px rgba(0,0,0,.06)}
 .nav-btn:active{transform:scale(.97);box-shadow:0 1px 3px rgba(0,0,0,.1)}
@@ -139,8 +146,10 @@ body{display:flex}
 h1{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
 .desc{font-size:13.5px;color:var(--t2);margin-bottom:24px}
 .grid{display:grid;gap:14px}
-.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
 .card{background:var(--cd);border-radius:12px;padding:22px;border:1px solid var(--bd)}
+/* result-grid cards stretch to equal height + lay out as columns so the Next-Draw footer aligns at the bottom */
+.grid.g2>.card,.grid.g3>.card{display:flex;flex-direction:column}
 .ball{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:700;font-family:var(--mo);flex-shrink:0;animation:popIn .35s cubic-bezier(.34,1.56,.64,1) both}
 .section-title{display:flex;align-items:center;gap:9px;margin-bottom:16px}
 .section-title .dot{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center}
@@ -240,6 +249,7 @@ input[type=number]::placeholder{font-size:15px}
 
   /* Force all hard-coded multi-column grids to stack */
   .grid.g2,.grid.g3,.grid.g4{grid-template-columns:1fr !important}
+  .grid.g5{grid-template-columns:repeat(2,1fr) !important}
 
   /* Cards a bit tighter */
   .card{padding:18px 16px;border-radius:11px}
@@ -279,6 +289,12 @@ input[type=number]::placeholder{font-size:15px}
     <div><div class="ltitle">Huat<b>lottery</b></div><div class="lsub">SG 4D & TOTO</div></div>
   </div>
   <nav id="nav"></nav>
+  <!-- Disclaimer link, pinned to the base of the sidebar tray; opens the full Disclaimer view -->
+  <div id="sidebar-legal-footer">
+    <a id="sbDisclaimerLink" href="/?tab=disclaimer" onclick="event.preventDefault();showDisclaimer();toggleSb(false);">Disclaimer</a>
+    <span style="color:var(--t3);margin:0 6px">·</span>
+    <a id="sbPrivacyLink" href="/?tab=privacy" onclick="event.preventDefault();showPrivacy();toggleSb(false);">Privacy</a>
+  </div>
 </aside>
 <div class="sb-backdrop" id="sbBackdrop" onclick="toggleSb(false)"></div>
 <div class="main">
@@ -292,11 +308,10 @@ input[type=number]::placeholder{font-size:15px}
       <button class="tab" id="langEn" onclick="setLang('en')">EN</button>
       <button class="tab" id="langZh" onclick="setLang('zh')">中文</button>
     </div>
-    <div class="status" id="statusBadge">Huatlottery v1.1</div>
+    <div class="status" id="statusBadge">Huatlottery v2.1</div>
   </div>
   <div class="content" id="content"></div>
 
-  <footer id="siteFooter" style="max-width:980px;margin:32px auto 0;padding:10px 18px 28px;text-align:right;font-size:11px;color:var(--t3)"><a href="/?tab=disclaimer" style="color:var(--t3)">Disclaimer</a></footer>
 </div>
 
 <script>
@@ -503,7 +518,7 @@ window.setLang = function(lang) {
 function renderAll() {
   document.getElementById('langEn').className = 'tab' + (LANG==='en' ? ' active' : '');
   document.getElementById('langZh').className = 'tab' + (LANG==='zh' ? ' active' : '');
-  document.getElementById('statusBadge').textContent = L('app.status', 'Huatlottery v1.1');
+  document.getElementById('statusBadge').textContent = L('app.status', 'Huatlottery v2.1');
   var menuLbl = document.querySelector('#menuTog .lbl');
   if (menuLbl) menuLbl.textContent = L('common.menu', 'More');
   renderNav();
@@ -513,11 +528,10 @@ function renderAll() {
 
 // Footer: just a small "Disclaimer" link tucked in the corner → opens the full view.
 function renderFooter() {
-  var el = document.getElementById('siteFooter');
+  // Disclaimer link now lives at the base of the sidebar; just refresh its i18n label.
+  var el = document.getElementById('sbDisclaimerLink');
   if (!el || !STRINGS || !STRINGS.footer) return;
-  var f = STRINGS.footer;
-  el.innerHTML = '<a href="/?tab=disclaimer" onclick="event.preventDefault();showDisclaimer();" style="color:var(--t3)">'
-    + (f.link || 'Disclaimer') + '</a>';
+  el.textContent = STRINGS.footer.link || 'Disclaimer';
 }
 
 // Navigate to the full Disclaimer view (not in the main nav; via footer / ?tab=disclaimer).
@@ -536,17 +550,69 @@ function renderDisclaimer() {
   return h;
 }
 
+function showPrivacy(){ currentTab = 'privacy'; try{ renderNav(); }catch(e){} renderPage(); try{ updateSEO('privacy'); }catch(e){} window.scrollTo(0,0); }
+function renderPrivacy() {
+  function sec(t, body){ return '<h3 style="font-size:16px;font-weight:800;color:var(--tx);margin:24px 0 8px">'+t+'</h3>'+body; }
+  var h = '<h1>'+L('privacy.title','Privacy & Cookie Policy')+'</h1>';
+  h += '<p class="desc" style="margin-top:-6px">'+L('privacy.updated','Last updated: July 2026')+'</p>';
+  h += '<div class="card" style="line-height:1.8;font-size:14px;color:var(--t2);padding:26px">';
+  h += '<p style="margin:0">Huatlottery (the “Site”) provides Singapore &amp; Malaysia 4D and TOTO results, statistics and number tools for information and entertainment only. We are <b>independent and not affiliated</b> with Singapore Pools, Magnum, Sports Toto, Da Ma Cai or any operator. This policy explains what we collect and how we handle it under Singapore’s Personal Data Protection Act (PDPA) and Malaysia’s Personal Data Protection Act 2010.</p>';
+  h += sec('1. Information we collect', '<p>The Site has <b>no accounts and no login</b> — we never ask for your name, email, address or payment details. We collect:</p><ul style="margin:6px 0 0;padding-left:20px"><li><b>Usage &amp; device data (automatic):</b> pages viewed, referring page, approximate location (from your IP), browser and device type, and on-page interactions — through Google Analytics.</li><li><b>Cookies &amp; local storage</b> (see section 3).</li><li><b>Information you enter:</b> a birth date/time for the Lucky Numbers tool and the 4D/TOTO numbers you look up — these are used only to produce your result, are <b>not linked to your identity</b>, and are not stored on our servers.</li></ul>');
+  h += sec('2. How we use it', '<ul style="margin:6px 0 0;padding-left:20px"><li>To display results and run the tools you request;</li><li>To understand and improve how the Site is used;</li><li>To show advertising that keeps the Site free;</li><li>To keep the Site secure and prevent abuse.</li></ul>');
+  h += sec('3. Cookies &amp; similar technologies', '<p>We use three kinds: <b>Necessary</b> (your language, region and cookie choice — these keep the Site working and are always on); <b>Analytics</b> (Google Analytics, to measure usage); and <b>Advertising</b> (Google AdSense and partners, to serve and measure ads). <b>Analytics and advertising cookies are only set after you accept</b> them in our cookie banner — by default they are denied (Google Consent Mode v2). You can change your choice any time via <b>“Manage cookies”</b> below, or block cookies in your browser.</p>');
+  h += sec('4. Advertising', '<p>We use Google AdSense and may use other ad partners. Google and its partners use cookies to serve ads based on your prior visits to this and other sites. You can opt out of personalised ads at <a href="https://adssettings.google.com" target="_blank" rel="noopener" style="color:var(--p)">Google Ads Settings</a> and <a href="https://www.aboutads.info/choices" target="_blank" rel="noopener" style="color:var(--p)">aboutads.info/choices</a>. If you reject advertising cookies you may still see non-personalised ads.</p>');
+  h += sec('5. Who we share data with', '<p>We do <b>not sell</b> your personal data. Usage data is processed by our providers only to run the Site — principally <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--p)">Google (Analytics &amp; AdSense)</a>. These providers may process data on servers outside Singapore/Malaysia under their own legal safeguards.</p>');
+  h += sec('6. Data retention', '<p>Analytics data follows Google Analytics’ retention (typically up to 14 months). Your cookie choice stays on your device until you clear it. Numbers and birth dates you enter are discarded once your result is shown.</p>');
+  h += sec('7. Your rights (PDPA)', '<p>Under the Singapore PDPA and Malaysia PDPA 2010 you may, where applicable, request access to or correction of personal data we hold, and withdraw consent for analytics/advertising cookies at any time (via the cookie banner or your browser). As we run no accounts, most data we hold is not directly identifying. To make a request, contact us below.</p>');
+  h += sec('8. Security', '<p>We apply reasonable technical and organisational measures to protect the limited data we handle. No method of transmission or storage is completely secure, but we work to keep it safe.</p>');
+  h += sec('9. Age &amp; children', '<p>Lottery participation is limited to persons aged 18+ (Malaysia) / 21+ (Singapore). This Site is informational only, is not directed at children, and we do not knowingly collect data from anyone under 18.</p>');
+  h += sec('10. Changes', '<p>We may update this policy; the “Last updated” date reflects the latest version. Please check back periodically.</p>');
+  h += sec('11. Contact', '<p>Questions or data requests: <a href="mailto:privacy@huatlottery.com" style="color:var(--p)">privacy@huatlottery.com</a>.</p>');
+  h += '<div style="margin-top:24px;border-top:1px solid var(--bl);padding-top:18px;display:flex;gap:10px;flex-wrap:wrap"><button onclick="openCookieSettings()" style="padding:10px 18px;border-radius:8px;border:none;background:var(--p);color:#fff;font-size:13px;font-weight:700;cursor:pointer">'+L('privacy.manage','Manage cookies')+'</button></div>';
+  h += '</div>';
+  return h;
+}
+
+// ─── Cookie consent banner (PDPA + AdSense) ───────────────────────────────
+function showCookieBanner(){
+  if (document.getElementById('cookieBanner')) return;
+  var b = document.createElement('div');
+  b.id = 'cookieBanner';
+  b.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:9999;background:var(--cd);border-top:1px solid var(--bd);box-shadow:0 -4px 24px rgba(0,0,0,.12);padding:16px 20px';
+  b.innerHTML = '<div style="max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap">'+
+    '<div style="flex:1;min-width:250px;font-size:13px;color:var(--t2);line-height:1.6">🍪 '+L('cookie.text','We use cookies for analytics and advertising to keep Huatlottery free. Accept to allow them, or reject non-essential cookies — the site works either way.')+' <a href="/?tab=privacy" onclick="event.preventDefault();hideCookieBanner();showPrivacy();" style="color:var(--p);font-weight:700;white-space:nowrap">'+L('cookie.learn','Privacy Policy')+'</a></div>'+
+    '<div style="display:flex;gap:9px;flex-wrap:wrap">'+
+      '<button onclick="setCookieConsent(false)" style="padding:10px 18px;border-radius:8px;border:1px solid var(--bd);background:transparent;color:var(--t2);font-size:13px;font-weight:700;cursor:pointer">'+L('cookie.reject','Reject')+'</button>'+
+      '<button onclick="setCookieConsent(true)" style="padding:10px 20px;border-radius:8px;border:none;background:var(--p);color:#fff;font-size:13px;font-weight:800;cursor:pointer">'+L('cookie.accept','Accept all')+'</button>'+
+    '</div></div>';
+  document.body.appendChild(b);
+}
+function hideCookieBanner(){ var b=document.getElementById('cookieBanner'); if(b) b.parentNode.removeChild(b); }
+window.setCookieConsent = function(accept){
+  try { localStorage.setItem('huat_cookie_consent', accept ? 'accepted' : 'rejected'); } catch(e){}
+  window.__cookieConsent = accept ? 'accepted' : 'rejected';
+  if (accept && typeof gtag === 'function') { try { gtag('consent','update',{ ad_storage:'granted', analytics_storage:'granted', ad_user_data:'granted', ad_personalization:'granted' }); } catch(e){} }
+  hideCookieBanner();
+};
+window.openCookieSettings = function(){ showCookieBanner(); };
+function initCookieConsent(){
+  var c=null; try { c = localStorage.getItem('huat_cookie_consent'); } catch(e){}
+  window.__cookieConsent = c;
+  if (!c) setTimeout(showCookieBanner, 700);
+}
+
 // ═══ NAVIGATION ══════════════════════════════════════════════
 function getTabs() {
   // Research Lab is intentionally NOT listed — internal sandbox only.
   // Accessible privately via ?tab=research in the URL.
   return [
-    { id:"dashboard",  icon:"dash",    label: L('tabs.dashboard',  'Dashboard') },
-    { id:"lucky",      icon:"clover",  label: L('tabs.lucky',      'Lucky Numbers') },
-    { id:"prediction", icon:"brain",   label: L('tabs.prediction', 'AI Prediction') },
+    { id:"dashboard",  icon:"dash",    label: L('tabs.results',    'Results') },
+    { id:"others",     icon:"plus",    label: L('tabs.others',     'Other Results') },
     { id:"toto",       icon:"ball",    label: L('tabs.toto',       'TOTO Stats') },
     { id:"fourd",      icon:"hash",    label: L('tabs.fourd',      '4D Stats') },
-    { id:"alpha4d",    icon:"target",  label: L('tabs.alpha4d',    'Alpha 4D Simulator') },
+    { id:"lucky",      icon:"clover",  label: L('tabs.lucky',      'Lucky Numbers') },
+    { id:"prediction", icon:"brain",   label: L('tabs.prediction', 'AI Prediction') },
+    { id:"alpha4d",    icon:"target",  label: L('tabs.morealpha',  'More Alpha') },
     { id:"history",    icon:"search",  label: L('tabs.history',    'History Search') }
   ];
 }
@@ -582,8 +648,14 @@ function renderNav() {
 // Per-tab SEO: keeps titles, meta descriptions, and OG tags relevant to the
 // currently viewed content. Helps search engines understand each route.
 var SEO_TABS = {
-  dashboard:  { title: 'Singapore 4D Results Today & TOTO Winning Numbers — Huatlottery',
-                desc:  'Live Singapore Pools 4D results and TOTO winning numbers. Latest draws Wed/Sat/Sun (4D) and Mon/Thu (TOTO).' },
+  dashboard:  { title: '4D & TOTO Results Today — Singapore & Malaysia | Huatlottery',
+                desc:  'Live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Latest winning numbers, jackpots and past results — SG & Malaysia.' },
+  others:     { title: 'Malaysia 5D, 6D, Lotto, 3+3D & Jackpot Results — Huatlottery',
+                desc:  'Malaysia non-4D results — Sports Toto 5D/6D, Star/Power/Supreme Toto, Da Ma Cai 3+3D, Magnum Jackpot Gold & Life, Sabah Lotto. Live numbers & jackpots.' },
+  drawhistory:{ title: '4D & TOTO Past Results Archive by Year — Huatlottery',
+                desc:  'Browse past 4D & TOTO draws by year and month — Singapore Pools, Magnum, Sports Toto, Da Ma Cai. Full winning-number archive.' },
+  privacy:    { title: 'Privacy & Cookie Policy — Huatlottery',
+                desc:  'How Huatlottery handles data and cookies under Singapore PDPA and Malaysia PDPA 2010.' },
   toto:       { title: 'Singapore TOTO Results, Statistics & Winning Numbers — Huatlottery',
                 desc:  'Singapore TOTO winning numbers history, hot/cold ball analysis, sum distribution, and frequency stats.' },
   fourd:      { title: 'Singapore 4D Results, Hot Numbers & Winners — Huatlottery',
@@ -632,15 +704,21 @@ function setMeta(name, content, isProperty) {
 // ═══ PAGES ═══════════════════════════════════════════════════
 function renderPage() {
   var html = '<div>';
-  if (currentTab === "dashboard") html += renderDashboard();
+  if (currentTab === "dashboard" || currentTab === "results") html += renderHome();
+  else if (currentTab === "others") html += renderOthers();
   else if (currentTab === "toto") html += renderTotoStats();
-  else if (currentTab === "fourd") html += render4DStats();
-  else if (currentTab === "alpha4d" || currentTab === "alpha" || currentTab === "alphatoto") html += renderAlpha4D();
+  else if (currentTab === "fourd" || currentTab === "stats") html += renderStats();
+  else if (currentTab === "numbers") html += renderNumbers();
+  else if (currentTab === "more") html += renderMore();
+  else if (currentTab === "alpha4d" || currentTab === "alpha" || currentTab === "alphatoto") html += renderMoreAlpha();
   else if (currentTab === "history") html += renderHistory();
   else if (currentTab === "research") html += renderResearch();
   else if (currentTab === "prediction") html += renderPrediction();
   else if (currentTab === "lucky") html += renderLucky();
   else if (currentTab === "disclaimer") html += renderDisclaimer();
+  else if (currentTab === "privacy") html += renderPrivacy();
+  else if (currentTab === "drawhistory") html += renderDrawHistory();
+  html += adSlot('site-footer', 'leaderboard');   // site-wide footer banner
   html += '</div>';
   contentEl.innerHTML = html;
   bindEvents();
@@ -680,6 +758,9 @@ function lazyLoad(elementId, fn) {
   (function attach() {
     var el = document.getElementById(elementId);
     if (el) {
+      // Already in/near the viewport → fire now (observers don't reliably emit for initially-visible elements)
+      var r = el.getBoundingClientRect();
+      if (r.top < (window.innerHeight || 800) + 300 && r.bottom > -300) { return fn(); }
       window.__lazyPending[elementId] = fn;
       window.__lazyObs.observe(el);
       return;
@@ -711,14 +792,15 @@ function ballWithTier(num, count, ballColor, ballSize) {
   '</div>';
 }
 
-function renderDashboard() {
+function renderDashboard(region) {
+  region = region || 'all';
   if (!DATA.ready) return loadingCard();
   var t = DATA.latest.toto;       // { draw_no, draw_date, numbers, additional_num, ... }
   var f = DATA.latest.fourd;      // { ..., first_prize, ..., starter_prizes, consolation_prizes }
   var totoCount = DATA.totoStats.total_draws;
   var fourdCount = DATA.fourdStats.total_draws;
   var hot1 = DATA.totoStats.hot_numbers[0];
-  var h = '<h1>'+L('dashboard.title','Dashboard')+'</h1><p class="desc">'+L('dashboard.desc','Singapore 4D & TOTO intelligence hub.')+'</p>';
+  var h = '';   // title + operator selector are provided by renderHome()
 
   // Top stat row removed \u2014 same info shown more prominently in the cards below.
 
@@ -729,8 +811,9 @@ function renderDashboard() {
   // TOTO card header \u2014 properly centered icon, slightly smaller label
   h += '<div class="card">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">';
-  h += '<div style="background:#3730a311;color:var(--p);width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("ball",28)+'</div>';
-  h += '<div style="font-size:22px;font-weight:800;color:var(--p);letter-spacing:.04em">TOTO</div>';
+  h += logoBox('singapore','Singapore Pools TOTO');
+  h += '<div style="font-size:22px;font-weight:800;color:var(--p);letter-spacing:.04em">🇸🇬 TOTO</div>';
+  h += viewHistoryLink("goHistory('toto')");
   h += '</div>';
   h += '<div style="font-family:var(--mo);font-size:36px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+t.draw_no+'</div>';
   h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">'+
@@ -763,13 +846,18 @@ function renderDashboard() {
   }
   t.numbers.forEach(function(n){ h += classifyRow(n, false); });
   h += classifyRow(t.additional_num, true);
-  h += '</div></div>';
+  h += '</div>';                              // close classification grid
+  h += '<div id="totoShares"></div>';         // Group 1–7 winning shares (live)
+  lazyLoad('totoShares', loadTotoShares);
+  h += nextDrawRow(t.draw_date, 'toto');
+  h += '</div>';                              // close TOTO card
 
   // \u2500\u2500 4D card header \u2014 matches TOTO sizing, properly centered icon
   h += '<div class="card">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">';
-  h += '<div style="background:#d9770611;color:var(--amb);width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("hash",28)+'</div>';
-  h += '<div style="font-size:22px;font-weight:800;color:var(--amb);letter-spacing:.04em">4D</div>';
+  h += logoBox('singapore','Singapore Pools 4D');
+  h += '<div style="font-size:22px;font-weight:800;color:var(--amb);letter-spacing:.04em">🇸🇬 4D</div>';
+  h += viewHistoryLink("goHistory('sg4d')");
   h += '</div>';
   h += '<div style="font-family:var(--mo);font-size:36px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+f.draw_no+'</div>';
   h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">'+
@@ -812,10 +900,637 @@ function renderDashboard() {
   (f.consolation_prizes || []).forEach(function(p){ h += fourdPill(p); });
   h += '</div></div>';
 
+  h += nextDrawRow(f.draw_date, 'sg4d');
   h += '</div>';   // close 4D card
   h += '</div>';   // close g2 grid
 
   // (TOTO Stats freq mini-chart removed per request — full stats live in TOTO Stats tab)
+
+  // ── Malaysia 4D — latest results at a glance (skipped on the Singapore-Pools region view) ──
+  if (region !== 'sg') {
+    h += adSlot('results-infeed', 'rectangle');   // in-feed, between Singapore & Malaysia
+    h += '<div style="margin:26px 0 14px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><span style="font-size:17px;font-weight:800;color:var(--tx)">🇲🇾 '+L('home.myTitle','Malaysia Results')+'</span><span style="font-size:12.5px;color:var(--t3)">'+L('home.mySub','West Malaysia · Sabah & Sarawak')+'</span></div>';
+    h += '<div id="myHome">'+loadingCard()+'</div>';
+    lazyLoad('myHome', loadMyHome);
+  }
+
+  return h;
+}
+
+// ─── HOME — Latest Results with REGIONAL tabs (All · Singapore Pools · Malaysia · Sabah & Sarawak) ──
+var REGIONS = [
+  { id:'all',  flag:'',   label:L('region.all','All') },
+  { id:'sg',   flag:'🇸🇬', label:L('region.sg','Singapore Pools') },
+  { id:'my',   flag:'🇲🇾', label:L('region.my','Malaysia'),          ops:['magnum','sportstoto','damacai'] },
+  { id:'east', flag:'🇲🇾', label:L('region.east','Sabah & Sarawak'), ops:['sabah','sarawak','sandakan'] }
+];
+var currentRegion = 'all';
+window.setRegion = function(r){ currentRegion = r; try{localStorage.setItem('huat_region',r);}catch(e){} renderPage(); window.scrollTo(0,0); };
+function anyOpCfg(id){
+  for (var i=0;i<OPS_4D.length;i++)    if (OPS_4D[i].id===id)    return OPS_4D[i];
+  for (var j=0;j<OTHERS_OPS.length;j++) if (OTHERS_OPS[j].id===id) return OTHERS_OPS[j];
+  return { id:id, label:id, flag:'🇲🇾', color:'var(--p)', logo:id };
+}
+function renderHome(){
+  var h = '<h1>'+L('home.title','Latest Results')+'</h1><p class="desc">'+L('home.desc','Every Singapore & Malaysia draw at a glance.')+'</p>';
+  h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px">';
+  REGIONS.forEach(function(o){ var on=o.id===currentRegion;
+    h += '<button onclick="setRegion(\''+o.id+'\')" style="padding:8px 14px;border-radius:9px;border:1px solid '+(on?'var(--p)':'var(--bd)')+';background:'+(on?'color-mix(in srgb, var(--p) 13%, transparent)':'var(--cd)')+';color:'+(on?'var(--p)':'var(--t2)')+';font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">'+(o.flag?o.flag+' ':'')+o.label+'</button>';
+  });
+  h += '</div>';
+  if (currentRegion === 'all') return h + renderDashboard('all');   // everything at once
+  if (currentRegion === 'sg')  return h + renderDashboard('sg');    // Singapore Pools only
+  var region = null; for (var i=0;i<REGIONS.length;i++) if (REGIONS[i].id===currentRegion) region=REGIONS[i];
+  var ops = (region && region.ops) || [];
+  h += '<div class="grid g3" id="regionGrid" style="gap:16px">'+loadingCard()+'</div>';
+  lazyLoad('regionGrid', function(){ loadRegionGrid(ops); });
+  return h;
+}
+function loadRegionGrid(ops){
+  Promise.all([
+    fetch('/api/my/latest').then(function(r){return r.json();}),
+    fetch('/api/my/drawnos').then(function(r){return r.json();}).catch(function(){return {data:{}};})
+  ]).then(function(res){
+    var d = (res[0]&&res[0].data) || {}, dn = (res[1]&&res[1].data) || {}; window.MY_DRAWNOS = dn;
+    var el=document.getElementById('regionGrid'); if(!el) return;
+    var html='';
+    ops.forEach(function(op){ var row=d[op], info=dn[op]; if(row){ if(info){ if(info.no) row.draw_no=info.no; row.jackpot=info; } html += fourdResultCard(row, anyOpCfg(op)); } });
+    el.innerHTML = html || '<div class="card" style="padding:22px;color:var(--t3)">No results available.</div>';
+  }).catch(function(){ var el=document.getElementById('regionGrid'); if(el) el.innerHTML='<div class="card" style="padding:20px;color:var(--red)">Could not load results.</div>'; });
+}
+
+// ─── OTHERS — secondary Malaysia 4D operators (GD Lotto, Perdana, Lucky, Sabah, Sarawak, Sandakan) ──
+var OTHERS_OPS = [
+  { id:'grandragon', label:'Grand Dragon',    flag:'🇲🇾', color:'#b91c1c', logo:'grandragon' },
+  { id:'perdana',    label:'Perdana',          flag:'🇲🇾', color:'#0369a1', logo:'perdana' },
+  { id:'lucky',      label:'Lucky Hari Hari',  flag:'🇲🇾', color:'#ca8a04', logo:'lucky' },
+  { id:'sabah',      label:'Sabah 88',         flag:'🇲🇾', color:'#15803d', logo:'sabah' },
+  { id:'sarawak',    label:'Cash Sweep',       flag:'🇲🇾', color:'#7c3aed', logo:'sarawak' },
+  { id:'sandakan',   label:'Sandakan',         flag:'🇲🇾', color:'#c2410c', logo:'sandakan' }
+];
+var currentOtherOp = 'grandragon';
+window.setOtherOp = function(op){ currentOtherOp = op; renderPage(); window.scrollTo(0,0); };
+function renderOthers(){
+  var h = '<h1>'+L('others.title','Other Malaysia Lotteries')+'</h1><p class="desc">'+L('others.desc','Non-4D games — 6D, 5D, Lotto, 3+3D, Jackpot Gold, Life & more.')+'</p>';
+  h += '<div class="grid g3" id="otherResult" style="gap:16px">'+loadingCard()+'</div>';
+  lazyLoad('otherResult', loadOthers);
+  return h;
+}
+function loadOthers(){
+  Promise.all([
+    fetch('/api/my/toto-products').then(function(r){return r.json();}).catch(function(){return {data:{}};}),
+    fetch('/api/my/drawnos').then(function(r){return r.json();}).catch(function(){return {data:{}};}),
+    fetch('/api/my/other-games').then(function(r){return r.json();}).catch(function(){return {data:{}};})
+  ]).then(function(res){
+    var d=(res[0]&&res[0].data)||{}, dn=(res[1]&&res[1].data)||{}, og=(res[2]&&res[2].data)||{}; window.MY_DRAWNOS=dn;
+    var el=document.getElementById('otherResult'); if(!el) return;
+    var html = my6DCard();                                      // Sports Toto 6D (filled by load6D)
+    html += fiveDCard(d.fiveD);
+    html += damacai33dCard(og.damacai33d);                      // tall multi-tier cards grouped on top row
+    html += lottoCard('Star Toto 6/50', d.star, '#dc2626', 'star');   // compact lotto cards next row
+    html += lottoCard('Power Toto 6/55', d.power, '#0369a1', 'power');
+    html += lottoCard('Supreme Toto 6/58', d.supreme, '#059669', 'supreme');
+    html += jackpotGoldCard(og.jackpotGold);
+    html += magnumLifeCard(og.magnumLife);
+    html += sabahLottoCard(og.sabahLotto);
+    el.innerHTML = html;
+    load6D();
+  }).catch(function(){ var el=document.getElementById('otherResult'); if(el) el.innerHTML='<div class="card" style="padding:20px;color:var(--red)">Could not load.</div>'; });
+}
+function animalEmoji(a){ var m={RAT:'🐀',OX:'🐂',TIGER:'🐅',RABBIT:'🐇',DRAGON:'🐉',SNAKE:'🐍',HORSE:'🐎',GOAT:'🐐',SHEEP:'🐐',MONKEY:'🐒',ROOSTER:'🐓',DOG:'🐕',PIG:'🐖'}; return m[(a||'').toUpperCase()]||'🎴'; }
+function damacai33dCard(g){
+  if(!g||!g.prizes||!g.prizes.length) return '';
+  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('damacai','Da Ma Cai 3+3D')+'<div style="font-size:19px;font-weight:800;color:#7c3aed">🇲🇾 Da Ma Cai 3+3D</div>'+viewHistoryLink("goHistory('damacai33d')")+'</div>';
+  if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
+  if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+g.date+' · '+dayOfWeek(g.date)+'</div>';
+  var labels=['1st','2nd','3rd'], cols=['#7c3aed','var(--t2)','#b45309'];
+  g.prizes.forEach(function(p,i){ if(!p.number)return;
+    h+='<div style="padding:8px 0;border-bottom:1px solid var(--bl)"><div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap"><span style="font-size:11px;font-weight:800;color:var(--t3);width:30px;text-transform:uppercase;flex-shrink:0">'+labels[i]+'</span><span style="font-family:var(--mo);font-size:22px;font-weight:800;color:'+cols[i]+';letter-spacing:.06em">'+p.number+'</span>'+(p.animal?'<span style="font-size:11.5px;font-weight:800;color:#7c3aed;background:#7c3aed15;padding:3px 10px;border-radius:6px">'+animalEmoji(p.animal)+' '+p.animal+'</span>':'')+'</div>'+(p.bonus?'<div style="font-size:11.5px;color:var(--t3);margin-top:4px;margin-left:41px;font-family:var(--mo);font-weight:600">'+L('others.bonus','Bonus')+' '+(i+1)+': '+p.bonus+'</div>':'')+'</div>';
+  });
+  function grid(arr,label,col){ if(!arr||!arr.length)return ''; var g2='<div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:'+col+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'+label+'</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">'; arr.forEach(function(n){ g2+='<span style="padding:6px;text-align:center;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-family:var(--mo);font-weight:700;font-size:14px;letter-spacing:.06em">'+n+'</span>'; }); return g2+'</div></div>'; }
+  h+=grid(g.special,'Special','var(--p)');
+  h+=grid(g.consolation,L('dashboard.consolation','Consolation'),'var(--vi)');
+  h+=nextDrawRow(g.date, 'lotto');
+  return h+'</div>';
+}
+function jackpotGoldCard(g){
+  if(!g||!g.number) return '';
+  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('magnum','Magnum 4D Jackpot Gold')+'<div style="font-size:18px;font-weight:800;color:#d97706">🇲🇾 Magnum 4D Jackpot Gold</div>'+viewHistoryLink("goHistory('jackpotgold')")+'</div>';
+  if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
+  if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:14px">'+g.date+' · '+dayOfWeek(g.date)+'</div>';
+  h+='<div style="text-align:center;padding:8px 0"><div style="font-size:11px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Jackpot 1</div><div style="font-family:var(--mo);font-size:34px;font-weight:800;color:#d97706;letter-spacing:.08em">'+g.number+(g.bonus?' <span style="color:var(--red);font-size:24px">+'+g.bonus+'</span>':'')+'</div>';
+  if(g.prize) h+='<div style="font-family:var(--mo);font-size:15px;font-weight:800;color:var(--tx);margin-top:8px">'+g.prize+'</div>';
+  h+='</div>';
+  h+=nextDrawRow(g.date, 'lotto');
+  return h+'</div>';
+}
+function magnumLifeCard(g){
+  if(!g||!g.winning||!g.winning.length) return '';
+  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('magnum','Magnum Life')+'<div style="font-size:19px;font-weight:800;color:#dc2626">🇲🇾 Magnum Life</div>'+viewHistoryLink("goHistory('magnumlife')")+'</div>';
+  if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
+  if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+g.date+' · '+dayOfWeek(g.date)+'</div>';
+  h+='<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Winning Numbers</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">'; g.winning.forEach(function(n){ h+=ballSm(n,'#dc2626'); }); h+='</div>';
+  if(g.bonus&&g.bonus.length){ h+='<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Bonus</div><div style="display:flex;gap:7px;flex-wrap:wrap">'; g.bonus.forEach(function(n){ h+=ballSm(n,'var(--amb)'); }); h+='</div>'; }
+  h+=nextDrawRow(g.date, 'lotto');
+  return h+'</div>';
+}
+function sabahLottoCard(g){
+  if(!g||!g.nums||!g.nums.length) return '';
+  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('sabah','Sabah Lotto 6/45')+'<div style="font-size:19px;font-weight:800;color:#15803d">🇲🇾 Sabah Lotto 6/45</div>'+viewHistoryLink("goHistory('sabahlotto')")+'</div>';
+  if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
+  if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+g.date+' · '+dayOfWeek(g.date)+'</div>';
+  h+='<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:6px 0 14px">'; g.nums.forEach(function(n){ h+=ballSm(n,'#15803d'); }); if(g.bonus) h+='<span style="font-size:22px;font-weight:800;color:var(--red);margin:0 3px">+</span>'+ballSm(g.bonus,'var(--red)'); h+='</div>';
+  if(g.jackpot1){ h+='<div style="border-top:1px solid var(--bl);padding-top:12px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:3px 0;font-size:13px"><span style="font-weight:700;color:var(--t2)">Jackpot 1</span><span style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+g.jackpot1+'</span></div>'; if(g.jackpot2) h+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:3px 0;font-size:13px"><span style="font-weight:700;color:var(--t2)">Jackpot 2</span><span style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+g.jackpot2+'</span></div>'; h+='</div>'; }
+  h+=nextDrawRow(g.date, 'lotto');
+  return h+'</div>';
+}
+function ballSm(n, col){ return '<div style="width:38px;height:38px;border-radius:50%;background:'+col+';color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mo);font-weight:800;font-size:14px;flex-shrink:0">'+n+'</div>'; }
+function fiveDCard(fd){
+  if(!fd) return '';
+  var p=fd.prizes||{};
+  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('sportstoto','Sports Toto 5D')+'<div style="font-size:20px;font-weight:800;color:#0369a1">🇲🇾 Sports Toto 5D</div>'+viewHistoryLink("goHistory('fived')")+'</div>';
+  if(fd.drawNo) h+='<div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--tx);margin-bottom:3px;line-height:1">#'+fd.drawNo+'</div>';
+  if(fd.date) h+='<div style="font-size:14px;color:var(--t2);font-weight:600;margin-bottom:10px">'+fd.date+' · '+dayOfWeek(fd.date)+'</div>';
+  [['1st',p['1st'],'#0369a1',24],['2nd',p['2nd'],'var(--t2)',22],['3rd',p['3rd'],'#b45309',22],['4th',p['4th'],'var(--t2)',18],['5th',p['5th'],'var(--t2)',18],['6th',p['6th'],'var(--t2)',18]].forEach(function(it,i){
+    if(it[1]==null) return;
+    h+='<div style="display:flex;align-items:baseline;gap:12px;padding:7px 0;border-bottom:'+(i<5?'1px solid var(--bl)':'none')+'"><span style="font-size:11px;font-weight:800;color:var(--t3);width:30px;text-transform:uppercase">'+it[0]+'</span><span style="font-family:var(--mo);font-size:'+it[3]+'px;font-weight:800;color:'+it[2]+';letter-spacing:.06em">'+it[1]+'</span></div>';
+  });
+  h+=nextDrawRow(fd.date, 'lotto');
+  return h+'</div>';
+}
+function lottoCard(name, ld, color, key){
+  if(!ld || !ld.nums || !ld.nums.length) return '';
+  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">'+logoBox('sportstoto',name)+'<div style="font-size:19px;font-weight:800;color:'+color+'">🇲🇾 '+name+'</div>'+viewHistoryLink("goHistory('"+key+"')")+'</div>';
+  if(ld.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px;line-height:1">#'+ld.drawNo+'</div>';
+  if(ld.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+ld.date+' · '+dayOfWeek(ld.date)+'</div>';
+  h+='<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:6px 0 14px">';
+  ld.nums.forEach(function(n){ h+=ballSm(n,color); });
+  if(ld.additional) h+='<span style="font-size:22px;font-weight:800;color:var(--red);margin:0 3px">+</span>'+ballSm(ld.additional,'var(--red)');
+  h+='</div>';
+  if(ld.jackpot1){
+    h+='<div style="border-top:1px solid var(--bl);padding-top:12px">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:3px 0;font-size:13px"><span style="font-weight:700;color:var(--t2)">'+(ld.jackpot2?'Jackpot 1':'Jackpot')+'</span><span style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+ld.jackpot1+'</span></div>';
+    if(ld.jackpot2) h+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:3px 0;font-size:13px"><span style="font-weight:700;color:var(--t2)">Jackpot 2</span><span style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+ld.jackpot2+'</span></div>';
+    h+='</div>';
+  }
+  h+=nextDrawRow(ld.date, 'lotto');
+  return h+'</div>';
+}
+
+// ─── RESULTS view — framework: operator is a FILTER, not a tab ──────────────
+// One shared 4D results view for SG 4D + Magnum + Sports Toto + Da Ma Cai.
+var currentOp = 'magnum';                       // remembered operator for Results
+window.MY_LATEST = window.MY_LATEST || {};      // per-operator latest-draw cache
+var OPS_4D = [
+  { id:'sg4d',       label:'SG Pools',    flag:'🇸🇬', region:'sg', color:'var(--amb)', logo:'singapore' },
+  { id:'magnum',     label:'Magnum',      flag:'🇲🇾', region:'my', color:'#dc2626', logo:'magnum' },
+  { id:'sportstoto', label:'Sports Toto', flag:'🇲🇾', region:'my', color:'#059669', logo:'sportstoto' },
+  { id:'damacai',    label:'Da Ma Cai',   flag:'🇲🇾', region:'my', color:'#7c3aed', logo:'damacai' }
+];
+function opCfg(id){ for (var i=0;i<OPS_4D.length;i++) if (OPS_4D[i].id===id) return OPS_4D[i]; return OPS_4D[0]; }
+// operator brand logo in a white rounded box (matches the 52px icon-box sizing)
+function logoBox(name, label){
+  return '<div style="width:52px;height:52px;border-radius:12px;overflow:hidden;flex-shrink:0;border:1px solid var(--bd);background:#fff;display:flex;align-items:center;justify-content:center"><img src="/assets/logos/'+name+'.jpg" alt="'+(label||'')+'" style="max-width:86%;max-height:86%;object-fit:contain"></div>';
+}
+window.setOp = function(op){ currentOp = op; try{localStorage.setItem('huat_op',op);}catch(e){} renderPage(); };
+
+// region-grouped operator selector (🇸🇬 SG | 🇲🇾 MY) — the anti-mess device
+function opSelector() {
+  function pill(o){ var on = o.id===currentOp;
+    return '<button onclick="setOp(\''+o.id+'\')" style="padding:8px 13px;border-radius:9px;border:1px solid '+(on?o.color:'var(--bd)')+';background:'+(on?'color-mix(in srgb, '+o.color+' 13%, transparent)':'var(--cd)')+';color:'+(on?o.color:'var(--t2)')+';font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s">'+o.flag+' '+o.label+'</button>'; }
+  var sg='',my='';
+  OPS_4D.forEach(function(o){ (o.region==='sg'?(sg+=pill(o)):(my+=pill(o))); });
+  return '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px">'+sg+'<span style="width:1px;height:22px;background:var(--bd);margin:0 3px"></span>'+my+'</div>';
+}
+
+// shared card: SG uses starter_prizes, MY uses special_prizes — both render identically
+// Next-draw date, computed from each operator's fixed weekly schedule (no scraping).
+// 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat. SG TOTO = Mon/Thu; everything else 4D/Lotto = Wed/Sat/Sun.
+var DRAW_DAYS = { toto:[1,4], sgToto:[1,4], sg4d:[0,3,6], sg:[0,3,6], magnum:[0,3,6], sportstoto:[0,3,6], damacai:[0,3,6], sabah:[0,3,6], sarawak:[0,3,6], sandakan:[0,3,6], lotto:[0,3,6] };
+function nextDrawLabel(latestDate, key){
+  var days = DRAW_DAYS[key] || [0,3,6];
+  if(!latestDate) return '';
+  var d = new Date(latestDate+'T00:00:00'); if(isNaN(d.getTime())) return '';
+  for(var i=1;i<=7;i++){ var nd=new Date(d.getTime()); nd.setDate(d.getDate()+i);
+    if(days.indexOf(nd.getDay())>=0){
+      var iso = nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0')+'-'+String(nd.getDate()).padStart(2,'0');
+      return iso+' ('+['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][nd.getDay()]+')';
+    }
+  }
+  return '';
+}
+function nextDrawRow(latestDate, key){
+  var lbl = nextDrawLabel(latestDate, key); if(!lbl) return '';
+  // Footer pushed to the very bottom (margin-top:auto) so it aligns across cards in a row
+  return '<div style="margin-top:auto;padding-top:16px"><div style="padding:13px 15px;background:var(--bg);border:1px solid var(--bd);border-radius:9px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">'+L('common.nextDraw','Next Draw')+'</span><span style="font-size:14px;font-weight:800;color:var(--p);font-family:var(--mo)">'+lbl+'</span></div></div>';
+}
+// Jump to an operator's own stats/history page (individual page per game)
+window.goStatOp = function(op){ currentStatOp = op; goTab('fourd'); };
+function viewHistoryLink(handlerJs){
+  return '<a href="#" onclick="event.preventDefault();'+handlerJs+'" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--p);text-decoration:none;white-space:nowrap;flex-shrink:0">'+L('common.viewHistory','View History')+' →</a>';
+}
+
+// ─── Draw History — clean per-game past-results page (last N draws + date) ───
+var HIST_META = {
+  toto:       { label:'🇸🇬 TOTO',        url:'/api/toto/draws',          kind:'toto' },
+  sg4d:       { label:'🇸🇬 4D',          url:'/api/fourd/draws',         kind:'fourd' },
+  magnum:     { label:'🇲🇾 Magnum',      url:'/api/my/magnum/draws',     kind:'fourd' },
+  sportstoto: { label:'🇲🇾 Sports Toto', url:'/api/my/sportstoto/draws', kind:'fourd' },
+  damacai:    { label:'🇲🇾 Da Ma Cai',   url:'/api/my/damacai/draws',    kind:'fourd' },
+  sabah:      { label:'🇲🇾 Sabah 88',    url:'/api/my/sabah/draws',      kind:'fourd' },
+  sarawak:    { label:'🇲🇾 Cash Sweep',  url:'/api/my/sarawak/draws',    kind:'fourd' },
+  sandakan:   { label:'🇲🇾 Sandakan',    url:'/api/my/sandakan/draws',   kind:'fourd' },
+  sixd:       { label:'🇲🇾 Sports Toto 6D', url:'/api/my/6d/draws',       kind:'6d' },
+  // Others games fetched live (latest only) — no stored archive yet
+  fived:      { label:'🇲🇾 Sports Toto 5D',        liveOnly:true },
+  star:       { label:'🇲🇾 Star Toto 6/50',        liveOnly:true },
+  power:      { label:'🇲🇾 Power Toto 6/55',       liveOnly:true },
+  supreme:    { label:'🇲🇾 Supreme Toto 6/58',     liveOnly:true },
+  damacai33d: { label:'🇲🇾 Da Ma Cai 3+3D',        liveOnly:true },
+  jackpotgold:{ label:'🇲🇾 Magnum 4D Jackpot Gold', liveOnly:true },
+  magnumlife: { label:'🇲🇾 Magnum Life',           liveOnly:true },
+  sabahlotto: { label:'🇲🇾 Sabah Lotto 6/45',      liveOnly:true }
+};
+var SEL_STYLE = 'padding:8px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--cd);color:var(--tx);font-size:13px;font-weight:700;cursor:pointer';
+var HIST_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var currentHistGame = 'toto', currentHistYear = '', currentHistMonth = '';
+window.goHistory = function(game){ currentHistGame = game; currentHistYear = ''; currentHistMonth = ''; goTab('drawhistory'); };
+window.setHistYear = function(y){ currentHistYear = y; currentHistMonth = ''; loadDrawHistory(); };
+window.setHistMonth = function(m){ currentHistMonth = m; loadDrawHistory(); };
+function renderDrawHistory(){
+  var m = HIST_META[currentHistGame] || HIST_META.toto;
+  var hint = (m.liveOnly || m.kind==='6d') ? '' : (currentHistGame==='toto' ? L('hist.tapToto','Tap any draw to see the Group 1–7 winners &amp; prize pool.') : L('hist.tap','Tap any draw to reveal its full Starter &amp; Consolation prizes.'));
+  var h = '<h1>'+m.label+' · '+L('hist.past','Past Results')+'</h1>';
+  h += '<p class="desc">'+L('hist.desc','Every past draw with its date.')+' '+hint+'</p>';
+  h += '<div id="histControls" style="margin-bottom:18px"></div>';
+  h += '<div id="histBody">'+loadingCard()+'</div>';
+  setTimeout(loadDrawHistory, 30);
+  return h;
+}
+function renderHistControls(yr){
+  var max = (yr && yr.max) || 2026, min = (yr && yr.min) || max;
+  var h = '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+  h += '<span style="font-size:13px;font-weight:700;color:var(--t2)">'+L('hist.year','Year')+':</span>';
+  h += '<select onchange="setHistYear(this.value)" style="'+SEL_STYLE+'">';
+  h += '<option value=""'+(currentHistYear===''?' selected':'')+'>'+L('hist.recent','Recent (last 20)')+'</option>';
+  for (var y=max; y>=min; y--) h += '<option value="'+y+'"'+(String(currentHistYear)===String(y)?' selected':'')+'>'+y+'</option>';
+  h += '</select>';
+  if (currentHistYear){
+    h += '<span style="font-size:13px;font-weight:700;color:var(--t2);margin-left:6px">'+L('hist.month','Month')+':</span>';
+    h += '<select onchange="setHistMonth(this.value)" style="'+SEL_STYLE+'">';
+    h += '<option value=""'+(currentHistMonth===''?' selected':'')+'>'+L('hist.allMonths','Whole year')+'</option>';
+    for (var mo=1; mo<=12; mo++){ var mm=(mo<10?'0':'')+mo; h += '<option value="'+mm+'"'+(currentHistMonth===mm?' selected':'')+'>'+HIST_MONTHS[mo-1]+'</option>'; }
+    h += '</select>';
+  }
+  return h + '</div>';
+}
+var _histId = 0;
+function pillHist(n){ return '<span style="padding:8px 0;text-align:center;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-family:var(--mo);font-weight:700;font-size:15px;color:var(--tx);letter-spacing:.04em">'+n+'</span>'; }
+window.toggleHist = function(id, kind, drawNo){
+  var el=document.getElementById(id); if(!el)return;
+  var open=el.style.display!=='none'; el.style.display=open?'none':'block';
+  var c=document.getElementById(id+'_c'); if(c)c.style.transform=open?'rotate(0deg)':'rotate(90deg)';
+  if(!open && kind==='toto' && drawNo){ var sh=document.getElementById(id+'_sh'); if(sh && !sh.getAttribute('data-loaded')){ sh.setAttribute('data-loaded','1'); loadHistShares(drawNo, id+'_sh'); } }
+};
+function sharesTable(s){
+  var h='';
+  if(s.snowball) h+='<div style="background:#dc262611;border:1px solid #dc262633;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--red);font-weight:700;margin-bottom:12px">'+L('hist.snowball','No Group 1 winner — jackpot snowballs to the next draw.')+(s.g1_prize?' '+L('hist.pool','Pool')+': '+s.g1_prize:'')+'</div>';
+  h+='<div style="display:grid;grid-template-columns:auto 1fr auto;gap:7px 20px;font-size:13.5px;align-items:baseline">';
+  h+='<div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">'+L('toto.group','Group')+'</div><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">'+L('toto.share','Share')+'</div><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;text-align:right">'+L('toto.winners','Winners')+'</div>';
+  s.groups.forEach(function(g){ h+='<div style="font-weight:800;color:var(--p)">'+L('toto.group','Group')+' '+g.group+'</div><div style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+g.share+'</div><div style="font-family:var(--mo);font-weight:700;color:var(--tx);text-align:right">'+g.winners+'</div>'; });
+  return h+'</div>';
+}
+function loadHistShares(drawNo, targetId){
+  fetch('/api/toto/shares?draw='+drawNo).then(function(r){return r.json();}).then(function(j){
+    var el=document.getElementById(targetId); if(!el)return;
+    var s=j.data;
+    if(!s || !s.groups || !s.groups.length){ el.innerHTML='<div style="color:var(--t3);font-size:13px">'+L('hist.noShares','Winning shares are not available for this draw.')+'</div>'; return; }
+    el.innerHTML = sharesTable(s);
+  }).catch(function(){ var el=document.getElementById(targetId); if(el) el.innerHTML='<div style="color:var(--t3);font-size:13px">'+L('hist.noShares','Winning shares are not available for this draw.')+'</div>'; });
+}
+function histRow(d, kind){
+  var id = 'hr'+(_histId++);
+  if (kind === '6d') {
+    return '<div class="card" style="padding:14px 18px;display:flex;align-items:center;gap:18px;flex-wrap:wrap"><div style="min-width:150px;flex-shrink:0"><div style="font-family:var(--mo);font-size:15px;font-weight:800;color:var(--tx)">'+d.draw_date+'</div><div style="font-size:12.5px;color:var(--t2);font-weight:600">'+dayOfWeek(d.draw_date)+'</div></div><div style="font-family:var(--mo);font-size:24px;font-weight:800;color:#0891b2;letter-spacing:.08em">'+(d.number||'')+'</div></div>';
+  }
+  var meta = '<div style="min-width:150px;flex-shrink:0"><div style="font-family:var(--mo);font-size:15px;font-weight:800;color:var(--tx)">'+(d.draw_no?'#'+d.draw_no:'—')+'</div><div style="font-size:12.5px;color:var(--t2);font-weight:600">'+d.draw_date+' · '+dayOfWeek(d.draw_date)+'</div></div>';
+  var body = '';
+  if (kind === 'toto') {
+    body = '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">';
+    (d.numbers||[]).forEach(function(n){ body += makeBall(n, 34, 'var(--p)', 0); });
+    if (d.additional_num) body += '<span style="color:var(--red);font-weight:800;font-size:15px;margin:0 2px">+</span>'+makeBall(d.additional_num, 34, 'var(--red)', 0);
+    body += '</div>';
+  } else {
+    body = '<div style="display:flex;gap:20px;flex-wrap:wrap">';
+    [['1st',d.first_prize,'var(--amb)'],['2nd',d.second_prize,'var(--t2)'],['3rd',d.third_prize,'#b45309']].forEach(function(tt){
+      body += '<div><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em">'+tt[0]+'</div><div style="font-family:var(--mo);font-size:20px;font-weight:800;color:'+tt[2]+';letter-spacing:.04em">'+(tt[1]||'—')+'</div></div>';
+    });
+    body += '</div>';
+  }
+  var chevron = '<span id="'+id+'_c" style="margin-left:auto;flex-shrink:0;color:var(--t3);font-size:15px;transition:transform .15s;font-family:var(--mo)">▸</span>';
+  var head = '<div onclick="toggleHist(\''+id+'\',\''+kind+'\','+(d.draw_no||'null')+')" style="cursor:pointer;display:flex;align-items:center;gap:18px;flex-wrap:wrap">'+meta+body+chevron+'</div>';
+  var detail = '<div id="'+id+'" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--bl)">';
+  if (kind === 'toto') {
+    detail += '<div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('hist.winShares','Winning Shares')+'</div><div id="'+id+'_sh"><div style="color:var(--t3);font-size:13px">'+L('common.loading','Loading…')+'</div></div>';
+  } else {
+    var starter = d.starter_prizes || d.special_prizes || [], consol = d.consolation_prizes || [], stLabel = d.starter_prizes ? L('dashboard.starters','Starter Prizes') : L('results.special','Special Prizes');
+    detail += '<div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px">'+stLabel+'</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">'+starter.map(pillHist).join('')+'</div>';
+    detail += '<div style="font-size:11px;font-weight:700;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 9px">'+L('dashboard.consolation','Consolation Prizes')+'</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">'+consol.map(pillHist).join('')+'</div>';
+  }
+  detail += '</div>';
+  return '<div class="card" style="padding:14px 18px">'+head+detail+'</div>';
+}
+function loadDrawHistory(){
+  var m = HIST_META[currentHistGame] || HIST_META.toto;
+  var el = document.getElementById('histBody'); if(!el) return;
+  if (m.liveOnly) {
+    var ctl0=document.getElementById('histControls'); if(ctl0) ctl0.innerHTML='';
+    el.innerHTML = '<div class="card" style="padding:30px 24px;text-align:center"><div style="font-size:34px;margin-bottom:8px">🗓️</div><div style="font-size:16px;font-weight:800;color:var(--tx);margin-bottom:8px">'+L('hist.liveTitle','Archive coming soon')+'</div><div style="font-size:13.5px;color:var(--t2);line-height:1.65;max-width:500px;margin:0 auto">'+L('hist.liveMsg','This game is fetched live, so only the latest result is available right now — its full past-results archive is being collected and will show here soon.')+'</div><div style="margin-top:18px"><button onclick="goTab(\'others\')" style="padding:9px 18px;border-radius:8px;border:none;background:var(--p);color:#fff;font-size:13px;font-weight:700;cursor:pointer">'+L('hist.backOthers','See the latest result')+'</button></div></div>';
+    return;
+  }
+  var url = m.url + '?' + (currentHistYear ? 'year='+currentHistYear+(currentHistMonth?'&month='+currentHistMonth:'') : 'limit=20');
+  fetch(url).then(function(r){return r.json();}).then(function(j){
+    var ctl=document.getElementById('histControls'); if(ctl) ctl.innerHTML = renderHistControls(j.year_range);
+    if(!j.success || !j.data || !j.data.length){ el.innerHTML='<div class="card" style="padding:20px;color:var(--t3)">'+L('hist.noneYear','No draws for this period.')+'</div>'; return; }
+    var h='<div style="display:flex;flex-direction:column;gap:10px">';
+    j.data.forEach(function(d){ h += histRow(d, m.kind); });
+    el.innerHTML = h + '</div>';
+  }).catch(function(){ el.innerHTML='<div class="card" style="padding:20px;color:var(--red)">Could not load history.</div>'; });
+}
+function fourdResultCard(d, cfg){
+  if (!d) return '<div class="card" style="padding:24px;color:var(--t3)">No result available.</div>';
+  var special = d.starter_prizes || d.special_prizes || [];
+  var consol  = d.consolation_prizes || [];
+  var specialLabel = d.special_prizes ? L('results.special','Special') : L('dashboard.starters','Starter Prizes');
+  function pill(num){ return '<span style="display:flex;align-items:center;justify-content:center;padding:9px 0;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-family:var(--mo);font-weight:700;font-size:16px;color:var(--tx);letter-spacing:.04em">'+num+'</span>'; }
+  var h = '<div class="card">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox(cfg.logo,cfg.label)+'<div style="font-size:22px;font-weight:800;color:'+cfg.color+'">'+cfg.flag+' '+cfg.label+'</div>'+viewHistoryLink("goHistory('"+cfg.id+"')")+'</div>';
+  if (d.draw_no) h += '<div style="font-family:var(--mo);font-size:30px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+d.draw_no+'</div>';
+  h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span>'+d.draw_date+'</span><span style="font-size:12.5px;font-weight:700;color:'+cfg.color+';background:color-mix(in srgb, '+cfg.color+' 10%, transparent);padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(d.draw_date)+'</span></div>';
+  var t3 = d.top3_counts || {};
+  [[L('dashboard.first','1st Prize'),d.first_prize,cfg.color,t3.first],[L('dashboard.second','2nd Prize'),d.second_prize,'var(--t2)',t3.second],[L('dashboard.third','3rd Prize'),d.third_prize,'#b45309',t3.third]].forEach(function(it,i){
+    h += '<div style="padding:10px 0;border-bottom:'+(i<2?'1px solid var(--bl)':'none')+';display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-size:12px;font-weight:700;color:'+it[2]+';text-transform:uppercase;letter-spacing:.05em;min-width:90px">'+it[0]+'</div><div style="font-family:var(--mo);font-size:26px;font-weight:800;color:'+it[2]+';letter-spacing:.05em">'+(it[1]||'—')+'</div>'+(it[3]!=null?'<span style="font-size:15px;font-weight:800;color:'+it[2]+';font-family:var(--mo)">× '+it[3]+'</span><span style="font-size:11px;color:var(--t3);font-weight:600">'+L('dashboard.top3hits','appeared in top-3')+'</span>':'')+'</div>';
+  });
+  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+specialLabel+'</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">'+special.map(pill).join('')+'</div></div>';
+  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--vi);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.consolation','Consolation Prizes')+'</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">'+consol.map(pill).join('')+'</div></div>';
+  // 4D Jackpot footer — amount + winner status (Magnum / Sports Toto / Da Ma Cai)
+  if (d.jackpot && (d.jackpot.j1 || d.jackpot.j2)) {
+    var jk = d.jackpot;
+    h += '<div style="margin-top:18px;border-top:1px solid var(--bl);padding-top:14px">';
+    h += '<div style="font-size:12px;font-weight:700;color:#b45309;margin-bottom:9px;text-transform:uppercase;letter-spacing:.05em">'+L('home.jackpot','4D Jackpot')+'</div>';
+    [['Jackpot 1', jk.j1], ['Jackpot 2', jk.j2]].forEach(function(j){
+      if (!j[1]) return;
+      var won = /won/i.test(j[1].status), partial = /partial/i.test(j[1].status);
+      var col = partial ? 'var(--amb)' : (won ? 'var(--em)' : 'var(--t3)');
+      h += '<div style="display:flex;align-items:baseline;gap:10px;padding:4px 0;font-size:13px;flex-wrap:wrap"><span style="font-weight:700;color:var(--t2);min-width:74px">'+j[0]+'</span><span style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+j[1].amt+'</span><span style="font-size:11px;font-weight:800;color:'+col+';background:color-mix(in srgb, '+col+' 12%, transparent);padding:2px 8px;border-radius:5px">'+j[1].status+'</span></div>';
+    });
+    if (jk.next) h += '<div style="font-size:11.5px;color:var(--t3);margin-top:8px">'+L('home.nextDrawEst','Next draw est.')+': <span style="font-family:var(--mo)">'+jk.next.j1+'</span> / <span style="font-family:var(--mo)">'+jk.next.j2+'</span></div>';
+    h += '</div>';
+  }
+  h += nextDrawRow(d.draw_date, cfg.id);
+  h += '</div>';
+  return h;
+}
+
+
+// generic tab switch (used by "view full" links etc.)
+window.goTab = function(tab){ currentTab = tab; resetLazyObserver(); renderNav(); renderPage(); updateSEO(currentTab); window.scrollTo(0,0); };
+
+// ── Ad slots ── reserved, labelled, responsive placeholders (no layout shift).
+// Drop an ad network's <ins>/<script> into the inner div by data-ad id later.
+// kinds: 'leaderboard' (top/footer banner) · 'rectangle' (in-feed) · 'sticky' (mobile anchor)
+function adSlot(id, kind, label){
+  kind = kind || 'leaderboard';
+  var minH = kind === 'rectangle' ? 250 : (kind === 'sticky' ? 60 : 90);
+  var maxW = kind === 'rectangle' ? '336px' : '970px';
+  return '<div class="ad-slot" data-ad="'+id+'" data-ad-kind="'+kind+'" '+
+    'style="width:100%;max-width:'+maxW+';margin:22px auto;min-height:'+minH+'px;display:flex;flex-direction:column;align-items:center;justify-content:center;'+
+    'background:var(--bg);border:1px dashed var(--bd);border-radius:12px;color:var(--t3);overflow:hidden">'+
+    '<div style="font-size:9.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.6;margin-bottom:3px">'+L('common.ad','Advertisement')+'</div>'+
+    '<div style="font-size:11.5px;opacity:.75">'+(label || (kind+' · '+id))+'</div>'+
+  '</div>';
+}
+
+// compact operator card for the "everything at once" Home
+function loadMyHome(){
+  Promise.all([
+    fetch('/api/my/latest').then(function(r){return r.json();}),
+    fetch('/api/my/drawnos').then(function(r){return r.json();}).catch(function(){return {data:{}};})
+  ]).then(function(res){
+    var el = document.getElementById('myHome'); if (!el) return;
+    var d = (res[0]&&res[0].data) || {}, dn = (res[1]&&res[1].data) || {};
+    window.MY_DRAWNOS = dn;
+    function grid(ops){
+      var g='<div class="grid g3" style="gap:16px">';
+      ops.forEach(function(op){ var row=d[op], info=dn[op]; if(row){ if(info){ if(info.no) row.draw_no=info.no; row.jackpot=info; } g += fourdResultCard(row, anyOpCfg(op)); } });
+      return g+'</div>';
+    }
+    var html = grid(['magnum','sportstoto','damacai']);   // Malaysia 4D (official operators), 3/row
+    html += '<div style="margin:26px 0 14px"><span style="font-size:17px;font-weight:800;color:var(--tx)">🇲🇾 '+L('region.east','Sabah & Sarawak')+'</span></div>';
+    html += grid(['sabah','sarawak','sandakan']);                       // East Malaysia, 3/row
+    el.innerHTML = html;
+  }).catch(function(){ var el=document.getElementById('myHome'); if(el) el.innerHTML='<div class="card" style="padding:20px;color:var(--red)">Could not load Malaysia results.</div>'; });
+}
+function my6DCard(){ return '<div class="card" id="sixdCard" style="padding:20px">'+loadingCard()+'</div>'; }
+// Sports Toto 6D — real winning number + prefix/suffix prize tiers
+function load6D(){
+  fetch('/api/my/6d').then(function(r){return r.json();}).then(function(j){
+    var el=document.getElementById('sixdCard'); if(!el) return;
+    if(!j.data){ el.innerHTML = '<div style="font-size:22px;font-weight:800;color:#0891b2;margin-bottom:8px">🇲🇾 '+L('home.sixd','Sports Toto 6D')+'</div><div style="font-size:13px;color:var(--t3)">'+L('home.sixdNone','No recent 6D result.')+'</div>'; return; }
+    var d=j.data, n=d.number;
+    // header matches the 4D cards (22px name · date · day)
+    var h = '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('sportstoto','Sports Toto 6D')+'<div style="font-size:22px;font-weight:800;color:#0891b2">🇲🇾 '+L('home.sixd','Sports Toto 6D')+'</div>'+viewHistoryLink("goHistory('sixd')")+'</div>';
+    var stoto=window.MY_DRAWNOS&&window.MY_DRAWNOS.sportstoto, dno=stoto&&stoto.no;   // 6D shares Sports Toto's draw number
+    if(dno) h += '<div style="font-family:var(--mo);font-size:30px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+dno+'</div>';
+    h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span>'+d.draw_date+'</span><span style="font-size:12.5px;font-weight:700;color:#0891b2;background:color-mix(in srgb, #0891b2 10%, transparent);padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(d.draw_date)+'</span></div>';
+    h += '<div style="padding:8px 0 18px;border-bottom:1px solid var(--bl);margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:#0891b2;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;text-align:center">'+L('home.sixd1st','1st Prize · Match all 6')+'</div><div style="font-family:var(--mo);font-size:54px;font-weight:800;color:#0891b2;letter-spacing:.1em;text-align:center;line-height:1">'+n+'</div></div>';
+    [['2nd',5,n.slice(0,5),n.slice(1)],['3rd',4,n.slice(0,4),n.slice(2)],['4th',3,n.slice(0,3),n.slice(3)],['5th',2,n.slice(0,2),n.slice(4)]].forEach(function(t){
+      h += '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;flex-wrap:wrap"><div style="font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;min-width:96px">'+t[0]+' · '+t[1]+' '+L('home.sixdDigits','digits')+'</div>'+
+        '<span style="padding:7px 13px;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-family:var(--mo);font-weight:700;font-size:18px;color:var(--tx);letter-spacing:.05em">'+t[2]+'</span>'+
+        '<span style="font-size:12px;color:var(--t3);font-weight:600">'+L('home.or','or')+'</span>'+
+        '<span style="padding:7px 13px;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-family:var(--mo);font-weight:700;font-size:18px;color:var(--tx);letter-spacing:.05em">'+t[3]+'</span></div>';
+    });
+    h += '<div style="font-size:11px;color:var(--t3);margin-top:12px;line-height:1.55;font-style:italic">'+L('home.sixdNote','6D pays by matching the front or back of the winning number — no group winners like TOTO.')+'</div>';
+    h += nextDrawRow(d.draw_date, 'lotto');
+    el.innerHTML = h;
+  }).catch(function(){});
+}
+
+// ─── STATISTICS view — unified: SG TOTO · SG 4D · MY operators (operator = filter) ──
+var STAT_OPS = [
+  { id:'sg4d',       label:'SG Pools',        flag:'🇸🇬', region:'sg', color:'var(--amb)' },
+  { id:'magnum',     label:'Magnum',          flag:'🇲🇾', region:'my', color:'#dc2626' },
+  { id:'sportstoto', label:'Sports Toto',     flag:'🇲🇾', region:'my', color:'#059669' },
+  { id:'damacai',    label:'Da Ma Cai',       flag:'🇲🇾', region:'my', color:'#7c3aed' },
+  { id:'sabah',      label:'Sabah 88',        flag:'🇲🇾', region:'my', color:'#15803d' },
+  { id:'sarawak',    label:'Cash Sweep',      flag:'🇲🇾', region:'my', color:'#7c3aed' },
+  { id:'sandakan',   label:'Sandakan',        flag:'🇲🇾', region:'my', color:'#c2410c' }
+];
+var currentStatOp = 'sg4d';
+window.setStatOp = function(op){ currentStatOp = op; try{localStorage.setItem('huat_statop',op);}catch(e){} renderPage(); window.scrollTo(0,0); };
+function statOpSelector(){
+  var h = '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px">', last=null;
+  STAT_OPS.forEach(function(o){
+    if (last==='sg' && o.region==='my') h += '<span style="width:1px;height:22px;background:var(--bd);margin:0 3px"></span>';
+    last=o.region; var on=o.id===currentStatOp;
+    h += '<button onclick="setStatOp(\''+o.id+'\')" style="padding:8px 13px;border-radius:9px;border:1px solid '+(on?o.color:'var(--bd)')+';background:'+(on?'color-mix(in srgb, '+o.color+' 13%, transparent)':'var(--cd)')+';color:'+(on?o.color:'var(--t2)')+';font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">'+o.flag+' '+o.label+'</button>';
+  });
+  return h + '</div>';
+}
+// SG TOTO winning shares (Group 1–7: share amount + no. of winners) on the current-draw card
+function loadTotoShares(){
+  fetch('/api/toto/shares').then(function(r){return r.json();}).then(function(j){
+    var el=document.getElementById('totoShares'); if(!el||!j||!j.data||!j.data.groups||!j.data.groups.length) return;
+    var d=j.data, h='<div style="margin-top:16px;border-top:1px solid var(--bl);padding-top:14px">';
+    h += '<div style="font-size:12px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('toto.winningShares','Winning Shares')+'</div>';
+    if (d.snowball) h += '<div style="background:rgba(220,38,38,.10);color:var(--red);font-size:12.5px;font-weight:700;padding:9px 12px;border-radius:8px;margin-bottom:12px;line-height:1.5">'+L('toto.snowball','No Group 1 winner — jackpot snowballs to the next draw.')+(d.g1_prize?' '+L('toto.pool','Pool')+': <span style="font-family:var(--mo)">'+d.g1_prize+'</span>':'')+'</div>';
+    h += '<div style="display:grid;grid-template-columns:auto 1fr auto;gap:7px 14px;font-size:13px;align-items:baseline">';
+    h += '<div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.05em">GROUP</div><div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.05em">'+L('toto.share','SHARE')+'</div><div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.05em;text-align:right">'+L('toto.winners','WINNERS')+'</div>';
+    d.groups.filter(function(g){return g.group<=3;}).forEach(function(g){
+      h += '<div style="font-weight:800;color:var(--tx)">Group '+g.group+'</div>'+
+           '<div style="font-family:var(--mo);color:var(--t2)">'+g.share+'</div>'+
+           '<div style="font-family:var(--mo);font-weight:700;color:var(--tx);text-align:right">'+g.winners+'</div>';
+    });
+    h += '</div></div>';
+    el.innerHTML = h;
+  }).catch(function(){});
+}
+
+function renderStats(){
+  var ids = STAT_OPS.map(function(o){return o.id;});
+  if (ids.indexOf(currentStatOp) < 0) currentStatOp = 'sg4d';     // guard stale/removed value
+  var h = statOpSelector();
+  if (currentStatOp === 'sg4d') return h + render4DStats();       // SG 4D engine
+  var cfg = opCfg(currentStatOp);                                 // MY operator → deep stats
+  h += '<h1>'+L('tabs.fourd','4D Stats')+' · '+cfg.flag+' '+cfg.label+'</h1>';
+  h += '<div id="myStats">'+loadingCard()+'</div>';
+  lazyLoad('myStats', function(){ loadMyStats(currentStatOp); });
+  return h;
+}
+function loadMyStats(op){
+  var cfg = opCfg(op);
+  fetch('/api/my/'+op+'/stats').then(function(r){return r.json();}).then(function(j){
+    var el=document.getElementById('myStats'); if(el) el.innerHTML = myStatsHTML(j.data, cfg);
+  }).catch(function(){ var el=document.getElementById('myStats'); if(el) el.innerHTML='<div class="card" style="padding:20px;color:var(--red)">Could not load stats.</div>'; });
+}
+function myStatsHTML(s, cfg){
+  if(!s) return '<div class="card" style="padding:20px;color:var(--t3)">No data.</div>';
+  function secHead(icon, color, bg, title){ return '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px"><div style="background:'+bg+';color:'+color+';width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon(icon,26)+'</div><h3 style="font-size:20px;font-weight:800;color:'+color+';margin:0">'+title+'</h3></div>'; }
+  var h = '<p class="desc" style="margin-top:-8px">'+s.total_draws.toLocaleString()+' '+L('dashboard.draws','draws')+' · '+s.date_range.from+' → '+s.date_range.to+' · '+s.total_numbers.toLocaleString()+' numbers</p>';
+
+  // 1 ── Top 10 Hot 4D Numbers (with per-tier breakdown) — same as SG Pools
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">'+secHead("flame","var(--red)","#dc262611",L('fourd.top10Hot','Top 10 Hot 4D Numbers'));
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.hotDesc','Ranked by appearances in any prize position (23 per draw).')+' <b>'+s.date_range.from+' → '+s.date_range.to+'</b> · '+s.total_draws.toLocaleString()+' '+L('dashboard.draws','draws')+'.</p>';
+  h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
+  s.hot_numbers.slice(0,10).forEach(function(x,i){ var b=x.breakdown||{};
+    h += '<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px 14px">';
+    h += '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:11px;color:var(--t3);font-weight:700;font-family:var(--mo)">#'+(i+1)+'</span><span style="font-family:var(--mo);font-size:21px;font-weight:800;color:var(--tx);letter-spacing:.03em">'+x.number+'</span></div><span style="font-size:15px;font-weight:800;color:var(--red);font-family:var(--mo)">'+x.count+'×</span></div>';
+    h += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">';
+    [['1st',b.first,'var(--em)'],['2nd',b.second,'var(--t2)'],['3rd',b.third,'var(--amb)'],['St',b.special,'var(--p)'],['Co',b.consol,'var(--vi)']].forEach(function(t){ if(t[1]) h+='<span style="font-size:10.5px;font-family:var(--mo);font-weight:700;color:'+t[2]+';background:var(--cd);border:1px solid var(--bd);padding:1px 6px;border-radius:4px">'+t[0]+':'+t[1]+'</span>'; });
+    h += '</div></div>';
+  });
+  h += '</div></div>';
+
+  // 1b ── Top 10 Cold 4D Numbers (least frequent) — brought up right below Hot
+  var _cold = s.cold_numbers || [];
+  if (_cold.length) {
+    h += '<div class="card" style="margin-bottom:28px;padding:24px">'+secHead("snow","var(--cy)","#0891b211",L('fourd.top10Cold','Top 10 Cold 4D Numbers'));
+    h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.top10ColdDesc','The least-frequent numbers — fewest appearances across the archive.')+'</p>';
+    h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
+    _cold.forEach(function(x,i){ var b=x.breakdown||{};
+      h += '<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px 14px">';
+      h += '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:11px;color:var(--t3);font-weight:700;font-family:var(--mo)">#'+(i+1)+'</span><span style="font-family:var(--mo);font-size:21px;font-weight:800;color:var(--tx);letter-spacing:.03em">'+x.number+'</span></div><span style="font-size:15px;font-weight:800;color:var(--cy);font-family:var(--mo)">'+x.count+'×</span></div>';
+      h += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">';
+      [['1st',b.first,'var(--em)'],['2nd',b.second,'var(--t2)'],['3rd',b.third,'var(--amb)'],['St',b.special,'var(--p)'],['Co',b.consol,'var(--vi)']].forEach(function(t){ if(t[1]) h+='<span style="font-size:10.5px;font-family:var(--mo);font-weight:700;color:'+t[2]+';background:var(--cd);border:1px solid var(--bd);padding:1px 6px;border-radius:4px">'+t[0]+':'+t[1]+'</span>'; });
+      h += '</div></div>';
+    });
+    h += '</div></div>';
+  }
+
+  // 2 ── Repeat 1st Prize Winners
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">'+secHead("trophy","var(--amb)","#d9770611",L('fourd.repeatWinners','Repeat 1st Prize Winners'));
+  if (s.repeat_winners && s.repeat_winners.length){
+    h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+s.repeat_winners.length+' '+L('fourd.repeatWinnersMy','numbers have won 1st prize more than once.')+'</p>';
+    h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px">';
+    s.repeat_winners.slice(0,10).forEach(function(x){ h+='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px;text-align:center"><div style="font-family:var(--mo);font-size:21px;font-weight:800;color:var(--amb)">'+x.number+'</div><div style="font-size:11px;color:var(--t3);font-weight:600;margin-top:3px">'+L('common.won','won')+' '+x.wins+' '+L('common.times','times')+'</div></div>'; });
+    h += '</div>';
+  } else h += '<div style="color:var(--t3);font-size:13px">'+L('fourd.noRepeat','No number has won 1st prize more than once yet.')+'</div>';
+  h += '</div>';
+
+  // 3 ── Year-by-Year Winners
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">'+secHead("cal","var(--amb)","#d9770611",L('fourd.yearlyWinners','Year-by-Year Winners'));
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.yearlyMy','The most-frequent number each year, across all 23 prize positions.')+'</p>';
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:8px">';
+  s.year_by_year.slice(0,42).forEach(function(x){ var b=x.breakdown||{};
+    h+='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:11px 13px">';
+    h+='<div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px"><span style="font-size:12px;color:var(--p);font-weight:800">'+x.year+'</span><span style="font-family:var(--mo);font-size:18px;font-weight:800;color:var(--tx)">'+x.number+'</span></div>';
+    h+='<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;font-size:10.5px;font-family:var(--mo)">';
+    [['1st',b.first,'var(--em)'],['2nd',b.second,'var(--t2)'],['3rd',b.third,'var(--amb)'],['St',b.special,'var(--p)'],['Co',b.consol,'var(--vi)']].forEach(function(t){ h+='<span style="color:'+(t[1]?t[2]:'var(--t3)')+';font-weight:'+(t[1]?800:400)+'">'+t[0]+':'+(t[1]||0)+'</span>'; });
+    h+='</div></div>';
+  });
+  h += '</div></div>';
+
+  // 4 ── Digit Frequency — Single, Double, Triple, Quad (all Top-3 / Bottom-3)
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">'+secHead("chart","var(--p)","#3730a311",L('fourd.digitFreq','Digit Frequency — Single, Double, Triple, Quad'));
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.digitFreqMyDesc','How often each digit pattern appears across all 23 prize positions per draw. <b>Total</b> (top-right) = that category’s occurrences; each <b>%</b> is the item’s share of its own category — e.g. 44 vs all doubles (uniform ≈ 10% each).')+'</p>';
+  var dp = s.digit_pairs || {};
+  var _singleTotal = s.digit_frequency.reduce(function(a,x){ return a + x.count; }, 0);
+  // % = item's share of its OWN category total (44 vs all doubles, 111 vs all triples, etc.)
+  function withPct(obj, catTotal){ if(!obj) return null; function m(a){ return (a||[]).map(function(x){ return { number:x.number, pct: catTotal ? x.count/catTotal*100 : 0 }; }); } return { top:m(obj.top), bottom:m(obj.bottom), total: catTotal || 0 }; }
+  var _sg = s.digit_frequency.slice().sort(function(a,b){return b.count-a.count;});
+  var singleTB = { top:_sg.slice(0,3).map(function(x){return {number:x.digit,count:x.count};}), bottom:_sg.slice(-3).reverse().map(function(x){return {number:x.digit,count:x.count};}) };
+  function pairCol(title, obj, color){
+    if(!obj) return '';
+    var head = '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px"><div style="font-size:16px;font-weight:800;color:'+color+'">'+title+'</div><div style="font-size:11px;color:var(--t3);font-family:var(--mo);font-weight:700">'+(obj.total||0).toLocaleString()+' '+L('stats.total','total')+'</div></div>';
+    var c='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:16px">'+head;
+    function line(x,up){ return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0"><span style="font-family:var(--mo);font-size:17px;font-weight:800;color:var(--tx)">'+x.number+'</span><span style="font-size:12.5px;color:'+(up?'var(--red)':'var(--cy)')+';font-weight:700;font-family:var(--mo)">'+x.pct.toFixed(1)+'%</span></div>'; }
+    c+='<div style="font-size:9.5px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px">'+L('stats.top3','Top 3')+'</div>';
+    obj.top.forEach(function(x){ c+=line(x,true); });
+    c+='<div style="font-size:9.5px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:9px 0 1px">'+L('stats.bottom3','Bottom 3')+'</div>';
+    obj.bottom.forEach(function(x){ c+=line(x,false); });
+    return c+'</div>';
+  }
+  h += '<div class="grid g4" style="gap:12px">';
+  h += pairCol(L('stats.single','Single')+' (X)', withPct(singleTB, _singleTotal), 'var(--em)');
+  h += pairCol(L('stats.doubles','Doubles')+' (XX)', withPct(dp.doubles, dp.doubles && dp.doubles.total), 'var(--amb)');
+  h += pairCol(L('stats.triples','Triples')+' (XXX)', withPct(dp.triples, dp.triples && dp.triples.total), 'var(--vi)');
+  h += pairCol(L('stats.quads','Quads')+' (XXXX)', withPct(dp.quads, dp.quads && dp.quads.total), 'var(--red)');
+  h += '</div></div>';
+
+  // 5 ── Most Overdue (bonus — MY has deep history)
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">'+secHead("snow","var(--cy)","#0891b211",L('stats.overdue','Most Overdue'));
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.overdueDesc','Numbers with the longest gap since their last appearance in any prize position.')+'</p>';
+  h += '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px">';
+  s.overdue_numbers.slice(0,12).forEach(function(x){ h+='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:14px 6px;text-align:center"><div style="font-family:var(--mo);font-size:20px;font-weight:800;color:var(--tx)">'+x.number+'</div><div style="font-size:10.5px;font-weight:700;color:var(--cy);margin-top:5px">'+x.draws_since+' '+L('stats.ago','ago')+'</div></div>'; });
+  h += '</div></div>';
+  return h;
+}
+
+// ─── NUMBERS view — merges Lucky Numbers + Alpha 4D Simulator as modes ──
+var currentNumMode = 'lucky';
+window.setNumMode = function(m){ currentNumMode = m; renderPage(); window.scrollTo(0,0); };
+function renderNumbers(){
+  var modes = [['lucky', L('tabs.lucky','Lucky Numbers')], ['alpha4d', L('tabs.alpha4d','Alpha 4D Simulator')]];
+  var h = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">';
+  modes.forEach(function(m){ var on=m[0]===currentNumMode;
+    h += '<button onclick="setNumMode(\''+m[0]+'\')" style="padding:8px 15px;border-radius:9px;border:1px solid '+(on?'var(--p)':'var(--bd)')+';background:'+(on?'color-mix(in srgb, var(--p) 13%, transparent)':'var(--cd)')+';color:'+(on?'var(--p)':'var(--t2)')+';font-size:13px;font-weight:700;cursor:pointer">'+m[1]+'</button>';
+  });
+  h += '</div>';
+  return h + (currentNumMode === 'alpha4d' ? renderAlpha4D() : renderLucky());
+}
+
+// ─── MORE view — utility links (History Search · Disclaimer · payout later) ──
+function renderMore(){
+  var h = '<h1>'+L('tabs.more','More')+'</h1><p class="desc">'+L('more.desc','Tools & information.')+'</p>';
+  h += '<div class="grid g2" style="gap:14px;margin-top:8px">';
+  var items = [
+    ['history', 'goTab(\'history\')', L('tabs.history','History Search'), L('more.historyDesc','Search any 4-digit number across every past draw.')],
+    ['disclaimer', 'showDisclaimer()', L('footer.link','Disclaimer'), L('more.disclaimerDesc','Legal notice & responsible play.')]
+  ];
+  items.forEach(function(it){
+    h += '<a href="/?tab='+it[0]+'" onclick="event.preventDefault();'+it[1]+'" style="text-decoration:none;color:inherit"><div class="card" style="padding:22px;cursor:pointer"><div style="font-size:17px;font-weight:800;color:var(--tx)">'+it[2]+'</div><div style="font-size:13px;color:var(--t2);margin-top:5px;line-height:1.5">'+it[3]+'</div></div></a>';
+  });
+  h += '</div>';
   return h;
 }
 
@@ -827,7 +1542,7 @@ function renderTotoStats() {
   var hot = s.hot_numbers, cold = s.cold_numbers;
   var tE = s.even_odd.total_even, tO = s.even_odd.total_odd;
   var evenPct = s.even_odd.even_pct, oddPct = s.even_odd.odd_pct;
-  var h = '<h1>'+L('toto.title','TOTO Stats')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.analyzed','draws analyzed')+'.</p>';
+  var h = '<h1>'+L('toto.title','TOTO Stats')+' · 🇸🇬 '+L('fourd.sgLabel','SG Pools')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.analyzed','draws analyzed')+'.</p>';
 
   // Hot / Cold — bigger headers, no meter bars (all-time = strict 6/49 era)
   h += '<div class="grid g2" style="margin-bottom:28px;gap:18px">';
@@ -1117,93 +1832,7 @@ window.loadNumberDetail = function() {
   });
 };
 
-function loadShape() {
-  var el = document.getElementById('shapeStats') || document.getElementById('shapeStatsAi');
-  if (!el) return;
-  fetch('/api/toto/shape-stats').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var html = '';
 
-    // KPI strip — 4 headline patterns
-    html += '<div class="grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:18px">';
-    [['Consecutive Numbers', d.consecutive.pct + '%', d.consecutive.count + ' of ' + d.total_draws_scanned + ' draws have 2+ in a row', 'var(--amb)'],
-     ['Repeat from Previous', d.repeat_from_previous.pct + '%', d.repeat_from_previous.count + ' draws shared at least 1 number with the previous draw', 'var(--p)'],
-     ['All-Even Draws', d.all_even.pct + '%', d.all_even.count + ' draws had all 6 numbers even', 'var(--cy)'],
-     ['All-Odd Draws', d.all_odd.pct + '%', d.all_odd.count + ' draws had all 6 numbers odd', 'var(--vi)']
-    ].forEach(function(k) {
-      html += '<div style="padding:14px;background:var(--bg);border-radius:8px">';
-      html += '<div style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">'+k[0]+'</div>';
-      html += '<div style="font-size:24px;font-weight:800;color:'+k[3]+';font-family:var(--mo)">'+k[1]+'</div>';
-      html += '<div style="font-size:11.5px;color:var(--t3);margin-top:6px;line-height:1.4">'+k[2]+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-
-    // Decade distribution
-    var maxDec = Math.max.apply(null, d.decade_distribution.map(x=>x.avg_per_draw));
-    html += '<div style="font-size:13px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 10px">Decade Distribution &nbsp;<span style="font-size:11px;color:var(--t3);font-weight:600;text-transform:none;letter-spacing:0">— average per draw of 6 numbers</span></div>';
-    html += '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:18px">';
-    d.decade_distribution.forEach(function(dx) {
-      var pct = maxDec > 0 ? dx.avg_per_draw / maxDec * 100 : 0;
-      html += '<div style="display:flex;align-items:center;gap:10px">';
-      html += '<div style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--t2);min-width:60px">'+dx.range+'</div>';
-      html += '<div style="flex:1;height:20px;background:var(--bg);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--em),#05966988);border-radius:5px"></div></div>';
-      html += '<div style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--em);min-width:60px;text-align:right">'+dx.avg_per_draw+'/draw</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-
-    // Range + low/high split
-    html += '<div class="grid g2" style="gap:14px">';
-    html += '<div style="padding:14px;background:var(--bg);border-radius:8px">';
-    html += '<div style="font-size:12px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Spread (max − min)</div>';
-    html += '<div style="font-size:24px;font-weight:800;color:var(--p);font-family:var(--mo)">avg '+d.range_stats.avg+'</div>';
-    html += '<div style="font-size:12px;color:var(--t3);margin-top:6px">median '+d.range_stats.median+' &nbsp;·&nbsp; smallest '+d.range_stats.min+' &nbsp;·&nbsp; largest '+d.range_stats.max+'</div>';
-    html += '</div>';
-    html += '<div style="padding:14px;background:var(--bg);border-radius:8px">';
-    html += '<div style="font-size:12px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Low (≤25) vs High (&gt;25)</div>';
-    html += '<div style="display:flex;align-items:baseline;gap:14px">';
-    html += '<div><span style="font-size:24px;font-weight:800;color:var(--em);font-family:var(--mo)">'+d.low_high.low_pct+'%</span> <span style="font-size:12px;color:var(--t3)">low</span></div>';
-    html += '<div><span style="font-size:24px;font-weight:800;color:var(--vi);font-family:var(--mo)">'+d.low_high.high_pct+'%</span> <span style="font-size:12px;color:var(--t3)">high</span></div>';
-    html += '</div>';
-    html += '<div style="font-size:11px;color:var(--t3);margin-top:6px">25 numbers in low range vs 24 in high — expected close to 51/49</div>';
-    html += '</div>';
-    html += '</div>';
-
-    el.innerHTML = html;
-  });
-}
-
-function loadDigitHeatmap() {
-  var el = document.getElementById('digitHeatmap'); if (!el) return;
-  fetch('/api/fourd/digit-positions').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var m = j.data.matrix;
-    var expected = j.data.expected_per_cell;
-    var html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;font-family:var(--mo)">';
-    html += '<thead><tr><th style="text-align:left;padding:6px 8px;font-weight:800;color:var(--t3)">Position</th>';
-    for (var d = 0; d < 10; d++) html += '<th style="padding:6px 8px;text-align:center;font-weight:800;color:var(--t3)">'+d+'</th>';
-    html += '</tr></thead><tbody>';
-    var posLabels = ['1st digit','2nd digit','3rd digit','4th digit'];
-    for (var pos = 0; pos < 4; pos++) {
-      html += '<tr style="border-top:1px solid var(--bl)">';
-      html += '<td style="padding:8px;color:var(--t2);font-weight:700">'+posLabels[pos]+'</td>';
-      for (var d = 0; d < 10; d++) {
-        var c = m[pos][d];
-        var ratio = c / expected;
-        // Background intensity: darker = more frequent (relative to expected)
-        var alpha = Math.min(0.5, Math.max(0.05, (ratio - 0.8) * 1.5));
-        var color = ratio >= 1 ? 'rgba(220,38,38,'+alpha+')' : 'rgba(8,145,178,'+alpha+')';
-        html += '<td style="padding:8px;text-align:center;background:'+color+'">'+c+'</td>';
-      }
-      html += '</tr>';
-    }
-    html += '</tbody></table></div>';
-    html += '<div style="font-size:11.5px;color:var(--t3);margin-top:10px">Expected per cell if uniform: ~'+expected+'. Cells redder = above expected, bluer = below.</div>';
-    el.innerHTML = html;
-  });
-}
 
 function loadClassByYear() {
   var el = document.getElementById('classByYear'); if (!el) return;
@@ -1211,96 +1840,36 @@ function loadClassByYear() {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var overall = j.data.overall;
 
-    // Helper to render one digit-frequency table sorted by appearance %
-    function digitTable(map, expected, fmt) {
+    // Render one digit-frequency column — % is each item's share of its OWN category total
+    function digitTable(map, total, fmt) {
       var arr = [];
-      for (var d = 0; d <= 9; d++) arr.push({ d: d, c: map[d].count, p: map[d].pct });
-      arr.sort(function(a,b){ return b.p - a.p; });
-      var max = arr[0].p || 1;
-      var html = '<div style="display:flex;flex-direction:column;gap:5px">';
-      arr.forEach(function(x, idx) {
-        var dev = x.p - expected;
-        var devPct = expected > 0 ? (dev / expected * 100) : 0;
-        var col = Math.abs(dev) < expected * 0.05 ? 'var(--t2)' : (dev > 0 ? '#dc2626' : '#0891b2');
-        var w = max > 0 ? (x.p / max * 100) : 0;
-        var rankCol = idx === 0 ? '#dc2626' : (idx === arr.length - 1 ? '#0891b2' : 'var(--t3)');
-        var sign = dev >= 0 ? '+' : '';
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 8px;background:'+(idx===0?'rgba(220,38,38,.05)':idx===arr.length-1?'rgba(8,145,178,.05)':'transparent')+';border-radius:6px">';
-        html += '<span style="font-family:var(--mo);color:'+rankCol+';font-size:10px;font-weight:800;min-width:14px">'+(idx+1)+'</span>';
-        html += '<span style="font-family:var(--mo);font-weight:800;color:var(--tx);font-size:14px;min-width:44px">'+fmt(x.d)+'</span>';
-        html += '<div style="flex:1;height:8px;background:var(--cd);border-radius:2px;overflow:hidden;min-width:40px"><div style="height:100%;width:'+w+'%;background:'+col+';border-radius:2px"></div></div>';
-        html += '<span style="font-family:var(--mo);font-weight:700;color:'+col+';font-size:12px;min-width:54px;text-align:right">'+x.p+'%</span>';
-        html += '<span style="font-family:var(--mo);color:'+col+';font-size:10.5px;font-weight:600;min-width:42px;text-align:right">'+sign+devPct.toFixed(1)+'%</span>';
-        html += '<span style="font-family:var(--mo);color:var(--t3);font-size:10.5px;min-width:62px;text-align:right">'+x.c.toLocaleString()+'×</span>';
-        html += '</div>';
-      });
-      html += '</div>';
-      var topD = arr[0], botD = arr[arr.length - 1];
-      html += '<div style="font-size:11px;color:var(--t3);margin-top:8px;padding-top:8px;border-top:1px solid var(--bl);line-height:1.5">';
-      html += L('fourd.expectedRandom','Expected <b>{pct}%</b> each if random.').replace('{pct}', expected)+'<br>';
-      html += '<span style="color:#dc2626">'+L('fourd.hottestColon','Hottest:')+' <b style="font-family:var(--mo)">'+fmt(topD.d)+'</b> ('+topD.p+'%)</span> · ';
-      html += '<span style="color:#0891b2">'+L('fourd.coldestColon','Coldest:')+' <b style="font-family:var(--mo)">'+fmt(botD.d)+'</b> ('+botD.p+'%)</span>';
-      html += '</div>';
+      for (var d = 0; d <= 9; d++) arr.push({ d: d, c: map[d].count, p: total ? map[d].count/total*100 : 0 });
+      arr.sort(function(a,b){ return b.c - a.c; });
+      function line(x, up){ return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0"><span style="font-family:var(--mo);font-size:17px;font-weight:800;color:var(--tx)">'+fmt(x.d)+'</span><span style="font-size:12.5px;color:'+(up?'#dc2626':'#0891b2')+';font-weight:700;font-family:var(--mo)">'+x.p.toFixed(1)+'%</span></div>'; }
+      var html = '<div style="font-size:9.5px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px">'+L('stats.top3','Top 3')+'</div>';
+      arr.slice(0,3).forEach(function(x){ html += line(x, true); });
+      html += '<div style="font-size:9.5px;color:var(--t3);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:9px 0 1px">'+L('stats.bottom3','Bottom 3')+'</div>';
+      arr.slice(-3).reverse().forEach(function(x){ html += line(x, false); });
       return html;
     }
 
-    // === Single overall card — compact 4-column grid ===
-    var html = '<div style="padding:18px;background:linear-gradient(135deg,rgba(55,48,163,.06),rgba(8,145,178,.06));border-radius:10px">';
-    html += '<div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px">';
-    html += '<span style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em">'+L('fourd.digitOverall','{from}–{to} Overall').replace('{from}', overall.year_range.from).replace('{to}', overall.year_range.to)+'</span>';
-    html += '<span style="font-size:12.5px;color:var(--t2);font-family:var(--mo)">'+L('fourd.digitOverallStats','{draws} draws · {prizes} prize numbers · {digits} digits scanned').replace('{draws}', overall.total_draws.toLocaleString()).replace('{prizes}', overall.total_prizes.toLocaleString()).replace('{digits}', overall.total_digits.toLocaleString())+'</span>';
-    html += '</div>';
-    html += '<div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px;font-size:12.5px">';
-    html += '<div><span style="color:var(--t3);font-weight:600">'+L('fourd.digitNone','None:')+'</span> <b style="font-family:var(--mo);color:var(--tx)">'+overall.none_pct+'%</b></div>';
-    html += '<div><span style="color:var(--t3);font-weight:600">'+L('fourd.digitDouble','Double:')+'</span> <b style="font-family:var(--mo);color:var(--cy)">'+overall.double_pct+'%</b></div>';
-    html += '<div><span style="color:var(--t3);font-weight:600">'+L('fourd.digitTriple','Triple:')+'</span> <b style="font-family:var(--mo);color:var(--amb)">'+overall.triple_pct+'%</b></div>';
-    html += '<div><span style="color:var(--t3);font-weight:600">'+L('fourd.digitQuad','Quad:')+'</span> <b style="font-family:var(--mo);color:var(--red)">'+overall.quad_pct+'%</b></div>';
-    html += '</div>';
-    // 4 compact frequency tables, side by side
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px">';
-    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">'+L('fourd.digitSingle','Single digit')+'</div>'+digitTable(overall.digit_pct, 10, function(d){return d;})+'</div>';
-    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">'+L('fourd.digitDoubleXX','Double XX')+'</div>'+digitTable(overall.double_pct_per_digit, 4.83, function(d){return ''+d+d;})+'</div>';
-    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">'+L('fourd.digitTripleXXX','Triple XXX')+'</div>'+digitTable(overall.triple_pct_per_digit, 0.36, function(d){return ''+d+d+d;})+'</div>';
-    html += '<div><div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">'+L('fourd.digitQuadXXXX','Quad XXXX')+'</div>'+digitTable(overall.quad_pct_per_digit, 0.01, function(d){return ''+d+d+d+d;})+'</div>';
-    html += '</div>';
-    html += '</div>';
-
-    el.innerHTML = html;
-  });
-}
-
-function loadPalindromes() {
-  var el = document.getElementById('palindromes'); if (!el) return;
-  fetch('/api/fourd/palindromes').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var html = '<div class="grid g3" style="gap:10px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">';
-    [['1st Prize', d.first_prize, 'var(--em)'],
-     ['2nd Prize', d.second_prize, 'var(--t2)'],
-     ['3rd Prize', d.third_prize, 'var(--amb)']
-    ].forEach(function(sec) {
-      html += '<div style="padding:14px;background:var(--bg);border-radius:8px;text-align:center">';
-      html += '<div style="font-size:11px;font-weight:800;color:'+sec[2]+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">'+sec[0]+'</div>';
-      html += '<div style="font-size:28px;font-weight:800;color:'+sec[2]+';font-family:var(--mo)">'+sec[1].count+'×</div>';
-      html += '<div style="font-size:11.5px;color:var(--t3);margin-top:4px">'+sec[1].pct+'% of draws</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-
-    // Recent palindromes
-    if (d.first_prize.recent && d.first_prize.recent.length) {
-      html += '<div style="margin-top:16px;font-size:12px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Most recent 1st-prize palindromes</div>';
-      d.first_prize.recent.forEach(function(r){
-        html += '<div style="display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--bl);font-size:13px">'+
-          '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:var(--em);min-width:60px">'+r.number+'</span>'+
-          '<span style="color:var(--t2)">draw #'+r.draw_no+'</span>'+
-          '<span style="color:var(--t3)">'+r.draw_date+'</span>'+
-          '</div>';
-      });
+    // === Digit Frequency — same layout as the Malaysia stats (g4 pairCol cards) ===
+    function digitCol(title, color, map, fmt){
+      var total = 0; for (var d = 0; d <= 9; d++) total += map[d].count;
+      var head = '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px"><div style="font-size:16px;font-weight:800;color:'+color+'">'+title+'</div><div style="font-size:11px;color:var(--t3);font-family:var(--mo);font-weight:700">'+total.toLocaleString()+' '+L('stats.total','total')+'</div></div>';
+      return '<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:16px">'+head+digitTable(map, total, fmt)+'</div>';
     }
+    var html = '<p style="font-size:12.5px;color:var(--t2);font-family:var(--mo);margin:-4px 0 14px">'+overall.year_range.from+'–'+overall.year_range.to+' · '+overall.total_draws.toLocaleString()+' '+L('dashboard.draws','draws')+' · '+overall.total_prizes.toLocaleString()+' '+L('fourd.prizeNumbers','prize numbers')+' · None '+overall.none_pct+'% · Double '+overall.double_pct+'% · Triple '+overall.triple_pct+'% · Quad '+overall.quad_pct+'%</p>';
+    html += '<div class="grid g4" style="gap:12px">';
+    html += digitCol(L('stats.single','Single')+' (X)', 'var(--em)', overall.digit_pct, function(d){return d;});
+    html += digitCol(L('stats.doubles','Doubles')+' (XX)', 'var(--amb)', overall.double_pct_per_digit, function(d){return ''+d+d;});
+    html += digitCol(L('stats.triples','Triples')+' (XXX)', 'var(--vi)', overall.triple_pct_per_digit, function(d){return ''+d+d+d;});
+    html += digitCol(L('stats.quads','Quads')+' (XXXX)', 'var(--red)', overall.quad_pct_per_digit, function(d){return ''+d+d+d+d;});
+    html += '</div>';
     el.innerHTML = html;
   });
 }
+
 
 function loadDollarSim() {
   var el = document.getElementById('dollarSim'); if (!el) return;
@@ -1354,109 +1923,6 @@ window.loadDollarSimLookup = function() {
   });
 };
 
-function loadDryDistribution() {
-  var el = document.getElementById('dryDist'); if (!el) return;
-  fetch('/api/fourd/dry-distribution').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var html = '';
-    html += '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
-    html += '<b>'+d.total_gaps_analyzed.toLocaleString()+'</b> gap-events analyzed (top-3 qualifying universe) · '+d.bucket_size+'-draw buckets · <b>'+d.profitable_buckets.length+'</b> buckets with +ROI ≥ 5 hits';
-    html += '</div>';
-
-    // === Chart: ROI per bucket ===
-    var bk = d.buckets.filter(function(b){ return b.hits >= 3; });   // skip very tiny buckets in viz
-    var maxAbsROI = Math.max.apply(null, bk.map(function(b){return Math.abs(b.roi);}));
-    var maxHazard = Math.max.apply(null, bk.map(function(b){return b.hazard_rate_pct;}));
-    html += '<div style="font-size:11.5px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">ROI per bucket — green = profitable, red = loss</div>';
-    html += '<div style="position:relative;overflow-x:auto;border-radius:6px;background:linear-gradient(180deg,rgba(5,150,105,.02) 0%,transparent 50%,rgba(220,38,38,.02) 100%);padding:8px">';
-    html += '<div style="display:flex;align-items:center;gap:2px;height:200px;position:relative;border-top:1px dashed var(--bd);border-bottom:1px dashed var(--bd)">';
-    html += '<div style="position:absolute;left:0;right:0;top:50%;height:1px;background:var(--bd);z-index:1"></div>';
-    bk.forEach(function(b) {
-      var roiPct = b.roi;
-      // bar grows up for positive, down for negative
-      var hPos = roiPct > 0 ? Math.min(100, (roiPct / maxAbsROI) * 50) : 0;
-      var hNeg = roiPct < 0 ? Math.min(100, (Math.abs(roiPct) / maxAbsROI) * 50) : 0;
-      var col = roiPct > 0 ? '#059669' : '#dc2626';
-      var sampleWarning = b.hits < 30 ? ' opacity:0.5;' : '';
-      html += '<div style="min-width:30px;display:flex;flex-direction:column;align-items:center;height:100%;position:relative;'+sampleWarning+'" title="'+b.bucket_start+'-'+b.bucket_end+': '+b.hits+' hits, '+b.hazard_rate_pct+'% hazard, ROI '+b.roi+'%">';
-      html += '<div style="position:absolute;top:50%;width:100%;transform:translateY(-100%);height:'+hPos+'%;background:'+col+';min-height:1px"></div>';
-      html += '<div style="position:absolute;top:50%;width:100%;height:'+hNeg+'%;background:'+col+';min-height:1px"></div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    // X-axis labels (every 5th bucket)
-    html += '<div style="display:flex;gap:2px;margin-top:6px">';
-    bk.forEach(function(b, i) {
-      var lbl = (i % 5 === 0) ? b.bucket_start : '';
-      html += '<div style="min-width:30px;font-family:var(--mo);font-size:9.5px;color:var(--t3);text-align:center">'+lbl+'</div>';
-    });
-    html += '</div></div>';
-    html += '<div style="font-size:11px;color:var(--t3);margin-top:6px;font-style:italic">Bars at 50% center = ROI 0%. Faded bars = small samples (&lt;30 hits). Hover for details.</div>';
-
-    // === Profitable buckets table ===
-    html += '<div style="font-size:13px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 10px">Profitable buckets (where to bet)</div>';
-    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:18px">';
-    html += '<thead><tr style="border-bottom:1px solid var(--bd);color:var(--t3);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em">';
-    ['Bucket','Hits','Survivors','Hazard','Avg payout','Top-3 %','Cost','Revenue','Net','ROI','vs Random'].forEach(function(c, i) {
-      html += '<th style="padding:6px 8px;text-align:'+(i<=0?'left':'right')+';font-weight:800">'+c+'</th>';
-    });
-    html += '</tr></thead><tbody>';
-    d.profitable_buckets.forEach(function(b) {
-      var sampleFlag = b.hits < 30 ? ' ⚠' : '';
-      var bg = b.hits >= 30 ? 'rgba(5,150,105,.06)' : 'rgba(217,119,6,.04)';
-      html += '<tr style="border-bottom:1px solid var(--bl);background:'+bg+'">';
-      html += '<td style="padding:6px 8px;font-family:var(--mo);font-weight:800;color:var(--p)">'+b.bucket_start+'-'+b.bucket_end+sampleFlag+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--em);font-weight:700">'+b.hits+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t3)">'+b.survivors_past+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t2)">'+b.hazard_rate_pct+'%</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t2)">$'+b.avg_payout+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:'+(b.top3_pct>13?'var(--em)':'var(--t2)')+';font-weight:700">'+b.top3_pct+'%</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:11.5px">$'+b.total_cost.toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t2);font-size:11.5px">$'+b.total_revenue.toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);font-weight:800;color:var(--em)">+$'+b.profit.toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);font-weight:800;color:var(--em)">+'+b.roi+'%</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--em);font-size:11.5px">+'+b.vs_random_pp+'pp</td>';
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-    html += '<div style="font-size:11.5px;color:var(--t3);font-style:italic;margin-bottom:18px">⚠ = small sample (&lt;30 hits) — high variance, treat as suggestive not proven.</div>';
-
-    // === Pattern comparison ===
-    var p = d.patterns;
-    html += '<div style="font-size:13px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Pattern comparison: profitable zone vs typical</div>';
-    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">';
-    html += '<thead><tr style="border-bottom:1px solid var(--bd);color:var(--t3);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em">';
-    ['Pattern','Profitable Zone (1900-2400)','Typical Zone (100-500)','All Hits (baseline)','Signal?'].forEach(function(c, i) {
-      html += '<th style="padding:7px 10px;text-align:'+(i===0?'left':'center')+';font-weight:800">'+c+'</th>';
-    });
-    html += '</tr></thead><tbody>';
-    function row(label, prof, typ, base, sig) {
-      var sigCol = sig === 'STRONG' ? '#dc2626' : sig === 'mild' ? '#d97706' : 'var(--t3)';
-      return '<tr style="border-bottom:1px solid var(--bl)">'+
-        '<td style="padding:7px 10px;font-weight:600;color:var(--tx)">'+label+'</td>'+
-        '<td style="padding:7px 10px;text-align:center;font-family:var(--mo);font-weight:'+(sig?800:600)+';color:'+(sig?sigCol:'var(--tx)')+'">'+prof+'</td>'+
-        '<td style="padding:7px 10px;text-align:center;font-family:var(--mo);color:var(--t2)">'+typ+'</td>'+
-        '<td style="padding:7px 10px;text-align:center;font-family:var(--mo);color:var(--t3)">'+base+'</td>'+
-        '<td style="padding:7px 10px;text-align:center;font-family:var(--mo);font-weight:800;color:'+sigCol+'">'+(sig||'noise')+'</td>'+
-        '</tr>';
-    }
-    html += row('Sample size (n)', p.profitable_zone.n, p.typical_zone.n, p.baseline.n, null);
-    html += row('Top-3 prize rate', p.profitable_zone.top3_pct+'%', p.typical_zone.top3_pct+'%', p.baseline.top3_pct+'%', 'STRONG');
-    html += row('1st prize rate', p.profitable_zone.tier_pct.first+'%', p.typical_zone.tier_pct.first+'%', p.baseline.tier_pct.first+'%', 'mild');
-    html += row('Starter rate', p.profitable_zone.tier_pct.starter+'%', p.typical_zone.tier_pct.starter+'%', p.baseline.tier_pct.starter+'%', null);
-    html += row('Consolation rate', p.profitable_zone.tier_pct.consol+'%', p.typical_zone.tier_pct.consol+'%', p.baseline.tier_pct.consol+'%', null);
-    // Digit-7 specifically
-    var dig7 = function(zone) { return zone.digit_freq.find(function(d){return d.digit===7;}).pct + '%'; };
-    html += row('Digit 7 frequency', dig7(p.profitable_zone), dig7(p.typical_zone), dig7(p.baseline), 'mild');
-    html += '</tbody></table></div>';
-    html += '<div style="margin-top:14px;padding:12px 14px;background:rgba(5,150,105,.06);border-left:3px solid var(--em);border-radius:6px;font-size:12.5px;color:var(--t2);line-height:1.7">';
-    html += '<b style="color:var(--em)">Headline pattern:</b> In the profitable zone (1900-2400 draws dry), <b>top-3 prize rate jumps to '+p.profitable_zone.top3_pct+'%</b> vs '+p.baseline.top3_pct+'% baseline. That\'s a <b>'+((p.profitable_zone.top3_pct/p.baseline.top3_pct).toFixed(1))+'× lift</b>. Numbers that resolve from extreme dry spells favor bigger payouts — that\'s the entire mechanism behind why bounded windows in this range turn positive.';
-    html += '</div>';
-
-    el.innerHTML = html;
-  });
-}
 
 window.loadBoundedWindow = function() {
   var el = document.getElementById('boundedWindow'); if (!el) return;
@@ -1564,251 +2030,8 @@ window.loadBoundedWindow = function() {
   });
 };
 
-function loadTop3DrySweep() {
-  var el = document.getElementById('top3DrySweep'); if (!el) return;
-  fetch('/api/fourd/top3-dry-sweep').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var b = d.best;
-    var baseline = -d.house_edge_pct;
-    var liftCol = b.vs_random_pp > 5 ? 'var(--em)' : b.vs_random_pp > 0 ? '#16a34a' : 'var(--red)';
-    var html = '';
-    // === Best banner ===
-    html += '<div style="padding:18px;background:rgba(55,48,163,.06);border-left:4px solid var(--p);border-radius:8px;margin-bottom:14px">';
-    html += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px">';
-    html += '<div style="font-size:11.5px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.06em">Optimal threshold</div>';
-    html += '<span style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--p)">'+b.threshold+' draws</span>';
-    html += '<span style="font-size:12.5px;color:var(--t3)">≈ '+(b.threshold/156).toFixed(1)+' years</span>';
-    html += '<span style="margin-left:auto;font-family:var(--mo);font-size:18px;font-weight:800;color:'+(b.profit>=0?'var(--em)':'var(--red)')+'">'+b.roi_pct+'% ROI</span>';
-    html += '<span style="font-family:var(--mo);font-size:15px;font-weight:800;color:'+liftCol+'">vs random: '+(b.vs_random_pp>=0?'+':'')+b.vs_random_pp+'pp</span>';
-    html += '</div>';
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;font-size:12.5px">';
-    html += '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase">Cost</div><b style="font-family:var(--mo);color:var(--tx);font-size:15px">$'+b.totalCost.toLocaleString()+'</b></div>';
-    html += '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase">Revenue</div><b style="font-family:var(--mo);color:var(--tx);font-size:15px">$'+b.revenue.toLocaleString()+'</b></div>';
-    html += '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase">Net</div><b style="font-family:var(--mo);color:'+(b.profit>=0?'var(--em)':'var(--red)')+';font-size:15px">'+(b.profit>=0?'+$':'-$')+Math.abs(b.profit).toLocaleString()+'</b></div>';
-    html += '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase">Completed bets</div><b style="font-family:var(--mo);color:var(--tx);font-size:15px">'+b.completed.toLocaleString()+'</b></div>';
-    html += '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase">Open bets</div><b style="font-family:var(--mo);color:var(--amb);font-size:15px">'+b.openBets+'</b></div>';
-    html += '</div>';
-    var t = b.tier_breakdown;
-    html += '<div style="margin-top:10px;font-size:12px;color:var(--t2)"><b>Tier wins:</b> ';
-    html += '<span style="color:#059669;font-weight:700">1st: '+t.first+'</span> · ';
-    html += '<span style="color:#ea580c;font-weight:700">2nd: '+t.second+'</span> · ';
-    html += '<span style="color:#2563eb;font-weight:700">3rd: '+t.third+'</span> · ';
-    html += '<span style="color:#4b5563;font-weight:700">Starter: '+t.starter+'</span> · ';
-    html += '<span style="color:#0f172a;font-weight:700">Consolation: '+t.consol+'</span>';
-    html += '</div>';
-    if (b.profit < 0) {
-      html += '<div style="margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--t2);font-style:italic"><b style="color:var(--red);font-style:normal">Honest:</b> still loses money in absolute terms (-'+Math.abs(b.roi_pct)+'% ROI), but does much better than random (-'+d.house_edge_pct+'%). The filter <b>does</b> work — but not enough to overcome the house edge. Useful as risk reduction, not profit.</div>';
-    }
-    // Show unreliable headline if different
-    var unrel = d.best_overall_unreliable;
-    if (unrel && unrel.threshold !== b.threshold) {
-      var unrelLift = unrel.vs_random_pp;
-      html += '<div style="margin-top:8px;padding:8px 12px;background:rgba(217,119,6,.08);border-left:3px solid var(--amb);border-radius:6px;font-size:11.5px;color:var(--t2)"><b style="color:var(--amb)">⚠ Higher ROI exists at threshold '+unrel.threshold+' draws ('+(unrel.threshold/156).toFixed(1)+'y) → ROI '+unrel.roi_pct+'% ('+(unrelLift>=0?'+':'')+unrelLift+'pp lift), BUT only '+unrel.completed+' completed bet runs — too small to trust. Reported "optimal" above requires ≥100 runs for statistical reliability.</div>';
-    }
-    html += '</div>';
 
-    // === Distribution histogram ===
-    var dist = d.distribution;
-    html += '<div style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Distribution of longest-dry streaks across '+dist.n.toLocaleString()+' qualifying numbers</div>';
-    html += '<div style="font-size:12px;color:var(--t2);margin-bottom:14px">Each bar = how many numbers had a maximum dry streak in that bucket. Mean = <b style="color:#dc2626">'+dist.mean+'d</b> (~'+(dist.mean/156).toFixed(1)+'y) · Median = <b style="color:#d97706">'+dist.median+'d</b> · p90 = <b style="color:#7c3aed">'+dist.p90+'d</b> · Max = <b style="color:#0f172a">'+dist.max+'d</b> (~'+(dist.max/156).toFixed(1)+'y). The edge appears only above p90 (~12y dry).</div>';
-    var maxBucketCount = Math.max.apply(null, d.histogram.map(function(b){return b.count;}));
-    html += '<div style="position:relative;display:flex;align-items:flex-end;gap:2px;height:180px;padding:6px 0;background:linear-gradient(180deg,transparent,rgba(55,48,163,.04));border-radius:6px;margin-bottom:10px;overflow-x:auto">';
-    d.histogram.forEach(function(b) {
-      if (b.count === 0 && b.bucket_start > dist.max) return;
-      var ht = maxBucketCount > 0 ? (b.count / maxBucketCount * 100) : 0;
-      var col = '#3730a3';
-      if (b.bucket_start <= dist.median && (b.bucket_start + 200) > dist.median) col = '#d97706';
-      else if (b.bucket_start <= dist.mean && (b.bucket_start + 200) > dist.mean) col = '#dc2626';
-      else if (b.bucket_start <= dist.p90 && (b.bucket_start + 200) > dist.p90) col = '#7c3aed';
-      else if (b.bucket_start >= dist.p90) col = '#7c3aed';
-      else if (b.bucket_start >= dist.p75) col = '#16a34a';
-      html += '<div style="min-width:32px;display:flex;flex-direction:column;align-items:center;gap:3px">';
-      html += '<div style="font-size:9.5px;color:var(--t3);font-family:var(--mo)">'+b.count+'</div>';
-      html += '<div style="width:100%;height:'+ht+'%;background:'+col+';border-radius:3px 3px 0 0;min-height:1px" title="'+b.bucket_start+'-'+b.bucket_end+' draws: '+b.count+' numbers"></div>';
-      html += '<div style="font-size:9px;color:var(--t3);font-family:var(--mo);transform:rotate(-40deg);transform-origin:top right;white-space:nowrap;margin-top:5px">'+b.bucket_start+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    // Legend
-    html += '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--t2);margin-bottom:14px">';
-    html += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#3730a3;vertical-align:middle;margin-right:4px"></span>Typical range</span>';
-    html += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;vertical-align:middle;margin-right:4px"></span>p75-p90 (above-average)</span>';
-    html += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#7c3aed;vertical-align:middle;margin-right:4px"></span>p90+ (edge zone)</span>';
-    html += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#d97706;vertical-align:middle;margin-right:4px"></span>median ('+dist.median+'d)</span>';
-    html += '<span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;vertical-align:middle;margin-right:4px"></span>mean ('+dist.mean+'d)</span>';
-    html += '</div>';
 
-    // === Sweep table ===
-    html += '<div style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Full threshold sweep</div>';
-    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">';
-    html += '<thead><tr style="border-bottom:1px solid var(--bd);color:var(--t3);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em">';
-    ['Threshold','In yrs','Completed','Open','Cost','Revenue','Net','ROI','vs Random'].forEach(function(c, i) {
-      var align = i === 0 ? 'left' : 'right';
-      html += '<th style="padding:6px 8px;text-align:'+align+';font-weight:800">'+c+'</th>';
-    });
-    html += '</tr></thead><tbody>';
-    d.sweep.forEach(function(r) {
-      if (r.totalCost === 0) return;
-      var pCol = r.profit >= 0 ? '#059669' : 'var(--t2)';
-      var liftCol = r.vs_random_pp > 5 ? '#059669' : r.vs_random_pp > 0 ? '#16a34a' : '#dc2626';
-      var isBest = r.threshold === b.threshold;
-      var bg = isBest ? 'rgba(55,48,163,.08)' : '';
-      html += '<tr style="border-bottom:1px solid var(--bl);background:'+bg+'">';
-      html += '<td style="padding:6px 8px;font-family:var(--mo);font-weight:'+(isBest?800:600)+';color:'+(isBest?'var(--p)':'var(--tx)')+'">'+r.threshold+(isBest?' <span style="font-size:10px">★</span>':'')+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:11.5px">'+(r.threshold/156).toFixed(1)+'y</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t2)">'+r.completed+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--amb);font-size:11.5px">'+r.openBets+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:11.5px">$'+r.totalCost.toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:11.5px">$'+r.revenue.toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);font-weight:700;color:'+pCol+'">'+(r.profit>=0?'+$':'-$')+Math.abs(r.profit).toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);font-weight:800;color:'+liftCol+'">'+r.roi_pct+'%</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);font-weight:700;color:'+liftCol+';font-size:11.5px">'+(r.vs_random_pp>=0?'+':'')+r.vs_random_pp+'pp</td>';
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-
-    // === Currently actionable ===
-    var ca = d.currently_actionable;
-    html += '<div style="font-size:13px;font-weight:800;color:var(--amb);text-transform:uppercase;letter-spacing:.05em;margin:24px 0 10px">Currently actionable @ '+ca.threshold_used+' threshold</div>';
-    html += '<div style="font-size:12.5px;color:var(--t2);margin-bottom:10px">';
-    html += '<b>'+ca.count+'</b> numbers are top-3 qualified AND currently dry ≥ '+ca.threshold_used+' draws. At the optimal threshold, the backtest says you\'d bet on these today (showing top 25).';
-    html += '</div>';
-    var TC = { first:'#059669', second:'#ea580c', third:'#2563eb', starter:'#4b5563', consol:'#0f172a' };
-    ca.list.forEach(function(x, i) {
-      html += '<div style="display:flex;align-items:center;gap:14px;padding:10px 14px;background:var(--bg);border-left:3px solid var(--amb);border-radius:6px;margin-bottom:6px;flex-wrap:wrap">';
-      html += '<span style="font-family:var(--mo);font-size:13px;font-weight:800;color:var(--amb);min-width:30px">#'+(i+1)+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:80px">'+x.number+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--amb)">dry '+x.current_gap+' draws (~'+x.current_gap_years+'y)</span>';
-      html += '<div style="display:flex;gap:6px;font-family:var(--mo);font-size:12.5px;font-weight:700;margin-left:auto">';
-      ['first','second','third','starter','consol'].forEach(function(k) {
-        if (x.tiers[k] > 0) html += '<span style="color:'+TC[k]+'">'+k.slice(0,3).replace('sta','S').replace('con','C').replace('fir','1st').replace('sec','2nd').replace('thi','3rd')+':'+x.tiers[k]+'</span>';
-      });
-      html += '<span style="color:var(--t3);font-size:11.5px;margin-left:10px">'+x.total_lifetime_hits+' total</span>';
-      html += '</div></div>';
-    });
-
-    el.innerHTML = html;
-  });
-}
-
-function loadStrategySweep() {
-  var el = document.getElementById('strategySweep'); if (!el) return;
-  fetch('/api/fourd/h1-h2-multi-test').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var baseline = -d.house_edge_pct;
-    var best = d.best_variants.filter(function(r){ return r.years_tested > 0; })[0];
-    var html = '';
-    // === Winner banner ===
-    if (best) {
-      var liftVsRandom = (best.roi_pct - baseline).toFixed(1);
-      var liftCol = best.roi_pct > baseline ? 'var(--em)' : 'var(--red)';
-      html += '<div style="padding:18px;background:rgba(5,150,105,.08);border-left:4px solid var(--em);border-radius:8px;margin-bottom:14px">';
-      html += '<div style="font-size:11.5px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Best variant</div>';
-      html += '<div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:10px">';
-      html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx)">'+best.name+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:'+(best.roi_pct>=0?'var(--em)':'var(--red)')+'">'+best.roi_pct+'% ROI</span>';
-      html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:'+liftCol+'">vs random: '+(parseFloat(liftVsRandom)>0?'+':'')+liftVsRandom+'pp '+(parseFloat(liftVsRandom)>0?'better':'worse')+'</span>';
-      html += '</div>';
-      html += '<div style="font-size:12.5px;color:var(--t2);line-height:1.6">';
-      html += 'Over '+best.years_tested+' years: bet $'+best.total_cost.toLocaleString()+', got back $'+best.total_revenue.toLocaleString()+', net '+(best.net_profit>=0?'+$':'-$')+Math.abs(best.net_profit).toLocaleString()+'. Profitable in '+best.profitable_years+' / '+best.years_tested+' years. ';
-      if (best.roi_pct > baseline + 5) {
-        html += '<b style="color:var(--em)">Beats the house-edge baseline by '+liftVsRandom+'pp</b> — the filter is doing real work, even though the absolute return is still negative.';
-      } else {
-        html += 'Within noise of random expectation.';
-      }
-      html += '</div>';
-      html += '<div style="margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:6px;font-size:11.5px;color:var(--t2);font-style:italic"><b>⚠ Multiple-testing caveat:</b> we tested '+d.strategy_grid_size+' variants, so 2-3 false-positive "winners" are expected by pure chance. The 23pp lift here is suggestive but n=39 yearly trials is small. Don\'t treat as proven edge — it\'s still a money-losing strategy in absolute terms.</div>';
-      html += '</div>';
-    }
-    // === Full table sortable ===
-    html += '<div style="font-size:13px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">All '+d.strategy_grid_size+' variants (sorted by ROI)</div>';
-    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12.5px">';
-    html += '<thead><tr style="border-bottom:1px solid var(--bd);color:var(--t3);font-size:10.5px;text-transform:uppercase;letter-spacing:.04em">';
-    ['Strategy','Avg qual/yr','Profit yrs','Cost','Revenue','Net','ROI','vs Random'].forEach(function(c, i) {
-      var align = i === 0 ? 'left' : 'right';
-      html += '<th style="padding:7px 8px;text-align:'+align+';font-weight:800">'+c+'</th>';
-    });
-    html += '</tr></thead><tbody>';
-    d.all_results.forEach(function(r) {
-      if (r.years_tested === 0) return;
-      var lift = r.roi_pct - baseline;
-      var liftCol = lift > 5 ? '#059669' : lift > 0 ? '#16a34a' : lift > -5 ? 'var(--t2)' : '#dc2626';
-      var pCol = r.net_profit >= 0 ? '#059669' : 'var(--t2)';
-      var isBest = r === best;
-      var bg = isBest ? 'rgba(5,150,105,.08)' : '';
-      html += '<tr style="border-bottom:1px solid var(--bl);background:'+bg+'">';
-      html += '<td style="padding:6px 8px;font-family:var(--mo);font-weight:'+(isBest?800:600)+';color:'+(isBest?'var(--em)':'var(--tx)')+'">'+r.name+(isBest?' <span style="font-size:10px">★</span>':'')+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t2)">'+r.avg_qualifying_per_year+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:11.5px">'+r.profitable_years+'/'+r.years_tested+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:11.5px">$'+r.total_cost.toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:11.5px">$'+r.total_revenue.toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);font-weight:700;color:'+pCol+'">'+(r.net_profit>=0?'+$':'-$')+Math.abs(r.net_profit).toLocaleString()+'</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);font-weight:800;color:'+(r.roi_pct>=baseline?liftCol:'var(--red)')+'">'+r.roi_pct+'%</td>';
-      html += '<td style="padding:6px 8px;text-align:right;font-family:var(--mo);font-weight:700;color:'+liftCol+';font-size:11.5px">'+(lift>0?'+':'')+lift.toFixed(1)+'pp</td>';
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-    el.innerHTML = html;
-  });
-}
-
-function loadH1H2Backtest() {
-  var el = document.getElementById('h1h2Backtest'); if (!el) return;
-  fetch('/api/fourd/h1-to-h2-backtest').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data, a = d.aggregate;
-    var profitCol = a.total_profit >= 0 ? 'var(--em)' : 'var(--red)';
-    var randomCol = a.vs_random >= 0 ? 'var(--em)' : 'var(--red)';
-    var html = '';
-    // === Verdict box ===
-    html += '<div style="padding:18px;background:'+(a.total_profit>=0?'rgba(5,150,105,.08)':'rgba(220,38,38,.08)')+';border-left:4px solid '+profitCol+';border-radius:8px;margin-bottom:14px">';
-    html += '<div style="font-size:11.5px;font-weight:800;color:'+profitCol+';text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Strategy verdict</div>';
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px">';
-    function tile(label, val, col, sub) {
-      return '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">'+label+'</div><div style="font-family:var(--mo);font-size:20px;font-weight:800;color:'+col+'">'+val+'</div>'+(sub?'<div style="font-size:11px;color:var(--t3);margin-top:2px">'+sub+'</div>':'')+'</div>';
-    }
-    html += tile('Net P/L', (a.total_profit>=0?'+$':'-$')+Math.abs(a.total_profit).toLocaleString(), profitCol, a.overall_roi_pct+'% ROI');
-    html += tile('Total cost', '$'+a.total_cost.toLocaleString(), 'var(--tx)', a.years_tested+' years tested');
-    html += tile('Total revenue', '$'+a.total_revenue.toLocaleString(), 'var(--tx)', a.total_hits.toLocaleString()+' prize hits');
-    html += tile('Avg qualifying #/yr', a.avg_qualifying_per_year, 'var(--tx)', a.total_qualifying_numbers+' total');
-    html += tile('vs. Random baseline', (a.vs_random>=0?'+$':'-$')+Math.abs(a.vs_random).toLocaleString(), randomCol, 'random expected -'+a.house_edge_pct+'%');
-    html += tile('Profitable years', a.profitable_years+'/'+a.years_tested, a.profitable_years > a.years_tested/2 ? 'var(--em)' : 'var(--red)', Math.round(a.profitable_years/a.years_tested*100)+'%');
-    html += '</div>';
-    if (a.total_profit < 0) {
-      html += '<div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:6px;font-size:12.5px;color:var(--t2)"><b style="color:var(--red)">⚠ Honest finding:</b> the strategy lost <b>$'+Math.abs(a.total_profit).toLocaleString()+'</b> (' + a.overall_roi_pct + '% ROI)';
-      if (a.vs_random < 0) html += ', which is <b>worse than the random house-edge baseline of -' + a.house_edge_pct + '%</b>';
-      html += '. Only ' + a.profitable_years + ' out of ' + a.years_tested + ' years were profitable. 1st-prize winners in H1 are not "hot" — they don\'t cluster a second hit. Picking them just creates a focused random portfolio.</div>';
-    }
-    html += '</div>';
-
-    // === Year-by-year table ===
-    html += '<div style="font-size:13px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Year-by-Year</div>';
-    html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">';
-    html += '<thead><tr style="border-bottom:1px solid var(--bd);color:var(--t3);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em">';
-    ['Year','Qual','H2 Draws','Cost','Revenue','Net','ROI','Hits'].forEach(function(c, i) {
-      var align = i === 0 ? 'left' : 'right';
-      html += '<th style="padding:7px 8px;text-align:'+align+';font-weight:800">'+c+'</th>';
-    });
-    html += '</tr></thead><tbody>';
-    d.yearly.slice().reverse().forEach(function(y) {
-      var pCol = y.profit >= 0 ? '#059669' : '#dc2626';
-      html += '<tr style="border-bottom:1px solid var(--bl)">';
-      html += '<td style="padding:7px 8px;font-family:var(--mo);font-weight:800;color:var(--p)">'+y.year+'</td>';
-      html += '<td style="padding:7px 8px;text-align:right;font-family:var(--mo);color:var(--t2)">'+y.qualifying_numbers+'</td>';
-      html += '<td style="padding:7px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:12px">'+y.h2_draws+'</td>';
-      html += '<td style="padding:7px 8px;text-align:right;font-family:var(--mo);color:var(--t2);font-size:12px">$'+y.cost.toLocaleString()+'</td>';
-      html += '<td style="padding:7px 8px;text-align:right;font-family:var(--mo);color:var(--t2);font-size:12px">$'+y.revenue.toLocaleString()+'</td>';
-      html += '<td style="padding:7px 8px;text-align:right;font-family:var(--mo);font-weight:800;color:'+pCol+'">'+(y.profit>=0?'+$':'-$')+Math.abs(y.profit).toLocaleString()+'</td>';
-      html += '<td style="padding:7px 8px;text-align:right;font-family:var(--mo);font-weight:800;color:'+pCol+';font-size:12px">'+y.roi_pct+'%</td>';
-      html += '<td style="padding:7px 8px;text-align:right;font-family:var(--mo);color:var(--t3);font-size:12px">'+y.total_hits+'</td>';
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-    el.innerHTML = html;
-  });
-}
 
 window.loadDryBacktest = function() {
   var el = document.getElementById('dryBacktest'); if (!el) return;
@@ -2276,24 +2499,24 @@ function loadYearlyWinners() {
     html += '</div>';
     // === All years in one box, multi-column grid (auto-fits screen) ===
     html += '<div style="padding:14px;background:var(--cd);border:1px solid var(--bd);border-radius:10px">';
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px">';
+    html += '<div class="grid g5" style="gap:8px">';
     years.slice().reverse().forEach(function(y) {
-      html += '<div style="padding:10px 12px;background:var(--bg);border-radius:7px">';
-      // Top row: year + number + profit
-      html += '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">';
-      html += '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:var(--p);min-width:54px">'+y.year+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);letter-spacing:.02em">'+y.number+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:16px;font-weight:800;color:#059669;margin-left:auto">+$'+y.profit.toLocaleString()+'</span>';
+      function tierSpan(t){ var n = y[t.key], col = n > 0 ? t.col : 'var(--t3)', op = n > 0 ? '1' : '.5'; return '<span style="color:'+col+';opacity:'+op+'">'+t.label+':<b>'+n+'</b></span>'; }
+      html += '<div style="padding:9px 10px;background:var(--bg);border-radius:8px">';
+      // Row 1: year (left) · number (centre) · profit (right)
+      html += '<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">';
+      html += '<span style="flex:1;text-align:left;font-family:var(--mo);font-size:11px;font-weight:800;color:var(--p)">'+y.year+'</span>';
+      html += '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:var(--tx);letter-spacing:.02em">'+y.number+'</span>';
+      html += '<span style="flex:1;text-align:right;font-family:var(--mo);font-size:11px;font-weight:800;color:#059669">+$'+y.profit.toLocaleString()+'</span>';
       html += '</div>';
-      // Bottom row: tier counts with color coding
-      html += '<div style="display:flex;gap:12px;flex-wrap:wrap;font-family:var(--mo);font-size:13.5px;font-weight:700">';
-      TIER.forEach(function(t) {
-        var n = y[t.key];
-        var col = n > 0 ? t.col : 'var(--t3)';
-        var op = n > 0 ? '1' : '.45';
-        html += '<span style="color:'+col+';opacity:'+op+'">'+t.label+':<b style="font-size:14.5px;margin-left:3px">'+n+'</b></span>';
-      });
-      html += '<span style="color:var(--t3);font-size:12px;margin-left:auto">'+y.roi+'% ROI</span>';
+      // Row 2: 1st / 2nd / 3rd
+      html += '<div style="display:flex;gap:9px;font-family:var(--mo);font-size:11px;font-weight:700;margin-bottom:4px">';
+      TIER.slice(0,3).forEach(function(t){ html += tierSpan(t); });
+      html += '</div>';
+      // Row 3: Start / Cons on the left, ROI on the right
+      html += '<div style="display:flex;gap:9px;align-items:baseline;font-family:var(--mo);font-size:11px;font-weight:700">';
+      TIER.slice(3).forEach(function(t){ html += tierSpan(t); });
+      html += '<span style="color:var(--t3);font-size:10px;margin-left:auto">'+y.roi+'%</span>';
       html += '</div></div>';
     });
     html += '</div></div>';
@@ -2301,27 +2524,6 @@ function loadYearlyWinners() {
   });
 }
 
-function loadIbetTop() {
-  var el = document.getElementById('ibetTop'); if (!el) return;
-  // Reuse ibet-sim endpoint so this list matches the $1 iBet Simulator below
-  fetch('/api/fourd/ibet-sim').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var html = '<div style="font-size:12.5px;color:var(--t3);margin-bottom:10px">Top 5 iBet sets ranked by <b>profit</b> under $1 iBet Big across '+d.total_draws_scanned.toLocaleString()+' draws.</div>';
-    d.most_profitable.slice(0, 5).forEach(function(x, i) {
-      var profitCol = x.profit >= 0 ? 'var(--em)' : 'var(--red)';
-      html += '<div style="display:flex;align-items:center;gap:14px;padding:12px 14px;background:var(--bg);border-left:3px solid '+profitCol+';border-radius:6px;margin-bottom:8px;flex-wrap:wrap">';
-      html += '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:var(--vi);min-width:32px">#'+(i+1)+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx)">'+x.number+'</span>';
-      html += '<span style="font-size:11px;color:var(--t3);min-width:56px">'+x.unique_perms+' perms</span>';
-      html += '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:'+profitCol+'">'+(x.profit>=0?'+$':'-$')+Math.abs(x.profit).toLocaleString()+'</span>';
-      html += '<span style="font-size:12px;color:var(--t3)">'+x.roi_pct+'% ROI</span>';
-      html += '<span style="margin-left:auto;font-size:11.5px;color:var(--t2);font-family:var(--mo)">'+x.total_hits+' perm hits</span>';
-      html += '</div>';
-    });
-    el.innerHTML = html;
-  });
-}
 
 window.loadIbet = function() {
   var raw = (document.getElementById('ibetDigits').value || '').replace(/\D/g, '').slice(0,4);
@@ -2357,126 +2559,9 @@ window.loadIbet = function() {
   });
 };
 
-function loadFourdSum() {
-  var el = document.getElementById('fourdSum'); if (!el) return;
-  fetch('/api/fourd/digit-sum').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var maxC = d.buckets.reduce(function(m,b){ return b.count > m ? b.count : m; }, 0);
-    var html = '<div style="display:flex;flex-direction:column;gap:6px">';
-    d.buckets.forEach(function(b) {
-      var pct = maxC > 0 ? (b.count / maxC * 100) : 0;
-      html += '<div style="display:flex;align-items:center;gap:10px">';
-      html += '<div style="font-family:var(--mo);font-size:12.5px;font-weight:600;color:var(--t2);min-width:70px">'+b.range+'</div>';
-      html += '<div style="flex:1;height:18px;background:var(--bg);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--cy),#0891b266);border-radius:5px"></div></div>';
-      html += '<div style="font-family:var(--mo);font-size:12.5px;font-weight:700;color:var(--cy);min-width:50px;text-align:right">'+b.count.toLocaleString()+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    html += '<div style="margin-top:12px;font-size:12px;color:var(--t3);font-style:italic">Total scanned: '+d.total_draws.toLocaleString()+' draws.</div>';
-    el.innerHTML = html;
-  });
-}
 
-function loadFourdSequential() {
-  var el = document.getElementById('fourdSeq'); if (!el) return;
-  fetch('/api/fourd/sequential').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var t = d.total_draws;
-    function pct(c) { return t > 0 ? ((c/t)*100).toFixed(2) + '%' : '–'; }
-    var html = '<div class="grid g2" style="gap:14px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">';
-    [['Strict ascending (0123, 1234…)', d.strictly_inc, 'var(--em)'],
-     ['Strict descending (9876, 4321…)', d.strictly_dec, 'var(--vi)'],
-     ['Contains a 3-digit run',          d.three_in_a_row, 'var(--amb)'],
-     ['Has any adjacent digit pair',     d.any_adjacent_pair, 'var(--p)']
-    ].forEach(function(sec) {
-      html += '<div style="padding:14px;background:var(--bg);border-radius:8px;text-align:center">';
-      html += '<div style="font-size:32px;font-weight:800;color:'+sec[2]+';font-family:var(--mo);line-height:1">'+sec[1].toLocaleString()+'</div>';
-      html += '<div style="font-size:11.5px;color:var(--t3);margin-top:4px">'+pct(sec[1])+' of draws</div>';
-      html += '<div style="font-size:12px;color:var(--t2);font-weight:600;margin-top:6px">'+sec[0]+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    // Recent examples
-    var rex = d.recent_examples;
-    if (rex && (rex.strictlyInc.length || rex.strictlyDec.length || rex.threeRun.length)) {
-      html += '<div style="margin-top:18px;font-size:12px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Recent examples</div>';
-      [['Ascending', rex.strictlyInc, 'var(--em)'],
-       ['Descending', rex.strictlyDec, 'var(--vi)'],
-       ['3-digit run', rex.threeRun, 'var(--amb)']
-      ].forEach(function(sec) {
-        if (!sec[1].length) return;
-        html += '<div style="margin-bottom:10px"><span style="font-size:11px;font-weight:800;color:'+sec[2]+';text-transform:uppercase;letter-spacing:.05em;margin-right:10px">'+sec[0]+'</span>';
-        sec[1].forEach(function(x) {
-          html += '<span style="display:inline-block;font-family:var(--mo);font-weight:700;color:'+sec[2]+';padding:3px 9px;background:var(--bg);border-radius:5px;margin-right:6px;font-size:12.5px">'+x.number+' <span style="color:var(--t3);font-weight:500;font-size:11px">('+x.draw_date+')</span></span>';
-        });
-        html += '</div>';
-      });
-    }
-    el.innerHTML = html;
-  });
-}
 
-function loadFourdEnding() {
-  var el = document.getElementById('fourdEnd'); if (!el) return;
-  fetch('/api/fourd/ending-digit').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var maxC = d.per_digit.reduce(function(m,x){ return x.count > m ? x.count : m; }, 0);
-    var html = '<div style="display:flex;flex-direction:column;gap:6px">';
-    d.per_digit.forEach(function(x) {
-      var pct = maxC > 0 ? (x.count / maxC * 100) : 0;
-      var deltaCol = x.vs_expected > 0 ? 'var(--em)' : x.vs_expected < 0 ? 'var(--red)' : 'var(--t3)';
-      var deltaTxt = (x.vs_expected > 0 ? '+' : '') + x.vs_expected;
-      html += '<div style="display:flex;align-items:center;gap:10px">';
-      html += '<div style="font-family:var(--mo);font-size:16px;font-weight:800;color:var(--tx);min-width:30px;text-align:center">'+x.digit+'</div>';
-      html += '<div style="flex:1;height:18px;background:var(--bg);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--em),#05966966);border-radius:5px"></div></div>';
-      html += '<div style="font-family:var(--mo);font-size:12.5px;font-weight:700;color:var(--em);min-width:50px;text-align:right">'+x.count+'</div>';
-      html += '<div style="font-family:var(--mo);font-size:11.5px;font-weight:700;color:'+deltaCol+';min-width:46px;text-align:right">'+deltaTxt+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    html += '<div style="margin-top:12px;font-size:12px;color:var(--t3);font-style:italic">Expected ≈ '+d.expected_per_digit+'× per digit if random. Delta shows how far each digit deviates.</div>';
-    el.innerHTML = html;
-  });
-}
 
-function loadCurrentMonth() {
-  var el = document.getElementById('thisMonth'); if (!el) return;
-  fetch('/api/toto/current-month').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var html = '<div style="font-size:12.5px;color:var(--t2);margin-bottom:14px;padding:10px 14px;background:var(--bg);border-radius:6px">';
-    html += 'Month: <b>'+d.month+'</b> · <b>'+d.draws_this_month+'</b> draws so far';
-    html += d.draws_this_month < 4 ? ' <span style="color:var(--red)">— very small sample</span>' : '';
-    html += '</div>';
-    if (d.draws_this_month === 0) {
-      html += '<p style="font-size:12.5px;color:var(--t3)">No draws yet this month.</p>';
-    } else {
-      html += '<div class="grid g2" style="gap:18px">';
-      [['Hot this month', d.hot, 'var(--red)'],
-       ['Quiet this month (0×)', d.cold.filter(x => x.c === 0), 'var(--cy)']].forEach(function(sec) {
-        html += '<div><div style="font-size:12.5px;font-weight:800;color:'+sec[2]+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+sec[0]+'</div>';
-        if (sec[1].length === 0) {
-          html += '<p style="font-size:12.5px;color:var(--t3)">(none)</p>';
-        } else {
-          html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
-          sec[1].slice(0,6).forEach(function(n){
-            html += '<div style="display:flex;flex-direction:column;align-items:center;gap:3px">'+
-              makeBall(n.n, 34, sec[2], 0)+
-              '<span style="font-size:10.5px;color:var(--t3);font-weight:600;font-family:var(--mo)">'+n.c+'×</span>'+
-              '</div>';
-          });
-          html += '</div>';
-        }
-        html += '</div>';
-      });
-      html += '</div>';
-    }
-    el.innerHTML = html;
-  });
-}
 
 window.loadAddPartners = function() {
   var n = parseInt(document.getElementById('addPartnerN').value, 10);
@@ -2810,13 +2895,13 @@ function loadYearlyHot() {
 
 // Generic anniversary helper used by TOTO Stats and 4D Stats — pass the
 // game ('toto' or 'fourd') and DOM ids; renders only that game's rows.
-function runAnniversary(inputId, outputId, game) {
+function runAnniversary(inputId, outputId, game, operator) {
   var dEl = document.getElementById(inputId);
   if (!dEl || !dEl.value) return;
   var md = dEl.value.slice(5);   // YYYY-MM-DD → MM-DD
   var out = document.getElementById(outputId); if (!out) return;
   out.innerHTML = loadingCard();
-  fetch('/api/draws-on-date?month_day='+md).then(r=>r.json()).then(function(j) {
+  fetch('/api/draws-on-date?month_day='+md+((operator && operator!=='sg4d')?'&operator='+operator:'')).then(r=>r.json()).then(function(j) {
     if (!j.success) { out.innerHTML = 'Error: '+(j.error||''); return; }
     var rows = j.data[game] || [];
     var html = '<div style="font-size:12.5px;color:var(--t2);margin-bottom:10px"><b>'+md+'</b> across all years &nbsp;·&nbsp; '+rows.length+' '+(game==='toto'?'TOTO':'4D')+' draws</div>';
@@ -2852,7 +2937,8 @@ window.loadAnniversaryToto = function() {
   runAnniversary('anniversaryDateToto', 'anniversaryResultToto', 'toto');
 };
 window.loadAnniversary4d = function() {
-  runAnniversary('anniversaryDate4d', 'anniversaryResult4d', 'fourd');
+  var op = (document.getElementById('annivOp4d')||{}).value || histOp;
+  runAnniversary('anniversaryDate4d', 'anniversaryResult4d', 'fourd', op);
 };
 
 function loadCombos() {
@@ -2958,6 +3044,40 @@ function renderAlpha4D() {
   };
   var h = '<h1>'+L('tabs.alpha4d','Alpha 4D Simulator')+'</h1>';
   h += '<p class="desc">'+L('alpha4d.desc','Quantitative number-selection lab. Filter, backtest, and identify candidates with mathematical edges.')+'</p>';
+
+  // $1 Bet Simulator \u2014 most profitable numbers if $1 Big bet every draw
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
+  h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('fourd.dollarSim','$1 4D Simulator')+'</h3>';
+  h += '</div>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.dollarSimDesc',"If you'd bet <b>$1 Big</b> on a number for every 4D draw, what would your profit be? Big-bet payouts: 1st <b>$2,000</b> \u00b7 2nd <b>$1,000</b> \u00b7 3rd <b>$490</b> \u00b7 starter <b>$250</b> \u00b7 consolation <b>$60</b>.")+'</p>';
+  h += '<div id="dollarSim">'+loadingCard()+'</div>';
+  h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
+  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn','CHECK YOUR OWN NUMBER')+'</div>';
+  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
+  h += '<input type="text" id="simN" maxlength="4" placeholder="e.g. 1234" style="width:120px;font-family:var(--mo);font-size:18px;text-align:center">';
+  h += '<button class="btn btn-p" onclick="loadDollarSimLookup()">'+L('fourd.simulate','Simulate')+'</button></div>';
+  h += '<div id="simLookupResult" style="margin-top:14px"></div></div>';
+  h += '</div>';
+  lazyLoad('dollarSim', loadDollarSim);
+
+  // iBet $1 Simulator \u2014 moved up right after $1 4D Simulator
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
+  h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.ibetSim','$1 iBet Simulator')+'</h3>';
+  h += '</div>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.ibetSimDesc','$1 iBet Big = bet on a 4-digit <b>set</b>, win if any permutation hits any prize. Payout divided by unique perms.')+'</p>';
+  h += '<div id="ibetSim">'+loadingCard()+'</div>';
+  h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
+  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn4digits','CHECK YOUR OWN 4 DIGITS')+'</div>';
+  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
+  h += '<input type="text" id="ibetSimN" maxlength="4" placeholder="1234" style="width:140px;font-family:var(--mo);font-size:18px;text-align:center">';
+  h += '<button class="btn btn-p" onclick="loadIbetSimLookup()">'+L('fourd.simulateIbet','Simulate iBet')+'</button></div>';
+  h += '<div id="ibetSimLookupResult" style="margin-top:14px"></div></div>';
+  h += '</div>';
+  lazyLoad('ibetSim', loadIbetSim);
 
   // === Strategy Simulator — forward-only rolling pool ===
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
@@ -3902,12 +4022,50 @@ window.drillSlice = function(axis, value, gapLo, gapHi) {
     .catch(function(e){ drill.innerHTML = '<div style="color:var(--red);padding:14px">Fetch error: '+e.message+'</div>'; });
 };
 
+
+// More Alpha — dropdown between 4D Simulators and More Stats
+var currentAlphaMode = 'simulator';
+window.setAlphaMode = function(m){ currentAlphaMode = m; renderPage(); window.scrollTo(0,0); };
+function renderMoreAlpha(){
+  var modes = [['simulator', L('alpha.simulator','4D Simulators')], ['stats', L('alpha.stats','More Stats')]];
+  var h = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">';
+  modes.forEach(function(m){ var on=m[0]===currentAlphaMode;
+    h += '<button onclick="setAlphaMode(\''+m[0]+'\')" style="padding:8px 15px;border-radius:9px;border:1px solid '+(on?'var(--p)':'var(--bd)')+';background:'+(on?'color-mix(in srgb, var(--p) 13%, transparent)':'var(--cd)')+';color:'+(on?'var(--p)':'var(--t2)')+';font-size:13px;font-weight:700;cursor:pointer">'+m[1]+'</button>';
+  });
+  h += '</div>';
+  return h + (currentAlphaMode === 'stats' ? renderMore4DStats() : renderAlpha4D());
+}
+
+// More 4D Stats — moved out of 4D Stats into the More Alpha 'Stats' mode
+function renderMore4DStats(){
+  var h = '<h1>'+L('fourd.moreStatsTitle','More 4D Stats')+'</h1><p class="desc">'+L('fourd.moreStatsDesc','Deeper year-over-year analyses for Singapore 4D.')+'</p>';
+  // Yearly Regulars — numbers that appear consistently year over year
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
+  h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trend",26)+'</div>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('fourd.yearlyRegulars','Yearly Regulars — Consistent Year-Over-Year')+'</h3>';
+  h += '</div>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.yearlyRegularsDesc','Numbers that hit in the most distinct years (a 4-hit year then 10-year drought counts the year <b>once</b> — eliminates cluster bias). Focus on high <b>year coverage %</b>, low <b>longest drought</b>, and good <b>recent 5/10y coverage</b>.')+'</p>';
+  h += '<div id="yearlyRegulars">'+loadingCard()+'</div></div>';
+  lazyLoad('yearlyRegulars', loadYearlyRegulars);
+
+  // Calendar-Biased Numbers — your "only opens during certain period" idea
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
+  h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.calendarBias','Calendar-Biased Numbers')+'</h3>';
+  h += '</div>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.calendarBiasDesc','Numbers whose historical prize hits cluster in specific months. <b style="color:var(--red)">Honest warning:</b> with 10,000 numbers × 23 windows tested, ~1,400 false positives are expected even by pure chance. Strong (z≥4) results are interesting but not proven edges — past clusters don\'t guarantee future hits. Use as curiosity, not strategy.')+'</p>';
+  h += '<div id="calendarBias">'+loadingCard()+'</div></div>';
+  lazyLoad('calendarBias', loadCalendarBias);
+  return h;
+}
 function render4DStats() {
   if (!DATA.ready) return loadingCard();
   var s = DATA.fourdStats;
   var top10 = s.top10_hot;
   var maxHot = top10.length ? top10[0].count : 1;
-  var h = '<h1>'+L('fourd.title','4D Stats')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.draws','draws')+' \u00B7 '+s.total_numbers.toLocaleString()+' numbers</p>';
+  var h = '<h1>'+L('fourd.title','4D Stats')+' \u00B7 \uD83C\uDDF8\uD83C\uDDEC '+L('fourd.sgLabel','SG Pools')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.draws','draws')+' \u00B7 '+s.total_numbers.toLocaleString()+' numbers</p>';
 
   // Top 10 hot 4D numbers — with prize tier breakdown and archive date range
   var dr = s.top10_date_range || {};
@@ -3935,6 +4093,31 @@ function render4DStats() {
   });
   h += '</div></div>';
 
+  // Top 10 Cold 4D numbers — least frequent, brought up right below Hot
+  var cold10 = s.top10_cold || [];
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px">';
+  h += '<div style="background:#0891b211;color:var(--cy);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("snow",26)+'</div>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--cy);margin:0">'+L('fourd.top10Cold','Top 10 Cold 4D Numbers')+'</h3>';
+  h += '</div>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.top10ColdDesc','The least-frequent numbers — fewest appearances in any prize position across the archive.')+'</p>';
+  h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
+  cold10.forEach(function(it,i) {
+    var b = it.breakdown || {};
+    h += '<div style="padding:10px 12px;background:var(--bg);border-radius:8px">';
+    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">';
+    h += '<span class="meter-rank" style="color:'+(i<3?"var(--cy)":"var(--t3)")+';min-width:24px;font-size:13px">#'+(i+1)+'</span>';
+    h += '<span style="font-family:var(--mo);font-size:20px;font-weight:800;color:var(--tx)">'+it.number+'</span>';
+    h += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--cy);margin-left:auto">'+it.count+'×</span>';
+    h += '</div>';
+    h += '<div style="display:flex;gap:4px;flex-wrap:wrap;font-size:10.5px;font-family:var(--mo)">';
+    [['1st',b.first,'var(--em)'],['2nd',b.second,'var(--p)'],['3rd',b.third,'var(--amb)'],['St',b.starter,'var(--t2)'],['Co',b.consol,'var(--t3)']].forEach(function(tier) {
+      if (tier[1] > 0) h += '<span style="padding:2px 6px;border-radius:4px;background:var(--cd);border:1px solid var(--bd);color:'+tier[2]+';font-weight:700">'+tier[0]+':'+tier[1]+'</span>';
+    });
+    h += '</div></div>';
+  });
+  h += '</div></div>';
+
   // Repeat 1st Prize Winners (moved right below Top 10 Hot)
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
@@ -3946,39 +4129,7 @@ function render4DStats() {
   h += '</div>';
   setTimeout(loadRepeatWinners, 50);
 
-  // $1 Bet Simulator \u2014 most profitable numbers if $1 Big bet every draw
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('fourd.dollarSim','$1 4D Simulator')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.dollarSimDesc',"If you'd bet <b>$1 Big</b> on a number for every 4D draw, what would your profit be? Big-bet payouts: 1st <b>$2,000</b> \u00b7 2nd <b>$1,000</b> \u00b7 3rd <b>$490</b> \u00b7 starter <b>$250</b> \u00b7 consolation <b>$60</b>.")+'</p>';
-  h += '<div id="dollarSim">'+loadingCard()+'</div>';
-  h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
-  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn','CHECK YOUR OWN NUMBER')+'</div>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="text" id="simN" maxlength="4" placeholder="e.g. 1234" style="width:120px;font-family:var(--mo);font-size:18px;text-align:center">';
-  h += '<button class="btn btn-p" onclick="loadDollarSimLookup()">'+L('fourd.simulate','Simulate')+'</button></div>';
-  h += '<div id="simLookupResult" style="margin-top:14px"></div></div>';
-  h += '</div>';
-  lazyLoad('dollarSim', loadDollarSim);
 
-  // iBet $1 Simulator \u2014 moved up right after $1 4D Simulator
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.ibetSim','$1 iBet Simulator')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.ibetSimDesc','$1 iBet Big = bet on a 4-digit <b>set</b>, win if any permutation hits any prize. Payout divided by unique perms.')+'</p>';
-  h += '<div id="ibetSim">'+loadingCard()+'</div>';
-  h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
-  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn4digits','CHECK YOUR OWN 4 DIGITS')+'</div>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="text" id="ibetSimN" maxlength="4" placeholder="1234" style="width:140px;font-family:var(--mo);font-size:18px;text-align:center">';
-  h += '<button class="btn btn-p" onclick="loadIbetSimLookup()">'+L('fourd.simulateIbet','Simulate iBet')+'</button></div>';
-  h += '<div id="ibetSimLookupResult" style="margin-top:14px"></div></div>';
-  h += '</div>';
-  lazyLoad('ibetSim', loadIbetSim);
 
   // Year-by-Year Winners \u2014 most-profitable $1 Big bet each year
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
@@ -3990,26 +4141,6 @@ function render4DStats() {
   h += '<div id="yearlyWinners">'+loadingCard()+'</div></div>';
   lazyLoad('yearlyWinners', loadYearlyWinners);
 
-  // Yearly Regulars — numbers that appear consistently year over year
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trend",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('fourd.yearlyRegulars','Yearly Regulars — Consistent Year-Over-Year')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.yearlyRegularsDesc','Numbers that hit in the most distinct years (a 4-hit year then 10-year drought counts the year <b>once</b> — eliminates cluster bias). Focus on high <b>year coverage %</b>, low <b>longest drought</b>, and good <b>recent 5/10y coverage</b>.')+'</p>';
-  h += '<div id="yearlyRegulars">'+loadingCard()+'</div></div>';
-  lazyLoad('yearlyRegulars', loadYearlyRegulars);
-
-  // Calendar-Biased Numbers — your "only opens during certain period" idea
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.calendarBias','Calendar-Biased Numbers')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.calendarBiasDesc','Numbers whose historical prize hits cluster in specific months. <b style="color:var(--red)">Honest warning:</b> with 10,000 numbers × 23 windows tested, ~1,400 false positives are expected even by pure chance. Strong (z≥4) results are interesting but not proven edges — past clusters don\'t guarantee future hits. Use as curiosity, not strategy.')+'</p>';
-  h += '<div id="calendarBias">'+loadingCard()+'</div></div>';
-  lazyLoad('calendarBias', loadCalendarBias);
-
   // Digit Frequency — overall across all 23 prize positions
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
@@ -4020,18 +4151,16 @@ function render4DStats() {
   h += '<div id="classByYear">'+loadingCard()+'</div></div>';
   lazyLoad('classByYear', loadClassByYear);
 
-  // 4D Anniversary Lookup — 4D only
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('fourd.anniversary','4D Anniversary Lookup')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.anniversaryDesc','Pick any date. See every 4D draw on that month-day across all years.')+'</p>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="date" id="anniversaryDate4d" style="flex:1;min-width:200px">';
-  h += '<button class="btn btn-p" onclick="loadAnniversary4d()">'+L('common.lookup','Look up')+'</button></div>';
-  h += '<div id="anniversaryResult4d" style="margin-top:14px"></div>';
-  h += '</div>';
+  // Most Overdue — same section the Malaysia operators have
+  var overdue = s.overdue_numbers || [];
+  if (overdue.length) {
+    h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+    h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px"><div style="background:#0891b211;color:var(--cy);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("snow",26)+'</div><h3 style="font-size:20px;font-weight:800;color:var(--cy);margin:0">'+L('stats.overdue','Most Overdue')+'</h3></div>';
+    h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.overdueDesc','Numbers with the longest gap since their last appearance in any prize position.')+'</p>';
+    h += '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px">';
+    overdue.slice(0,12).forEach(function(x){ h+='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:14px 6px;text-align:center"><div style="font-family:var(--mo);font-size:20px;font-weight:800;color:var(--tx)">'+x.number+'</div><div style="font-size:10.5px;font-weight:700;color:var(--cy);margin-top:5px">'+x.draws_since+' '+L('stats.ago','ago')+'</div></div>'; });
+    h += '</div></div>';
+  }
 
   return h;
 }
@@ -4064,44 +4193,6 @@ window.lookupFourd = function() {
   });
 };
 
-function loadLuckyReality() {
-  var el = document.getElementById('luckyReality'); if (!el) return;
-  var candidates = [
-    {num:'8888',label:'Four 8s (max prosperity)',category:'lucky'},
-    {num:'1688',label:'Way to prosperity',category:'lucky'},
-    {num:'0168',label:'Prosperity all the way',category:'lucky'},
-    {num:'9999',label:'Eternal (perfect)',category:'lucky'},
-    {num:'6688',label:'Smooth & prosperous',category:'lucky'},
-    {num:'4444',label:'Four 4s (death)',category:'unlucky'},
-    {num:'1313',label:'Double unlucky',category:'unlucky'},
-    {num:'1234',label:'Sequential (popular)',category:'popular'},
-    {num:'0000',label:'All zeros (popular)',category:'popular'},
-    {num:'7777',label:'Lucky 7s',category:'lucky'},
-  ];
-  Promise.all(candidates.map(function(c) {
-    return fetch('/api/my-numbers/fourd?num='+c.num).then(r=>r.json()).then(function(j) {
-      return Object.assign({}, c, j.data.hit_counts);
-    });
-  })).then(function(results) {
-    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px">';
-    results.forEach(function(r) {
-      var color = r.category === 'lucky' ? 'var(--em)' : r.category === 'unlucky' ? 'var(--red)' : 'var(--p)';
-      var badge = r.category === 'lucky' ? '\u2728 LUCKY' : r.category === 'unlucky' ? '\u2717 UNLUCKY' : '\uD83D\uDC65 POPULAR';
-      html += '<div style="padding:14px;background:var(--bg);border:1px solid var(--bd);border-radius:10px">';
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
-      html += '<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:'+color+'">'+r.num+'</div>';
-      html += '<div style="font-size:9.5px;font-weight:800;color:'+color+';background:'+color+'15;padding:3px 7px;border-radius:5px;letter-spacing:.04em">'+badge+'</div>';
-      html += '</div>';
-      html += '<div style="font-size:12px;color:var(--t2);margin-bottom:10px;font-style:italic">'+r.label+'</div>';
-      var totalWin = r.first + r.second + r.third;
-      var firstStr = r.first > 0 ? '<b style="color:var(--em)">'+r.first+'\u00D7 1st prize</b>' : '<span style="color:var(--t3)">never won 1st prize</span>';
-      html += '<div style="font-size:12.5px;color:var(--t2);line-height:1.55">'+firstStr+'<br>top-3: '+totalWin+'\u00D7 \u00B7 total appearances: '+r.total+'</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    el.innerHTML = html;
-  });
-}
 
 function loadRepeatWinners() {
   var el = document.getElementById('repeatWinners'); if (!el) return;
@@ -4126,11 +4217,27 @@ function renderHistory() {
 
   // Primary search bar
   h += '<div class="card" style="margin-bottom:28px"><div style="display:flex;gap:6px;margin-bottom:14px"><button class="tab active" id="tab4d" onclick="setHistGame(\'4d\')">4D</button><button class="tab" id="tabtoto" onclick="setHistGame(\'toto\')">TOTO</button></div>';
+  h += '<div id="histOpRow" style="margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap'+(histGame==='4d'?'':';display:none')+'"><span style="font-size:12.5px;font-weight:700;color:var(--t2)">'+L('history.source4d','4D operator')+':</span><select id="histOpSel" onchange="setHistOp(this.value)" style="'+SEL_STYLE+'">'+STAT_OPS.map(function(o){return '<option value="'+o.id+'"'+(o.id===histOp?' selected':'')+'>'+(o.flag||'')+' '+o.label+'</option>';}).join('')+'</select></div>';
   h += '<div style="display:flex;gap:8px"><input type="text" id="histQ" class="imo" placeholder="'+L('history.placeholder4d','4D number (e.g. 1234)')+'" style="flex:1"><button class="btn btn-p" onclick="doHistSearch()">'+svgIcon("search",13)+' '+L('common.search','Search')+'</button></div></div>';
   h += '<div id="histResults" style="margin-bottom:28px"></div>';
 
   // ═══ TOTO LOOKUP TOOLS — moved here from Alpha TOTO ═══════════════
-  h += '<h2 style="font-size:18px;font-weight:800;color:var(--t2);margin:32px 0 14px;border-top:2px solid var(--bd);padding-top:24px">'+L('history.moreTotoLookups','More TOTO Lookups')+'</h2>';
+  // 4D lookup tools — moved here from 4D Stats
+  h += '<h2 style="font-size:18px;font-weight:800;color:var(--t2);margin:32px 0 14px;border-top:2px solid var(--bd);padding-top:24px">'+L('history.more4dLookups','More 4D Lookups')+'</h2>';
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
+  h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('fourd.anniversary','4D Anniversary Lookup')+'</h3>';
+  h += '</div>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.anniversaryDesc','Pick an operator and a date. See every 4D draw on that month-day across all years.')+'</p>';
+  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
+  h += '<select id="annivOp4d" style="'+SEL_STYLE+'">'+STAT_OPS.map(function(o){return '<option value="'+o.id+'"'+(o.id===histOp?' selected':'')+'>'+(o.flag||'')+' '+o.label+'</option>';}).join('')+'</select>';
+  h += '<input type="date" id="anniversaryDate4d" style="flex:1;min-width:180px">';
+  h += '<button class="btn btn-p" onclick="loadAnniversary4d()">'+L('common.lookup','Look up')+'</button></div>';
+  h += '<div id="anniversaryResult4d" style="margin-top:14px"></div>';
+  h += '</div>';
+
+  h += '<h2 style="font-size:18px;font-weight:800;color:var(--t2);margin:32px 0 14px;border-top:2px solid var(--bd);padding-top:24px">'+L('history.moreTotoLookups','More TOTO Lookups')+' · 🇸🇬 '+L('fourd.sgLabel','SG Pools')+'</h2>';
 
   // Number Deep Dive
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
@@ -4282,7 +4389,8 @@ function renderLucky() {
 }
 
 // ═══ EVENT HANDLERS ══════════════════════════════════════════
-var histGame = "4d";
+var histGame = "4d", histOp = "sg4d";
+window.setHistOp = function(op){ histOp = op; var r=document.getElementById("histResults"); if(r) r.innerHTML=""; var q=document.getElementById("histQ"); if(q&&q.value.trim()) doHistSearch(); };
 
 function bindEvents() {
   var qInput = document.getElementById("histQ");
@@ -4295,6 +4403,7 @@ window.setHistGame = function(g) {
   document.getElementById("tabtoto").className = "tab" + (g==="toto"?" active":"");
   document.getElementById("histQ").placeholder = g==="4d" ? L('history.placeholder4d','4D number (e.g. 1234)') : L('history.placeholderToto','TOTO number (1-49)');
   document.getElementById("histResults").innerHTML = "";
+  var opRow=document.getElementById('histOpRow'); if(opRow) opRow.style.display = g==='4d' ? 'flex' : 'none';
 };
 
 window.doHistSearch = function() {
@@ -4303,6 +4412,20 @@ window.doHistSearch = function() {
   if (window.track) window.track('number_searched', { game: histGame, length: q.length });
   var resEl = document.getElementById("histResults");
   resEl.innerHTML = loadingCard();
+  if (histGame === '4d' && histOp !== 'sg4d') {   // Malaysia operator — use the did-I-win check
+    fetch('/api/my/'+histOp+'/check?num='+encodeURIComponent(q)).then(function(r){return r.json();}).then(function(j){
+      if(!j.success){ resEl.innerHTML='<div class="card">'+L('common.error','Error')+': '+(j.error||'')+'</div>'; return; }
+      var d=j.data;
+      var html='<div class="card" style="margin-top:16px"><div style="font-size:20px;font-weight:800;color:var(--tx);margin-bottom:4px;font-family:var(--mo);letter-spacing:.05em">'+d.number+'</div><div style="font-size:12.5px;color:var(--t2);margin-bottom:14px"><b>'+d.total_wins+'</b> '+L('history.wins','win(s)')+' '+L('history.acrossDraws','across')+' '+d.draws_scanned.toLocaleString()+' '+L('dashboard.draws','draws')+'</div>';
+      html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:8px;margin-bottom:16px">';
+      [['1st',d.hits.first,'var(--em)'],['2nd',d.hits.second,'var(--t2)'],['3rd',d.hits.third,'var(--amb)'],['Special',d.hits.special,'var(--p)'],['Cons',d.hits.consolation,'var(--vi)']].forEach(function(t){ html+='<div style="background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:9px;text-align:center"><div style="font-size:19px;font-weight:800;font-family:var(--mo);color:'+t[2]+'">'+t[1]+'</div><div style="font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase">'+t[0]+'</div></div>'; });
+      html+='</div>';
+      if(d.recent&&d.recent.length){ html+='<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'+L('history.recentWins','Recent wins')+'</div>'; d.recent.forEach(function(x){ html+='<div style="display:flex;gap:14px;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--bl)"><span style="color:var(--t2);min-width:100px;font-family:var(--mo)">'+x.date+'</span><span style="font-weight:700;color:var(--p);text-transform:capitalize">'+x.tier+'</span></div>'; }); }
+      else html+='<p style="font-size:12.5px;color:var(--t3)">'+L('history.noMatches','No matches.')+'</p>';
+      resEl.innerHTML=html+'</div>';
+    }).catch(function(e){ resEl.innerHTML='<div class="card">'+L('common.error','Error')+': '+e.message+'</div>'; });
+    return;
+  }
   var url = '/api/' + (histGame === '4d' ? 'fourd' : 'toto') + '/search?number=' + encodeURIComponent(q);
   fetch(url).then(function(r){return r.json();}).then(function(j) {
     if (!j.success) { resEl.innerHTML = '<div class="card">'+L('common.error','Error')+': '+(j.error||'unknown')+'</div>'; return; }
@@ -4487,10 +4610,18 @@ function renderLuckyResult(d) {
 // Private back-door: ?tab=research lets the owner reach the hidden tab.
 var initialTab = new URLSearchParams(location.search).get('tab');
 if (initialTab) currentTab = initialTab;
+// operator for the Results view: URL ?op= wins, else remembered, else default
+var initialOp = new URLSearchParams(location.search).get('op');
+try { currentOp = initialOp || localStorage.getItem('huat_op') || currentOp; } catch(e) { if (initialOp) currentOp = initialOp; }
+var initialStatOp = new URLSearchParams(location.search).get('statop');   // deep-link a 4D-Stats operator
+if (initialStatOp) currentStatOp = initialStatOp;
+var initialHist = new URLSearchParams(location.search).get('hist');       // deep-link a draw-history game
+if (initialHist) currentHistGame = initialHist;
 updateSEO(currentTab);   // set initial title/meta before content renders
 loadStrings(function() {
   renderAll();
   loadData(function() { renderPage(); });
+  initCookieConsent();
 });
 </script>
 </body>

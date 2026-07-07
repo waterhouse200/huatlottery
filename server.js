@@ -60,6 +60,29 @@ const DREAM_TO_NUMBERS = {
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+app.disable("x-powered-by");                       // don't advertise the stack
+// Security headers (no CSP — the SPA uses inline scripts + GA/AdSense)
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+  res.setHeader("Strict-Transport-Security", "max-age=15552000; includeSubDomains");
+  next();
+});
+// Lightweight per-IP rate limit on the API (generous; localhost/warmup exempt)
+const _rl = new Map();
+app.use("/api", (req, res, next) => {
+  const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket.remoteAddress || "?";
+  if (ip === "127.0.0.1" || ip === "::1" || ip === "::ffff:127.0.0.1") return next();
+  const now = Date.now();
+  let e = _rl.get(ip);
+  if (!e || now - e.ts > 60000) { e = { ts: now, count: 0 }; _rl.set(ip, e); }
+  e.count++;
+  if (e.count > 300) return res.status(429).json({ success: false, error: "Too many requests — please slow down." });
+  next();
+});
+setInterval(() => { const now = Date.now(); for (const [ip, e] of _rl) if (now - e.ts > 120000) _rl.delete(ip); }, 120000).unref();
 app.use(cors());
 app.use(express.json());
 
@@ -206,13 +229,351 @@ app.get("/api/latest", cache.withCache((req, res) => {
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 }));
 
+// ─── MALAYSIA 4D (my_draws: magnum · sportstoto · damacai · singapore) ───
+const MY_OPS = ["magnum", "sportstoto", "damacai", "singapore", "grandragon", "perdana", "lucky", "sabah", "sarawak", "sandakan"];
+function parseMyRow(row) {
+  if (!row) return null;
+  return { ...row, special_prizes: JSON.parse(row.special_prizes), consolation_prizes: JSON.parse(row.consolation_prizes) };
+}
+app.get("/api/my/latest", (req, res) => {
+  try {
+    const data = {};
+    const top3 = db.prepare("SELECT COUNT(*) AS n FROM my_draws WHERE operator=? AND (first_prize=? OR second_prize=? OR third_prize=?)");
+    for (const op of MY_OPS) {
+      const row = parseMyRow(db.prepare("SELECT * FROM my_draws WHERE operator=? ORDER BY draw_date DESC LIMIT 1").get(op));
+      if (row) row.top3_counts = {
+        first:  top3.get(op, row.first_prize,  row.first_prize,  row.first_prize).n,
+        second: top3.get(op, row.second_prize, row.second_prize, row.second_prize).n,
+        third:  top3.get(op, row.third_prize,  row.third_prize,  row.third_prize).n,
+      };
+      data[op] = row;
+    }
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+app.get("/api/my/:operator/draws", (req, res, next) => {
+  try {
+    const op = req.params.operator;
+    if (op === "6d") return next();   // handled by the dedicated /api/my/6d/draws route
+    if (!MY_OPS.includes(op)) return res.status(404).json({ success: false, error: "unknown operator" });
+    const year = req.query.year, month = req.query.month;
+    let where = " WHERE operator=?", params = [op];
+    if (year) { where += " AND substr(draw_date,1,4)=?"; params.push(String(year));
+      if (month) { where += " AND substr(draw_date,6,2)=?"; params.push(String(month).padStart(2, "0")); } }
+    const limit = year ? 400 : Math.min(parseInt(req.query.limit) || 20, 100);
+    const offset = year ? 0 : (parseInt(req.query.offset) || 0);
+    const rows = db.prepare("SELECT * FROM my_draws" + where + " ORDER BY draw_date DESC LIMIT ? OFFSET ?").all(...params, limit, offset);
+    const total = db.prepare("SELECT COUNT(*) AS cnt FROM my_draws" + where).get(...params).cnt;
+    const yr = db.prepare("SELECT MIN(substr(draw_date,1,4)) mn, MAX(substr(draw_date,1,4)) mx FROM my_draws WHERE operator=?").get(op);
+    res.json({ success: true, data: rows.map(parseMyRow), pagination: { limit, offset, total }, year_range: { min: +yr.mn, max: +yr.mx } });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+app.get("/api/my/:operator/check", (req, res) => {
+  try {
+    const op = req.params.operator;
+    if (!MY_OPS.includes(op)) return res.status(404).json({ success: false, error: "unknown operator" });
+    const num = String(req.query.num || "").padStart(4, "0");
+    if (!/^[0-9]{4}$/.test(num)) return res.status(400).json({ success: false, error: "num must be 4 digits" });
+    const rows = db.prepare("SELECT * FROM my_draws WHERE operator=? ORDER BY draw_date DESC").all(op);
+    const hits = { first: 0, second: 0, third: 0, special: 0, consolation: 0 }, recent = [];
+    for (const r of rows) {
+      let tier = r.first_prize === num ? "first" : r.second_prize === num ? "second" : r.third_prize === num ? "third"
+        : JSON.parse(r.special_prizes).includes(num) ? "special" : JSON.parse(r.consolation_prizes).includes(num) ? "consolation" : null;
+      if (tier) { hits[tier]++; if (recent.length < 10) recent.push({ date: r.draw_date, tier }); }
+    }
+    const total_wins = hits.first + hits.second + hits.third + hits.special + hits.consolation;
+    res.json({ success: true, data: { operator: op, number: num, total_wins, hits, recent, draws_scanned: rows.length } });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+// deep stats over an operator's full history (mirrors /api/fourd/stats, on my_draws)
+app.get("/api/my/:operator/stats", cache.withCache((req, res) => {
+  try {
+    const op = req.params.operator;
+    if (!MY_OPS.includes(op)) return res.status(404).json({ success: false, error: "unknown operator" });
+    const rows = db.prepare("SELECT * FROM my_draws WHERE operator=? ORDER BY draw_date DESC").all(op);
+    const freq = {}, tierBreak = {}, lastSeen = {}, digitFreq = [0,0,0,0,0,0,0,0,0,0], yearFreq = {};
+    const doubleD = [0,0,0,0,0,0,0,0,0,0], tripleD = [0,0,0,0,0,0,0,0,0,0], quadD = [0,0,0,0,0,0,0,0,0,0];
+    const cls = { double: 0, triple: 0, quad: 0 };
+    let totalNumbers = 0;
+    rows.forEach((row, idx) => {
+      const yr = row.draw_date.slice(0, 4);
+      const sp = JSON.parse(row.special_prizes), cn = JSON.parse(row.consolation_prizes);
+      const tiered = [[row.first_prize,"first"],[row.second_prize,"second"],[row.third_prize,"third"]]
+        .concat(sp.map(n => [n,"special"])).concat(cn.map(n => [n,"consol"]));
+      for (const [num, tier] of tiered) {
+        if (!num) continue;
+        freq[num] = (freq[num] || 0) + 1;
+        tierBreak[num] = tierBreak[num] || { first:0, second:0, third:0, special:0, consol:0 };
+        tierBreak[num][tier]++;
+        if (lastSeen[num] == null) lastSeen[num] = idx;          // rows DESC → first hit = most recent
+        const dcount = {};
+        for (const d of num) { digitFreq[+d]++; dcount[d] = (dcount[d] || 0) + 1; }
+        for (const d in dcount) { if (dcount[d] === 2) doubleD[+d]++; else if (dcount[d] === 3) tripleD[+d]++; else if (dcount[d] === 4) quadD[+d]++; }
+        const c = classifyNumber(num); if (c !== "none") cls[c]++;
+        const yb = (yearFreq[yr] = yearFreq[yr] || {});
+        const e = yb[num] = yb[num] || { first:0, second:0, third:0, special:0, consol:0, total:0 };
+        e[tier]++; e.total++;
+        totalNumbers++;
+      }
+    });
+    const hot = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,20)
+      .map(([number,count]) => ({ number, count, pct: Math.round(count/totalNumbers*10000)/100, breakdown: tierBreak[number] }));
+    const cold = Object.entries(freq).sort((a,b) => a[1]-b[1] || (a[0] < b[0] ? -1 : 1)).slice(0,10)
+      .map(([number,count]) => ({ number, count, pct: Math.round(count/totalNumbers*10000)/100, breakdown: tierBreak[number] }));
+    const overdue = Object.entries(lastSeen).sort((a,b) => b[1]-a[1]).slice(0,20)
+      .map(([number,idx]) => ({ number, draws_since: idx, last_date: rows[idx] ? rows[idx].draw_date : null }));
+    const digit_frequency = digitFreq.map((count,d) => ({ digit: String(d), count, pct: Math.round(count/totalNumbers*1000)/10 }));
+    // Repeat 1st-Prize Winners — numbers that won 1st prize more than once
+    const repeat_winners = Object.entries(tierBreak).filter(([n,b]) => b.first >= 2).sort((a,b) => b[1].first - a[1].first).slice(0,25)
+      .map(([number,b]) => ({ number, wins: b.first }));
+    // Year-by-Year — most-frequent number each year (across all 23 prize positions)
+    const year_by_year = Object.keys(yearFreq).sort().reverse().map((yr) => {
+      const top = Object.entries(yearFreq[yr]).sort((a,b) => b[1].total - a[1].total)[0], b = top[1];
+      return { year: yr, number: top[0], count: b.total, breakdown: { first: b.first, second: b.second, third: b.third, special: b.special, consol: b.consol } };
+    });
+    const rank = (arr, n) => arr.map((count, d) => ({ number: String(d).repeat(n), count })).sort((a, b) => b.count - a.count);
+    const pick = (a) => ({ top: a.slice(0, 3), bottom: a.slice(-3).reverse() });
+    const sum = (arr) => arr.reduce((s, v) => s + v, 0);
+    // total = category occurrences, so each item's % can be measured against its own kind
+    const digit_pairs = {
+      doubles: Object.assign(pick(rank(doubleD, 2)), { total: sum(doubleD) }),
+      triples: Object.assign(pick(rank(tripleD, 3)), { total: sum(tripleD) }),
+      quads: Object.assign(pick(rank(quadD, 4)), { total: sum(quadD) }),
+    };
+    res.json({ success: true, data: {
+      operator: op, total_draws: rows.length, total_numbers: totalNumbers,
+      date_range: { from: rows.length ? rows[rows.length-1].draw_date : null, to: rows.length ? rows[0].draw_date : null },
+      hot_numbers: hot, cold_numbers: cold, overdue_numbers: overdue, digit_frequency, classification: cls,
+      repeat_winners, year_by_year, digit_pairs
+    } });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+}));
+
+// SG TOTO winning shares (Group 1–7: share amount + no. of winners) for the CURRENT draw.
+// Live-fetched from SG Pools' server-rendered result page (has the shares statically), cached 1h.
+let _totoShares = {};   // per-draw cache: { [drawNo]: { ts, data } }
+app.get("/api/toto/shares", async (req, res) => {
+  try {
+    const latest = db.prepare("SELECT draw_no FROM toto_draws ORDER BY draw_no DESC LIMIT 1").get();
+    if (!latest) return res.json({ success: true, data: null });
+    const drawNo = req.query.draw ? parseInt(req.query.draw, 10) : latest.draw_no;
+    const cached = _totoShares[drawNo];
+    if (cached && Date.now() - cached.ts < 3600e3) return res.json({ success: true, data: cached.data });
+    const sppl = Buffer.from("DrawNumber=" + drawNo).toString("base64");
+    const url = "https://www.singaporepools.com.sg/en/product/sr/Pages/toto_results.aspx?sppl=" + sppl;
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36" } });
+    const $ = require("cheerio").load(await r.text());
+    const groups = [];
+    $("table").each((i, t) => {
+      if (!/Prize Group|Group 1/i.test($(t).text())) return;
+      $(t).find("tr").each((j, tr) => {
+        const c = $(tr).find("td,th").map((k, x) => $(x).text().replace(/\s+/g, " ").trim()).get();
+        const m = c[0] && c[0].match(/Group ([1-7])/);
+        if (m) groups.push({ group: +m[1], share: c[1] || "-", winners: c[2] || "-" });
+      });
+    });
+    const seen = {}, uniq = [];
+    for (const g of groups) if (!seen[g.group]) { seen[g.group] = 1; uniq.push(g); }
+    uniq.sort((a, b) => a.group - b.group);
+    const g1 = $.text().replace(/\s+/g, " ").match(/Group 1 Prize[^0-9]*(\$[\d,]+)/i);
+    const snowball = uniq.length > 0 && (uniq[0].share === "-" || uniq[0].winners === "-" || uniq[0].winners === "0");
+    const data = { draw_no: drawNo, g1_prize: g1 ? g1[1] : null, groups: uniq, snowball };
+    _totoShares[drawNo] = { ts: Date.now(), data };
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// Check a specific TOTO combination against the full archive — precise "how would my numbers have done"
+app.get("/api/toto/combo-check", (req, res) => {
+  try {
+    const nums = [...new Set((req.query.nums || "").split(/[,\s]+/).map((n) => parseInt(n, 10)).filter((n) => n >= 1 && n <= 49))];
+    if (!nums.length) return res.json({ success: false, error: "Enter 1–6 numbers between 1 and 49." });
+    const rows = db.prepare("SELECT * FROM toto_draws ORDER BY draw_no DESC").all();
+    const perNum = {}; nums.forEach((n) => (perNum[n] = 0));
+    const dist = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    const all = [];
+    for (const row of rows) {
+      const d = formatTotoRow(row);
+      const drawSet = new Set(d.numbers.map(Number));
+      let matched = 0;
+      for (const n of nums) if (drawSet.has(n)) { matched++; perNum[n]++; }
+      dist[matched] = (dist[matched] || 0) + 1;
+      all.push({ draw_no: d.draw_no, draw_date: d.draw_date, numbers: d.numbers, additional_num: d.additional_num, matched, add_match: nums.includes(Number(d.additional_num)) });
+    }
+    all.sort((a, b) => b.matched - a.matched || b.draw_no - a.draw_no);
+    res.json({ success: true, data: {
+      input: nums.slice().sort((a, b) => a - b), total_draws: rows.length, best_match: all.length ? all[0].matched : 0,
+      distribution: dist, per_number: nums.slice().sort((a, b) => a - b).map((n) => ({ number: n, count: perNum[n] })),
+      top_draws: all.slice(0, 10),
+    } });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// Sports Toto 6D — latest from my6d_draws (backfilled from gd4d; stored history enables future stats).
+app.get("/api/my/6d", (req, res) => {
+  try {
+    const has = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='my6d_draws'").get();
+    if (!has) return res.json({ success: true, data: null });
+    const row = db.prepare("SELECT draw_date, number FROM my6d_draws ORDER BY draw_date DESC LIMIT 1").get();
+    const total = db.prepare("SELECT COUNT(*) AS n FROM my6d_draws").get().n;
+    res.json({ success: true, data: row ? { operator: "sportstoto", game: "6D", draw_date: row.draw_date, number: row.number, total_draws: total } : null });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// 6D history — past draws with year/month filter (Others "View History")
+app.get("/api/my/6d/draws", (req, res) => {
+  try {
+    const has = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='my6d_draws'").get();
+    if (!has) return res.json({ success: true, data: [], year_range: null });
+    const year = req.query.year, month = req.query.month;
+    let where = "", params = [];
+    if (year) { where = " WHERE substr(draw_date,1,4)=?"; params.push(String(year));
+      if (month) { where += " AND substr(draw_date,6,2)=?"; params.push(String(month).padStart(2, "0")); } }
+    const limit = year ? 400 : 20;
+    const rows = db.prepare("SELECT draw_date, number FROM my6d_draws" + where + " ORDER BY draw_date DESC LIMIT ?").all(...params, limit);
+    const yr = db.prepare("SELECT MIN(substr(draw_date,1,4)) mn, MAX(substr(draw_date,1,4)) mx FROM my6d_draws").get();
+    res.json({ success: true, data: rows.map((r) => ({ draw_date: r.draw_date, number: r.number })), year_range: yr.mn ? { min: +yr.mn, max: +yr.mx } : null });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// Malaysia big-3 current draw number + 4D Jackpot 1/2 amount and winner status, live from check4d,
+// cached 1h. Parsed per operator block (name at top, jackpot at bottom of each block).
+// Shape: { magnum: { no:"390/26", j1:{amt,status}, j2:{amt,status} }, ... }
+let _drawNos = { ts: 0, data: null };
+app.get("/api/my/drawnos", async (req, res) => {
+  try {
+    if (_drawNos.data && Date.now() - _drawNos.ts < 3600e3) return res.json({ success: true, data: _drawNos.data });
+    const r = await fetch("https://www.check4d.org/", { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36" } });
+    const t = (await r.text()).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    const anchors = { magnum: "Magnum 4D", damacai: "Da Ma Cai 1+3D", sportstoto: "SportsToto 4D" };
+    const pos = Object.keys(anchors).map((op) => ({ op, i: t.indexOf(anchors[op]) })).filter((x) => x.i >= 0).sort((a, b) => a.i - b.i);
+    const map = {};
+    const fmt = (p) => (p ? { amt: p[1].replace(/\s+/g, " ").trim(), status: p[2] || "No winner" } : null);
+    for (let idx = 0; idx < pos.length; idx++) {
+      const op = pos[idx].op;
+      const block = t.slice(pos[idx].i, idx + 1 < pos.length ? pos[idx + 1].i : pos[idx].i + 2500);
+      const info = {};
+      const dm = block.match(/Draw No[.:]*\s*(\d{2,5}\/\d{2})/i);
+      if (dm) info.no = dm[1];
+      const jm = block.match(/4D Jackpot 1 Prize\s*4D Jackpot 2 Prize\s*(.*?)(?:Next Draw|3D Jackpot|$)/i);
+      if (jm) {
+        const parts = [...jm[1].matchAll(/(RM\s?[\d,]+(?:\.\d+)?)\s*(Partially Won|Won)?/gi)];
+        info.j1 = fmt(parts[0]); info.j2 = fmt(parts[1]);
+      }
+      const nm = block.match(/Next Draw Estimated Amount\s*4D Jackpot 1 Prize\s*4D Jackpot 2 Prize\s*(RM\s?[\d,]+(?:\.\d+)?)\s*(RM\s?[\d,]+(?:\.\d+)?)/i);
+      if (nm) info.next = { j1: nm[1].replace(/\s+/g, " ").trim(), j2: nm[2].replace(/\s+/g, " ").trim() };
+      map[op] = info;
+    }
+    _drawNos = { ts: Date.now(), data: map };
+    res.json({ success: true, data: map });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// Sports Toto non-4D products: 5D (gd4d) + Star/Power/Supreme Toto lotto (check4d). Cached 1h.
+let _totoProd = { ts: 0, data: null };
+app.get("/api/my/toto-products", async (req, res) => {
+  try {
+    if (_totoProd.data && Date.now() - _totoProd.ts < 3600e3) return res.json({ success: true, data: _totoProd.data });
+    const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36";
+    const $ = require("cheerio").load(await (await fetch("https://gd4d.co/en", { headers: { "User-Agent": UA } })).text());
+    let fiveD = null, date = null;
+    $(".result-jackpot").each((_, el) => {
+      if (fiveD || !/5D/i.test($(el).text())) return;
+      const dm = $(el).find(".result-date").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      if (dm) date = `${dm[3]}-${String(dm[2]).padStart(2, "0")}-${String(dm[1]).padStart(2, "0")}`;
+      $(el).find(".result-normal").each((__, sec) => {
+        if (!/^5D$/i.test($(sec).find(".result-legend").first().text().trim())) return;
+        const prizes = {};
+        $(sec).find(".result-row").each((k, r) => {
+          const label = $(r).find(".result-label").text().trim(), num = $(r).find(".result-number").first().text().trim();
+          if (label && /^\d+$/.test(num)) prizes[label] = num;
+        });
+        if (Object.keys(prizes).length) fiveD = { date, prizes };
+      });
+    });
+    const t = (await (await fetch("https://www.check4d.org/", { headers: { "User-Agent": UA } })).text()).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    const grab = (seg) => {
+      const dm = seg.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+      const dn = seg.match(/\b(\d{3,4})[-/](\d{2})\b/);
+      return { date: dm ? `${dm[3]}-${String(dm[2]).padStart(2,"0")}-${String(dm[1]).padStart(2,"0")}` : null, drawNo: dn ? dn[1] + "/" + dn[2] : null };
+    };
+    // hasBonus: only Star Toto 6/50 has an extra number; Power/Supreme are 6 numbers only
+    const lotto = (name, twoJp, hasBonus) => {
+      const i = t.indexOf(name); if (i < 0) return null;
+      const seg = t.slice(i + name.length, i + name.length + 240);
+      const nums = (seg.match(/\b\d{1,2}\b/g) || []).slice(0, 7);
+      const jps = seg.match(/RM\s?[\d,]+(?:\.\d+)?/g) || [];
+      const meta = grab(t.slice(Math.max(0, i - 130), i + 240));
+      return { nums: nums.slice(0, 6), additional: hasBonus ? (nums[6] || null) : null, jackpot1: jps[0] || null, jackpot2: twoJp ? (jps[1] || null) : null, drawNo: meta.drawNo, date: meta.date || date };
+    };
+    const i5 = t.indexOf("SportsToto 5D");
+    if (fiveD && i5 >= 0) fiveD.drawNo = grab(t.slice(i5, i5 + 200)).drawNo;
+    const data = { date, fiveD, star: lotto("Star Toto 6/50", true, true), power: lotto("Power Toto 6/55", false, false), supreme: lotto("Supreme Toto 6/58", false, false) };
+    // Star/Power/Supreme are one Lotto draw — share the draw number if any game is missing it
+    const lottoNo = (data.star && data.star.drawNo) || (data.power && data.power.drawNo) || (data.supreme && data.supreme.drawNo);
+    [data.star, data.power, data.supreme].forEach((x) => { if (x && !x.drawNo) x.drawNo = lottoNo; });
+    _totoProd = { ts: Date.now(), data };
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
+// More non-4D MY games: Da Ma Cai 3+3D, Magnum Life, Magnum 4D Jackpot Gold, Sabah Lotto 6/45. Cached 1h.
+let _otherGames = { ts: 0, data: null };
+app.get("/api/my/other-games", async (req, res) => {
+  try {
+    if (_otherGames.data && Date.now() - _otherGames.ts < 3600e3) return res.json({ success: true, data: _otherGames.data });
+    const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36";
+    const t = (await (await fetch("https://www.check4d.org/", { headers: { "User-Agent": UA } })).text()).replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
+    const grab = (seg) => {
+      const dm = seg.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+      const dn = seg.match(/\b(\d{3,4})[-/](\d{2})\b/);
+      return { date: dm ? `${dm[3]}-${String(dm[2]).padStart(2,"0")}-${String(dm[1]).padStart(2,"0")}` : null, drawNo: dn ? dn[1] + "/" + dn[2] : null };
+    };
+    // Da Ma Cai 3+3D — 6-digit game: 1st/2nd/3rd + 10 special
+    let damacai33d = null;
+    { const i = t.indexOf("Da Ma Cai 3+3D");
+      if (i >= 0) { const seg = t.slice(i, i + 720); const m = grab(seg); const nums = seg.match(/\b\d{6}\b/g) || [];
+        // each of 1st/2nd/3rd carries a zodiac animal + a Bonus prize amount: "917609 DRAGON Bonus 1 RM 338,333.30"
+        const prize = (n) => { const mm = seg.match(new RegExp(n + "\\s+([A-Z]+)\\s+Bonus\\s+\\d+\\s+(RM\\s?[\\d,]+(?:\\.\\d+)?)")); return { number: n, animal: mm ? mm[1] : null, bonus: mm ? mm[2] : null }; };
+        if (nums.length >= 3) damacai33d = { drawNo: m.drawNo, date: m.date, prizes: [prize(nums[0]), prize(nums[1]), prize(nums[2])], special: nums.slice(3, 13), consolation: nums.slice(13, 23) }; } }
+    // Magnum Life — 8 winning numbers + 2 bonus
+    let magnumLife = null;
+    { const i = t.indexOf("Magnum Life");
+      if (i >= 0) { const seg = t.slice(i, i + 230); const m = grab(seg);
+        const wm = seg.match(/Winning Numbers\s+((?:\d{2}\s+){2,9}\d{2})\s+Bonus/), bm = seg.match(/Bonus Numbers\s+(\d{2})\s+(\d{2})/);
+        magnumLife = { drawNo: m.drawNo, date: m.date, winning: wm ? wm[1].trim().split(/\s+/) : [], bonus: bm ? [bm[1], bm[2]] : [] }; } }
+    // Magnum 4D Jackpot Gold — 6-digit number + 2-digit bonus + prize
+    let jackpotGold = null;
+    { const i = t.indexOf("Jackpot Gold");
+      if (i >= 0) { const seg = t.slice(i, i + 240); const m = grab(seg);
+        const j1 = seg.match(/Jackpot 1\s+((?:\d\s+){5}\d)\s*\+\s*(\d\s*\d)/), prize = seg.match(/Prize\s*:\s*(RM\s?[\d,]+(?:\.\d+)?)/);
+        jackpotGold = { drawNo: m.drawNo, date: m.date, number: j1 ? j1[1].replace(/\s+/g, "") : null, bonus: j1 ? j1[2].replace(/\s+/g, "") : null, prize: prize ? prize[1] : null }; } }
+    // Sabah Lotto 6/45 — 6 numbers + bonus + Jackpot 1/2 (meta from the Sabah 88 4D block)
+    let sabahLotto = null;
+    { const i = t.indexOf("Lotto 6/45");
+      if (i >= 0) { const seg = t.slice(i + 10, i + 150);
+        const nm = seg.match(/((?:\d{1,2}\s+){5}\d{1,2})\s*\+\s*(\d{1,2})/);
+        const jps = (seg.match(/Jackpot \d\s+(RM\s?[\d,]+(?:\.\d+)?)/g) || []).map((x) => x.replace(/Jackpot \d\s+/, ""));
+        const s88 = t.indexOf("Sabah 88 4D"), meta = s88 >= 0 ? grab(t.slice(s88, s88 + 90)) : {};
+        if (nm) sabahLotto = { drawNo: meta.drawNo, date: meta.date, nums: nm[1].trim().split(/\s+/), bonus: nm[2], jackpot1: jps[0] || null, jackpot2: jps[1] || null }; } }
+    const data = { damacai33d, magnumLife, jackpotGold, sabahLotto };
+    _otherGames = { ts: Date.now(), data };
+    res.json({ success: true, data });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
+
 app.get("/api/toto/draws", (req, res) => {
   try {
-    const limit = Math.min(parseInt(req.query.limit) || 20, 100);
-    const offset = parseInt(req.query.offset) || 0;
-    const rows = db.prepare("SELECT * FROM toto_draws ORDER BY draw_no DESC LIMIT ? OFFSET ?").all(limit, offset);
-    const total = db.prepare("SELECT COUNT(*) AS cnt FROM toto_draws").get().cnt;
-    res.json({ success: true, data: rows.map(formatTotoRow), pagination: { limit, offset, total } });
+    const year = req.query.year, month = req.query.month;
+    let where = "", params = [];
+    if (year) { where = " WHERE substr(draw_date,1,4)=?"; params.push(String(year));
+      if (month) { where += " AND substr(draw_date,6,2)=?"; params.push(String(month).padStart(2, "0")); } }
+    const limit = year ? 400 : Math.min(parseInt(req.query.limit) || 20, 100);
+    const offset = year ? 0 : (parseInt(req.query.offset) || 0);
+    const rows = db.prepare("SELECT * FROM toto_draws" + where + " ORDER BY draw_no DESC LIMIT ? OFFSET ?").all(...params, limit, offset);
+    const total = db.prepare("SELECT COUNT(*) AS cnt FROM toto_draws" + where).get(...params).cnt;
+    const yr = db.prepare("SELECT MIN(substr(draw_date,1,4)) mn, MAX(substr(draw_date,1,4)) mx FROM toto_draws").get();
+    res.json({ success: true, data: rows.map(formatTotoRow), pagination: { limit, offset, total }, year_range: { min: +yr.mn, max: +yr.mx } });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
@@ -294,11 +655,16 @@ app.get("/api/toto/search", (req, res) => {
 
 app.get("/api/fourd/draws", (req, res) => {
   try {
-    const limit = Math.min(parseInt(req.query.limit) || 20, 100);
-    const offset = parseInt(req.query.offset) || 0;
-    const rows = db.prepare("SELECT * FROM fourd_draws ORDER BY draw_no DESC LIMIT ? OFFSET ?").all(limit, offset);
-    const total = db.prepare("SELECT COUNT(*) AS cnt FROM fourd_draws").get().cnt;
-    res.json({ success: true, data: rows.map(parseFourdRow), pagination: { limit, offset, total } });
+    const year = req.query.year, month = req.query.month;
+    let where = "", params = [];
+    if (year) { where = " WHERE substr(draw_date,1,4)=?"; params.push(String(year));
+      if (month) { where += " AND substr(draw_date,6,2)=?"; params.push(String(month).padStart(2, "0")); } }
+    const limit = year ? 400 : Math.min(parseInt(req.query.limit) || 20, 100);
+    const offset = year ? 0 : (parseInt(req.query.offset) || 0);
+    const rows = db.prepare("SELECT * FROM fourd_draws" + where + " ORDER BY draw_no DESC LIMIT ? OFFSET ?").all(...params, limit, offset);
+    const total = db.prepare("SELECT COUNT(*) AS cnt FROM fourd_draws" + where).get(...params).cnt;
+    const yr = db.prepare("SELECT MIN(substr(draw_date,1,4)) mn, MAX(substr(draw_date,1,4)) mx FROM fourd_draws").get();
+    res.json({ success: true, data: rows.map(parseFourdRow), pagination: { limit, offset, total }, year_range: { min: +yr.mn, max: +yr.mx } });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
@@ -332,13 +698,15 @@ app.get("/api/fourd/stats", cache.withCache((req, res) => {
     const rows = db.prepare("SELECT * FROM fourd_draws ORDER BY draw_no DESC").all();
     const totalDraws = rows.length;
     const byC = { first: [], second: [], third: [], starter: [], consolation: [] };
-    const allNumbers = [];
-    for (const row of rows) {
+    const allNumbers = [], lastSeen = {};
+    rows.forEach((row, idx) => {
       const p = parseFourdRow(row);
       byC.first.push(p.first_prize); byC.second.push(p.second_prize); byC.third.push(p.third_prize);
       byC.starter.push(...p.starter_prizes); byC.consolation.push(...p.consolation_prizes);
-      allNumbers.push(p.first_prize, p.second_prize, p.third_prize, ...p.starter_prizes, ...p.consolation_prizes);
-    }
+      const nums = [p.first_prize, p.second_prize, p.third_prize, ...p.starter_prizes, ...p.consolation_prizes];
+      allNumbers.push(...nums);
+      for (const n of nums) if (lastSeen[n] == null) lastSeen[n] = idx;   // rows DESC → first hit = most recent
+    });
     const tn = allNumbers.length;
     const dc = { double: {}, triple: {}, quad: {} };
     let dC = 0, tC = 0, qC = 0;
@@ -365,6 +733,11 @@ app.get("/api/fourd/stats", cache.withCache((req, res) => {
       breakdown: tierBreak[number] || {first:0,second:0,third:0,starter:0,consol:0},
     }));
     const top10Range = { from: earliestDate, to: latestDate };
+    // Coldest 10 — least-frequent numbers that have still appeared at least once
+    const top10Cold = Object.entries(gf).sort((a, b) => a[1] - b[1] || (a[0] < b[0] ? -1 : 1)).slice(0, 10).map(([number, count]) => ({
+      number, count, pct: Math.round(count / tn * 10000) / 100,
+      breakdown: tierBreak[number] || {first:0,second:0,third:0,starter:0,consol:0},
+    }));
     const eTop = arr => { const f = {}; arr.forEach(n => f[n] = (f[n] || 0) + 1); const t = arr.length; return Object.entries(f).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([number, count]) => ({ number, count, pct: Math.round(count / t * 10000) / 100 })); };
     const pTop = arr => { const f = {}; arr.forEach(n => { const k = getSortedDigits(n); f[k] = (f[k] || 0) + 1; }); const t = arr.length; return Object.entries(f).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([sd, count]) => ({ sorted_digits: sd, count, pct: Math.round(count / t * 10000) / 100 })); };
     const exact = {}, perm = {};
@@ -372,7 +745,9 @@ app.get("/api/fourd/stats", cache.withCache((req, res) => {
     res.json({ success: true, data: {
       total_draws: totalDraws, total_numbers: tn,
       digit_classification: { double: { count: dC, pct: Math.round(dC / tn * 1000) / 10, top3: topN(dc.double, 3) }, triple: { count: tC, pct: Math.round(tC / tn * 1000) / 10, top3: topN(dc.triple, 3) }, quad: { count: qC, pct: Math.round(qC / tn * 1000) / 10, top3: topN(dc.quad, 3) } },
-      top10_hot: top10, top10_date_range: top10Range, exact_match: exact, perm_match: perm,
+      top10_hot: top10, top10_cold: top10Cold, top10_date_range: top10Range,
+      overdue_numbers: Object.entries(lastSeen).sort((a, b) => b[1] - a[1]).slice(0, 12).map(([number, idx]) => ({ number, draws_since: idx, last_date: rows[idx] ? rows[idx].draw_date : null })),
+      exact_match: exact, perm_match: perm,
     }});
   } catch (err) { console.error(err); res.status(500).json({ success: false, error: err.message }); }
 }));
@@ -4090,6 +4465,14 @@ app.get("/api/draws-on-date", (req, res) => {
     if (!/^\d{2}-\d{2}$/.test(md)) {
       return res.status(400).json({ success: false, error: "Provide ?month_day=MM-DD" });
     }
+    // Malaysia operator anniversary — returned in the `fourd` slot so the frontend renders it the same way
+    const op = String(req.query.operator || "").trim();
+    if (op && op !== "sg4d" && MY_OPS.includes(op)) {
+      const myRows = db.prepare(
+        "SELECT draw_date, first_prize, second_prize, third_prize FROM my_draws WHERE operator=? AND substr(draw_date,6)=? ORDER BY draw_date DESC"
+      ).all(op, md);
+      return res.json({ success: true, data: { month_day: md, toto: [], fourd: myRows.map(r => ({ draw_no: null, draw_date: r.draw_date, first_prize: r.first_prize, second_prize: r.second_prize, third_prize: r.third_prize })) } });
+    }
     // Find all draws where draw_date matches MM-DD across all years
     const totoRows = db.prepare(
       "SELECT draw_no, draw_date, num1, num2, num3, num4, num5, num6, additional_num " +
@@ -4249,6 +4632,13 @@ function warmupCache() {
     "/api/fourd/steady-hitters",
     // Lucky tab
     "/api/festival",
+    // Malaysia 4D stats — pre-warm so switching operators is instant (heavy scans)
+    "/api/my/magnum/stats",
+    "/api/my/sportstoto/stats",
+    "/api/my/damacai/stats",
+    "/api/my/sabah/stats",
+    "/api/my/sarawak/stats",
+    "/api/my/sandakan/stats",
   ];
   console.log("[warmup] starting — " + endpoints.length + " endpoints to cache");
   let i = 0;
