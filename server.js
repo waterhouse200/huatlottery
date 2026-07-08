@@ -226,9 +226,10 @@ function serveSeo(routePath, res){
     .replace(/(<meta property="og:title" content=")[^"]*(">)/, (m,a,b)=> a+cfg.title+b)
     .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
     // Put the real content in a PERSISTENT sibling (#seoLander) the SPA never
-    // overwrites — the app renders into #content, but crawlers (and Googlebot
-    // after running JS) always see this rich result content → no soft-404.
-    .replace('<div class="content" id="content"></div>', () => '<div class="content" id="content"></div><div id="seoLander" style="max-width:1040px;margin:0 auto 40px;padding:0 20px;line-height:1.75;color:var(--t2)">'+cfg.block()+'</div>');
+    // overwrites — crawlers (and Googlebot after running JS) always read this
+    // rich result content → no soft-404. Visually hidden (sr-only) so users see
+    // only the app UI, not a raw text block; the text stays in the DOM for bots.
+    .replace('<div class="content" id="content"></div>', () => '<div class="content" id="content"></div><div id="seoLander" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);border:0">'+cfg.block()+'</div>');
   res.setHeader("Content-Type","text/html; charset=utf-8");
   res.setHeader("Cache-Control","public, max-age=300");
   res.send(html);
