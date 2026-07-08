@@ -734,6 +734,17 @@ function loadingCard() {
 // Subsequent scrolls trigger off-screen cards as the user reaches them.
 window.__lazyObs = null;
 window.__lazyPending = {};
+// In-memory API cache — skip re-fetching heavy endpoints when re-visiting a tab
+var __apiCache = {};
+function fetchJSON(url, ttlMs) {
+  ttlMs = ttlMs || 300000;                       // 5 min default
+  var c = __apiCache[url];
+  if (c && (Date.now() - c.t) < ttlMs) return Promise.resolve(c.v);
+  return fetch(url).then(function(r){ return r.json(); }).then(function(j){
+    __apiCache[url] = { t: Date.now(), v: j };
+    return j;
+  });
+}
 function lazyLoad(elementId, fn) {
   if (!window.IntersectionObserver) {
     // Fallback: load immediately on browsers without IntersectionObserver
@@ -979,9 +990,9 @@ function renderOthers(){
 }
 function loadOthers(){
   Promise.all([
-    fetch('/api/my/toto-products').then(function(r){return r.json();}).catch(function(){return {data:{}};}),
-    fetch('/api/my/drawnos').then(function(r){return r.json();}).catch(function(){return {data:{}};}),
-    fetch('/api/my/other-games').then(function(r){return r.json();}).catch(function(){return {data:{}};})
+    fetchJSON('/api/my/toto-products').catch(function(){return {data:{}};}),
+    fetchJSON('/api/my/drawnos').catch(function(){return {data:{}};}),
+    fetchJSON('/api/my/other-games').catch(function(){return {data:{}};})
   ]).then(function(res){
     var d=(res[0]&&res[0].data)||{}, dn=(res[1]&&res[1].data)||{}, og=(res[2]&&res[2].data)||{}; window.MY_DRAWNOS=dn;
     var el=document.getElementById('otherResult'); if(!el) return;
@@ -1410,7 +1421,7 @@ function renderStats(){
 }
 function loadMyStats(op){
   var cfg = opCfg(op);
-  fetch('/api/my/'+op+'/stats').then(function(r){return r.json();}).then(function(j){
+  fetchJSON('/api/my/'+op+'/stats').then(function(j){
     var el=document.getElementById('myStats'); if(el) el.innerHTML = myStatsHTML(j.data, cfg);
   }).catch(function(){ var el=document.getElementById('myStats'); if(el) el.innerHTML='<div class="card" style="padding:20px;color:var(--red)">Could not load stats.</div>'; });
 }

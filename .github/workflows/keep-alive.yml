@@ -1,0 +1,26 @@
+name: keep-alive
+
+# Render's free tier spins the server down after ~15 min idle, so the next
+# visitor pays a 30–60s cold-start + cold-cache penalty. Pinging every ~10 min
+# keeps it awake and its caches warm, so tabs load instantly.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # every 10 minutes (GitHub may delay under load)
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        run: |
+          ok=0
+          for url in \
+            "https://huatlottery.com/api/health" \
+            "https://huatlottery.onrender.com/api/health"; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 "$url" || echo "000")
+            echo "$url -> $code"
+            if [ "$code" = "200" ]; then ok=1; break; fi
+          done
+          if [ "$ok" != "1" ]; then echo "::warning::keep-alive ping did not get 200"; fi

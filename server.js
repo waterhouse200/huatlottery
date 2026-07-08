@@ -521,12 +521,15 @@ app.get("/api/my/drawnos", async (req, res) => {
 });
 
 // Sports Toto non-4D products: 5D (gd4d) + Star/Power/Supreme Toto lotto (check4d). Cached 1h.
-let _totoProd = { ts: 0, data: null };
-app.get("/api/my/toto-products", async (req, res) => {
-  try {
-    if (_totoProd.data && Date.now() - _totoProd.ts < 3600e3) return res.json({ success: true, data: _totoProd.data });
-    const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36";
-    const $ = require("cheerio").load(await (await fetch("https://gd4d.co/en", { headers: { "User-Agent": UA } })).text());
+// External scrapes with a hard timeout so a slow source can't hang the request.
+const _SCRAPE_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36";
+function fetchTimeout(url, ms) {
+  const ctrl = new AbortController();
+  const to = setTimeout(() => ctrl.abort(), ms || 8000);
+  return fetch(url, { headers: { "User-Agent": _SCRAPE_UA }, signal: ctrl.signal }).finally(() => clearTimeout(to));
+}
+async function computeTotoProd() {
+    const $ = require("cheerio").load(await (await fetchTimeout("https://gd4d.co/en", 8000)).text());
     let fiveD = null, date = null;
     $(".result-jackpot").each((_, el) => {
       if (fiveD || !/5D/i.test($(el).text())) return;
@@ -542,7 +545,7 @@ app.get("/api/my/toto-products", async (req, res) => {
         if (Object.keys(prizes).length) fiveD = { date, prizes };
       });
     });
-    const t = (await (await fetch("https://www.check4d.org/", { headers: { "User-Agent": UA } })).text()).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    const t = (await (await fetchTimeout("https://www.check4d.org/", 8000)).text()).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
     const grab = (seg) => {
       const dm = seg.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
       const dn = seg.match(/\b(\d{3,4})[-/](\d{2})\b/);
@@ -563,18 +566,29 @@ app.get("/api/my/toto-products", async (req, res) => {
     // Star/Power/Supreme are one Lotto draw — share the draw number if any game is missing it
     const lottoNo = (data.star && data.star.drawNo) || (data.power && data.power.drawNo) || (data.supreme && data.supreme.drawNo);
     [data.star, data.power, data.supreme].forEach((x) => { if (x && !x.drawNo) x.drawNo = lottoNo; });
-    _totoProd = { ts: Date.now(), data };
-    res.json({ success: true, data });
-  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+    return data;
+}
+// Stale-while-revalidate: answer from cache instantly; refresh in background when stale.
+let _totoProd = { ts: 0, data: null, refreshing: false };
+async function refreshTotoProd() {
+  if (_totoProd.refreshing) return;
+  _totoProd.refreshing = true;
+  try { _totoProd = { ts: Date.now(), data: await computeTotoProd(), refreshing: false }; }
+  catch (e) { _totoProd.refreshing = false; }
+}
+app.get("/api/my/toto-products", async (req, res) => {
+  if (_totoProd.data) {
+    res.json({ success: true, data: _totoProd.data });
+    if (Date.now() - _totoProd.ts >= 3600e3) refreshTotoProd();   // stale → refresh in bg
+    return;
+  }
+  try { await refreshTotoProd(); } catch (e) {}                    // first-ever fetch (cold)
+  res.json({ success: true, data: _totoProd.data || {} });
 });
 
-// More non-4D MY games: Da Ma Cai 3+3D, Magnum Life, Magnum 4D Jackpot Gold, Sabah Lotto 6/45. Cached 1h.
-let _otherGames = { ts: 0, data: null };
-app.get("/api/my/other-games", async (req, res) => {
-  try {
-    if (_otherGames.data && Date.now() - _otherGames.ts < 3600e3) return res.json({ success: true, data: _otherGames.data });
-    const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36";
-    const t = (await (await fetch("https://www.check4d.org/", { headers: { "User-Agent": UA } })).text()).replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
+// More non-4D MY games: Da Ma Cai 3+3D, Magnum Life, Magnum 4D Jackpot Gold, Sabah Lotto 6/45.
+async function computeOtherGames() {
+    const t = (await (await fetchTimeout("https://www.check4d.org/", 8000)).text()).replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
     const grab = (seg) => {
       const dm = seg.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
       const dn = seg.match(/\b(\d{3,4})[-/](\d{2})\b/);
@@ -608,9 +622,23 @@ app.get("/api/my/other-games", async (req, res) => {
         const s88 = t.indexOf("Sabah 88 4D"), meta = s88 >= 0 ? grab(t.slice(s88, s88 + 90)) : {};
         if (nm) sabahLotto = { drawNo: meta.drawNo, date: meta.date, nums: nm[1].trim().split(/\s+/), bonus: nm[2], jackpot1: jps[0] || null, jackpot2: jps[1] || null }; } }
     const data = { damacai33d, magnumLife, jackpotGold, sabahLotto };
-    _otherGames = { ts: Date.now(), data };
-    res.json({ success: true, data });
-  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+    return data;
+}
+let _otherGames = { ts: 0, data: null, refreshing: false };
+async function refreshOtherGames() {
+  if (_otherGames.refreshing) return;
+  _otherGames.refreshing = true;
+  try { _otherGames = { ts: Date.now(), data: await computeOtherGames(), refreshing: false }; }
+  catch (e) { _otherGames.refreshing = false; }
+}
+app.get("/api/my/other-games", async (req, res) => {
+  if (_otherGames.data) {
+    res.json({ success: true, data: _otherGames.data });
+    if (Date.now() - _otherGames.ts >= 3600e3) refreshOtherGames();   // stale → refresh in bg
+    return;
+  }
+  try { await refreshOtherGames(); } catch (e) {}                      // first-ever fetch (cold)
+  res.json({ success: true, data: _otherGames.data || {} });
 });
 
 app.get("/api/toto/draws", (req, res) => {
@@ -4690,6 +4718,12 @@ function warmupCache() {
     "/api/my/sabah/stats",
     "/api/my/sarawak/stats",
     "/api/my/sandakan/stats",
+    // Other Results tab — pre-warm so it's instant on first open
+    "/api/my/latest",
+    "/api/my/toto-products",
+    "/api/my/other-games",
+    "/api/my/drawnos",
+    "/api/my/6d",
   ];
   console.log("[warmup] starting — " + endpoints.length + " endpoints to cache");
   let i = 0;
