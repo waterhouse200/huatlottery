@@ -50,6 +50,17 @@ jobs:
       - name: Scrape Other games (5D, 3+3D, Life, Gold, Sabah Lotto, Toto lottos)
         run: node scraper/my/scrape-other.js
 
+      # Regenerate this week's AI picks (deterministic per week) so they self-heal
+      # daily — a missed weekly run or a DB merge can no longer leave them stale.
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install prediction deps
+        run: pip install --no-cache-dir numpy pandas scipy pyarrow
+      - name: Regenerate weekly AI picks
+        run: python -m analysis.serve || echo "prediction gen skipped (non-fatal)"
+
       - name: Commit & push if updated
         run: |
           git config user.name  "Huatlottery Bot"
