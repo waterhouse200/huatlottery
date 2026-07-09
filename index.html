@@ -824,11 +824,7 @@ function renderDashboard(region) {
   // \u2500\u2500 TOTO \u2500\u2500 balls + per-number hot/cold classification
   // TOTO card header \u2014 properly centered icon, slightly smaller label
   h += '<div class="card">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">';
-  h += logoBox('singapore','Singapore Pools TOTO');
-  h += '<div style="font-size:22px;font-weight:800;color:var(--p);letter-spacing:.04em">🇸🇬 TOTO</div>';
-  h += viewHistoryLink("goHistory('toto')");
-  h += '</div>';
+  h += cardHeader('singapore','Singapore Pools TOTO','🇸🇬 TOTO','var(--p)','toto',22);
   h += '<div style="font-family:var(--mo);font-size:36px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+t.draw_no+'</div>';
   h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">'+
        '<span>'+t.draw_date+'</span>'+
@@ -868,11 +864,7 @@ function renderDashboard(region) {
 
   // \u2500\u2500 4D card header \u2014 matches TOTO sizing, properly centered icon
   h += '<div class="card">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">';
-  h += logoBox('singapore','Singapore Pools 4D');
-  h += '<div style="font-size:22px;font-weight:800;color:var(--amb);letter-spacing:.04em">🇸🇬 4D</div>';
-  h += viewHistoryLink("goHistory('sg4d')");
-  h += '</div>';
+  h += cardHeader('singapore','Singapore Pools 4D','🇸🇬 4D','var(--amb)','sg4d',22);
   h += '<div style="font-family:var(--mo);font-size:36px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+f.draw_no+'</div>';
   h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">'+
        '<span>'+f.draw_date+'</span>'+
@@ -1014,7 +1006,7 @@ function loadOthers(){
 function animalEmoji(a){ var m={RAT:'🐀',OX:'🐂',TIGER:'🐅',RABBIT:'🐇',DRAGON:'🐉',SNAKE:'🐍',HORSE:'🐎',GOAT:'🐐',SHEEP:'🐐',MONKEY:'🐒',ROOSTER:'🐓',DOG:'🐕',PIG:'🐖'}; return m[(a||'').toUpperCase()]||'🎴'; }
 function damacai33dCard(g){
   if(!g||!g.prizes||!g.prizes.length) return '';
-  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('damacai','Da Ma Cai 3+3D')+'<div style="font-size:19px;font-weight:800;color:#7c3aed">🇲🇾 Da Ma Cai 3+3D</div>'+viewHistoryLink("goHistory('damacai33d')")+'</div>';
+  var h='<div class="card" style="padding:20px">'+cardHeader('damacai','Da Ma Cai 3+3D','🇲🇾 Da Ma Cai 3+3D','#7c3aed','damacai33d',19);
   if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
   if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+g.date+' · '+dayOfWeek(g.date)+'</div>';
   var labels=['1st','2nd','3rd'], cols=['#7c3aed','var(--t2)','#b45309'];
@@ -1029,7 +1021,7 @@ function damacai33dCard(g){
 }
 function jackpotGoldCard(g){
   if(!g||!g.number) return '';
-  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('magnum','Magnum 4D Jackpot Gold')+'<div style="font-size:18px;font-weight:800;color:#d97706">🇲🇾 Magnum 4D Jackpot Gold</div>'+viewHistoryLink("goHistory('jackpotgold')")+'</div>';
+  var h='<div class="card" style="padding:20px">'+cardHeader('magnum','Magnum 4D Jackpot Gold','🇲🇾 Magnum 4D Jackpot Gold','#d97706','jackpotgold',18);
   if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
   if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:14px">'+g.date+' · '+dayOfWeek(g.date)+'</div>';
   h+='<div style="text-align:center;padding:8px 0"><div style="font-size:11px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Jackpot 1</div><div style="font-family:var(--mo);font-size:34px;font-weight:800;color:#d97706;letter-spacing:.08em">'+g.number+(g.bonus?' <span style="color:var(--red);font-size:24px">+'+g.bonus+'</span>':'')+'</div>';
@@ -1040,7 +1032,7 @@ function jackpotGoldCard(g){
 }
 function magnumLifeCard(g){
   if(!g||!g.winning||!g.winning.length) return '';
-  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('magnum','Magnum Life')+'<div style="font-size:19px;font-weight:800;color:#dc2626">🇲🇾 Magnum Life</div>'+viewHistoryLink("goHistory('magnumlife')")+'</div>';
+  var h='<div class="card" style="padding:20px">'+cardHeader('magnum','Magnum Life','🇲🇾 Magnum Life','#dc2626','magnumlife',19);
   if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
   if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+g.date+' · '+dayOfWeek(g.date)+'</div>';
   h+='<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Winning Numbers</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">'; g.winning.forEach(function(n){ h+=ballSm(n,'#dc2626'); }); h+='</div>';
@@ -1050,7 +1042,7 @@ function magnumLifeCard(g){
 }
 function sabahLottoCard(g){
   if(!g||!g.nums||!g.nums.length) return '';
-  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('sabah','Sabah Lotto 6/45')+'<div style="font-size:19px;font-weight:800;color:#15803d">🇲🇾 Sabah Lotto 6/45</div>'+viewHistoryLink("goHistory('sabahlotto')")+'</div>';
+  var h='<div class="card" style="padding:20px">'+cardHeader('sabah','Sabah Lotto 6/45','🇲🇾 Sabah Lotto 6/45','#15803d','sabahlotto',19);
   if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
   if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+g.date+' · '+dayOfWeek(g.date)+'</div>';
   h+='<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:6px 0 14px">'; g.nums.forEach(function(n){ h+=ballSm(n,'#15803d'); }); if(g.bonus) h+='<span style="font-size:22px;font-weight:800;color:var(--red);margin:0 3px">+</span>'+ballSm(g.bonus,'var(--red)'); h+='</div>';
@@ -1062,7 +1054,7 @@ function ballSm(n, col){ return '<div style="width:38px;height:38px;border-radiu
 function fiveDCard(fd){
   if(!fd) return '';
   var p=fd.prizes||{};
-  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('sportstoto','Sports Toto 5D')+'<div style="font-size:20px;font-weight:800;color:#0369a1">🇲🇾 Sports Toto 5D</div>'+viewHistoryLink("goHistory('fived')")+'</div>';
+  var h='<div class="card" style="padding:20px">'+cardHeader('sportstoto','Sports Toto 5D','🇲🇾 Sports Toto 5D','#0369a1','fived',20);
   if(fd.drawNo) h+='<div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--tx);margin-bottom:3px;line-height:1">#'+fd.drawNo+'</div>';
   if(fd.date) h+='<div style="font-size:14px;color:var(--t2);font-weight:600;margin-bottom:10px">'+fd.date+' · '+dayOfWeek(fd.date)+'</div>';
   [['1st',p['1st'],'#0369a1',24],['2nd',p['2nd'],'var(--t2)',22],['3rd',p['3rd'],'#b45309',22],['4th',p['4th'],'var(--t2)',18],['5th',p['5th'],'var(--t2)',18],['6th',p['6th'],'var(--t2)',18]].forEach(function(it,i){
@@ -1074,7 +1066,7 @@ function fiveDCard(fd){
 }
 function lottoCard(name, ld, color, key){
   if(!ld || !ld.nums || !ld.nums.length) return '';
-  var h='<div class="card" style="padding:20px"><div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">'+logoBox('sportstoto',name)+'<div style="font-size:19px;font-weight:800;color:'+color+'">🇲🇾 '+name+'</div>'+viewHistoryLink("goHistory('"+key+"')")+'</div>';
+  var h='<div class="card" style="padding:20px">'+cardHeader('sportstoto',name,'🇲🇾 '+name,color,key,19);
   if(ld.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px;line-height:1">#'+ld.drawNo+'</div>';
   if(ld.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+ld.date+' · '+dayOfWeek(ld.date)+'</div>';
   h+='<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:6px 0 14px">';
@@ -1142,6 +1134,16 @@ function nextDrawRow(latestDate, key){
 window.goStatOp = function(op){ currentStatOp = op; goTab('fourd'); };
 function viewHistoryLink(handlerJs){
   return '<a href="#" onclick="event.preventDefault();'+handlerJs+'" style="margin-left:auto;font-size:12px;font-weight:700;color:var(--p);text-decoration:none;white-space:nowrap;flex-shrink:0">'+L('common.viewHistory','View History')+' →</a>';
+}
+// Consistent card header: logo left; View History top-right; operator name below
+// it (full width) so long names never squeeze. Used by every result card.
+function cardHeader(logoName, logoAlt, nameHtml, colorCss, histKey, fontPx){
+  return '<div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:10px">'+logoBox(logoName,logoAlt)+
+         '<div style="flex:1;min-width:0">'+
+           '<div style="display:flex;justify-content:flex-end;margin-bottom:2px">'+viewHistoryLink("goHistory('"+histKey+"')")+'</div>'+
+           '<div style="font-size:'+(fontPx||20)+'px;font-weight:800;color:'+colorCss+';line-height:1.15">'+nameHtml+'</div>'+
+         '</div>'+
+         '</div>';
 }
 
 // ─── Draw History — clean per-game past-results page (last N draws + date) ───
@@ -1278,14 +1280,7 @@ function fourdResultCard(d, cfg){
   var specialLabel = d.special_prizes ? L('results.special','Special') : L('dashboard.starters','Starter Prizes');
   function pill(num){ return '<span style="display:flex;align-items:center;justify-content:center;padding:9px 0;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-family:var(--mo);font-weight:700;font-size:16px;color:var(--tx);letter-spacing:.04em">'+num+'</span>'; }
   var h = '<div class="card">';
-  // Header: logo left; to its right the View History link sits on top, operator name below it
-  // with full width (so long names like "Da Ma Cai" render cleanly instead of squeezing to 3 lines).
-  h += '<div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:10px">'+logoBox(cfg.logo,cfg.label)+
-       '<div style="flex:1;min-width:0">'+
-         '<div style="display:flex;justify-content:flex-end;margin-bottom:2px">'+viewHistoryLink("goHistory('"+cfg.id+"')")+'</div>'+
-         '<div style="font-size:22px;font-weight:800;color:'+cfg.color+';line-height:1.15">'+cfg.flag+' '+cfg.label+'</div>'+
-       '</div>'+
-       '</div>';
+  h += cardHeader(cfg.logo, cfg.label, cfg.flag+' '+cfg.label, cfg.color, cfg.id, 22);
   if (d.draw_no) h += '<div style="font-family:var(--mo);font-size:30px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+d.draw_no+'</div>';
   h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span>'+d.draw_date+'</span><span style="font-size:12.5px;font-weight:700;color:'+cfg.color+';background:color-mix(in srgb, '+cfg.color+' 10%, transparent);padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(d.draw_date)+'</span></div>';
   var t3 = d.top3_counts || {};
@@ -1360,7 +1355,7 @@ function load6D(){
     if(!j.data){ el.innerHTML = '<div style="font-size:22px;font-weight:800;color:#0891b2;margin-bottom:8px">🇲🇾 '+L('home.sixd','Sports Toto 6D')+'</div><div style="font-size:13px;color:var(--t3)">'+L('home.sixdNone','No recent 6D result.')+'</div>'; return; }
     var d=j.data, n=d.number;
     // header matches the 4D cards (22px name · date · day)
-    var h = '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">'+logoBox('sportstoto','Sports Toto 6D')+'<div style="font-size:22px;font-weight:800;color:#0891b2">🇲🇾 '+L('home.sixd','Sports Toto 6D')+'</div>'+viewHistoryLink("goHistory('sixd')")+'</div>';
+    var h = cardHeader('sportstoto','Sports Toto 6D','🇲🇾 '+L('home.sixd','Sports Toto 6D'),'#0891b2','sixd',22);
     var stoto=window.MY_DRAWNOS&&window.MY_DRAWNOS.sportstoto, dno=stoto&&stoto.no;   // 6D shares Sports Toto's draw number
     if(dno) h += '<div style="font-family:var(--mo);font-size:30px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+dno+'</div>';
     h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span>'+d.draw_date+'</span><span style="font-size:12.5px;font-weight:700;color:#0891b2;background:color-mix(in srgb, #0891b2 10%, transparent);padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(d.draw_date)+'</span></div>';
