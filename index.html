@@ -149,6 +149,10 @@ h1{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
 /* minmax(0,1fr) (not 1fr=minmax(auto,1fr)) so a wide card can't force the track — and every card — past the viewport */
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
 .grid>*{min-width:0}
+/* prize-pill grid: 5 per row by default, drops to fewer only when space is tight (never overflows — minmax(0,1fr) shrinks cells) */
+.przgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media(max-width:440px){.przgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:340px){.przgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .card{background:var(--cd);border-radius:12px;padding:22px;border:1px solid var(--bd);min-width:0;overflow-wrap:break-word}
 /* result-grid cards stretch to equal height + lay out as columns so the Next-Draw footer aligns at the bottom */
 .grid.g2>.card,.grid.g3>.card{display:flex;flex-direction:column}
@@ -895,14 +899,14 @@ function renderDashboard(region) {
   // Starter Prizes — clean 5 × 2 grid
   h += '<div style="margin-top:18px">';
   h += '<div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.starters','Starter Prizes')+'</div>';
-  h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px">';
+  h += '<div class="przgrid" style="gap:8px">';
   (f.starter_prizes || []).forEach(function(p){ h += fourdPill(p); });
   h += '</div></div>';
 
   // Consolation Prizes — same 5 × 2 grid
   h += '<div style="margin-top:18px">';
   h += '<div style="font-size:12px;font-weight:700;color:var(--vi);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.consolation','Consolation Prizes')+'</div>';
-  h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px">';
+  h += '<div class="przgrid" style="gap:8px">';
   (f.consolation_prizes || []).forEach(function(p){ h += fourdPill(p); });
   h += '</div></div>';
 
@@ -1128,12 +1132,13 @@ function nextDrawLabel(latestDate, key){
 function nextDrawRow(latestDate, key){
   var lbl = nextDrawLabel(latestDate, key); if(!lbl) return '';
   // Footer pushed to the very bottom (margin-top:auto) so it aligns across cards in a row
-  var row = '<div style="padding:13px 15px;background:var(--bg);border:1px solid var(--bd);border-radius:9px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">'+L('common.nextDraw','Next Draw')+'</span><span style="font-size:14px;font-weight:800;color:var(--p);font-family:var(--mo)">'+lbl+'</span></div>';
-  // Next Jackpot estimate (scraped from Singapore Pools) — shown below Next Draw when available
+  var drawRow = '<div style="padding:13px 15px;background:var(--bg);border:1px solid var(--bd);border-radius:9px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">'+L('common.nextDraw','Next Draw')+'</span><span style="font-size:14px;font-weight:800;color:var(--p);font-family:var(--mo)">'+lbl+'</span></div>';
+  // Next Jackpot estimate (scraped from Singapore Pools) — sits ABOVE Next Draw so
+  // the Next Draw row stays pinned to the bottom and aligns across all cards in a row.
   var nd = (DATA.latest && DATA.latest.next_draws && DATA.latest.next_draws[key]) || null;
   var jp = nd && nd.jackpot;
-  if(jp){ row += '<div style="margin-top:8px;padding:13px 15px;background:color-mix(in srgb, var(--red) 7%, transparent);border:1px solid color-mix(in srgb, var(--red) 22%, transparent);border-radius:9px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">'+L('common.nextJackpot','Next Jackpot')+'</span><span style="font-size:15px;font-weight:800;color:var(--red);font-family:var(--mo)">'+jp+'</span></div>'; }
-  return '<div style="margin-top:auto;padding-top:16px">'+row+'</div>';
+  var jpRow = jp ? '<div style="margin-bottom:8px;padding:13px 15px;background:color-mix(in srgb, var(--red) 7%, transparent);border:1px solid color-mix(in srgb, var(--red) 22%, transparent);border-radius:9px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em">'+L('common.nextJackpot','Next Jackpot')+'</span><span style="font-size:15px;font-weight:800;color:var(--red);font-family:var(--mo)">'+jp+'</span></div>' : '';
+  return '<div style="margin-top:auto;padding-top:16px">'+jpRow+drawRow+'</div>';
 }
 // Jump to an operator's own stats/history page (individual page per game)
 window.goStatOp = function(op){ currentStatOp = op; goTab('fourd'); };
@@ -1255,8 +1260,8 @@ function histRow(d, kind){
     detail += '<div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('hist.winShares','Winning Shares')+'</div><div id="'+id+'_sh"><div style="color:var(--t3);font-size:13px">'+L('common.loading','Loading…')+'</div></div>';
   } else {
     var starter = d.starter_prizes || d.special_prizes || [], consol = d.consolation_prizes || [], stLabel = d.starter_prizes ? L('dashboard.starters','Starter Prizes') : L('results.special','Special Prizes');
-    detail += '<div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px">'+stLabel+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px">'+starter.map(pillHist).join('')+'</div>';
-    detail += '<div style="font-size:11px;font-weight:700;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 9px">'+L('dashboard.consolation','Consolation Prizes')+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px">'+consol.map(pillHist).join('')+'</div>';
+    detail += '<div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px">'+stLabel+'</div><div class="przgrid" style="gap:6px">'+starter.map(pillHist).join('')+'</div>';
+    detail += '<div style="font-size:11px;font-weight:700;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 9px">'+L('dashboard.consolation','Consolation Prizes')+'</div><div class="przgrid" style="gap:6px">'+consol.map(pillHist).join('')+'</div>';
   }
   detail += '</div>';
   return '<div class="card" style="padding:14px 18px">'+head+detail+'</div>';
@@ -1292,8 +1297,8 @@ function fourdResultCard(d, cfg){
   [[L('dashboard.first','1st Prize'),d.first_prize,cfg.color,t3.first],[L('dashboard.second','2nd Prize'),d.second_prize,'var(--t2)',t3.second],[L('dashboard.third','3rd Prize'),d.third_prize,'#b45309',t3.third]].forEach(function(it,i){
     h += '<div style="padding:10px 0;border-bottom:'+(i<2?'1px solid var(--bl)':'none')+';display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-size:12px;font-weight:700;color:'+it[2]+';text-transform:uppercase;letter-spacing:.05em;min-width:90px">'+it[0]+'</div><div style="font-family:var(--mo);font-size:26px;font-weight:800;color:'+it[2]+';letter-spacing:.05em">'+(it[1]||'—')+'</div>'+(it[3]!=null?'<span style="font-size:15px;font-weight:800;color:'+it[2]+';font-family:var(--mo)">× '+it[3]+'</span><span style="font-size:11px;color:var(--t3);font-weight:600">'+L('dashboard.top3hits','appeared in top-3')+'</span>':'')+'</div>';
   });
-  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+specialLabel+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px">'+special.map(pill).join('')+'</div></div>';
-  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--vi);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.consolation','Consolation Prizes')+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px">'+consol.map(pill).join('')+'</div></div>';
+  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+specialLabel+'</div><div class="przgrid" style="gap:8px">'+special.map(pill).join('')+'</div></div>';
+  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--vi);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.consolation','Consolation Prizes')+'</div><div class="przgrid" style="gap:8px">'+consol.map(pill).join('')+'</div></div>';
   // 4D Jackpot footer — amount + winner status (Magnum / Sports Toto / Da Ma Cai)
   if (d.jackpot && (d.jackpot.j1 || d.jackpot.j2)) {
     var jk = d.jackpot;
