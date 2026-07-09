@@ -528,6 +528,17 @@ function fetchTimeout(url, ms) {
   const to = setTimeout(() => ctrl.abort(), ms || 8000);
   return fetch(url, { headers: { "User-Agent": _SCRAPE_UA }, signal: ctrl.signal }).finally(() => clearTimeout(to));
 }
+// Persist a single Other-game result into the archive (idempotent per game+date).
+// Called from the live scrapes so history accrues going forward.
+const _archiveOther = db.prepare(
+  "INSERT OR IGNORE INTO other_draws (game, draw_date, draw_no, payload) VALUES (?, ?, ?, ?)"
+);
+function archiveOtherGame(game, obj) {
+  try {
+    if (!obj || !obj.date) return;                  // need at least a date to key on
+    _archiveOther.run(game, obj.date, obj.drawNo || null, JSON.stringify(obj));
+  } catch (e) { /* archival is best-effort; never break the live response */ }
+}
 async function computeTotoProd() {
     const $ = require("cheerio").load(await (await fetchTimeout("https://gd4d.co/en", 8000)).text());
     let fiveD = null, date = null;
@@ -566,6 +577,11 @@ async function computeTotoProd() {
     // Star/Power/Supreme are one Lotto draw — share the draw number if any game is missing it
     const lottoNo = (data.star && data.star.drawNo) || (data.power && data.power.drawNo) || (data.supreme && data.supreme.drawNo);
     [data.star, data.power, data.supreme].forEach((x) => { if (x && !x.drawNo) x.drawNo = lottoNo; });
+    // archive each game for history (5D keys on the page date if it lacks its own)
+    archiveOtherGame("fived", data.fiveD && { ...data.fiveD, date: data.fiveD.date || date });
+    archiveOtherGame("star", data.star);
+    archiveOtherGame("power", data.power);
+    archiveOtherGame("supreme", data.supreme);
     return data;
 }
 // Stale-while-revalidate: answer from cache instantly; refresh in background when stale.
@@ -622,6 +638,10 @@ async function computeOtherGames() {
         const s88 = t.indexOf("Sabah 88 4D"), meta = s88 >= 0 ? grab(t.slice(s88, s88 + 90)) : {};
         if (nm) sabahLotto = { drawNo: meta.drawNo, date: meta.date, nums: nm[1].trim().split(/\s+/), bonus: nm[2], jackpot1: jps[0] || null, jackpot2: jps[1] || null }; } }
     const data = { damacai33d, magnumLife, jackpotGold, sabahLotto };
+    archiveOtherGame("damacai33d", damacai33d);
+    archiveOtherGame("magnumlife", magnumLife);
+    archiveOtherGame("jackpotgold", jackpotGold);
+    archiveOtherGame("sabahlotto", sabahLotto);
     return data;
 }
 let _otherGames = { ts: 0, data: null, refreshing: false };

@@ -68,6 +68,24 @@ function initSchema(db) {
       raw            TEXT,                        -- raw "Mon, 22 Jun 2026, 6.30pm"
       updated_at     TEXT DEFAULT (datetime('now'))
     );
+
+    ---------------------------------------------------------------
+    -- Archive for the non-4D "Other" games (5D, Da Ma Cai 3+3D,
+    -- Magnum Life, Magnum Jackpot Gold, Sabah Lotto, Star/Power/
+    -- Supreme Toto). One flexible table: each game has its own shape,
+    -- stored as a JSON payload so one schema covers all of them.
+    -- Filled going forward from the live scrape → builds real history
+    -- so these games can eventually have View-History + stats too.
+    ---------------------------------------------------------------
+    CREATE TABLE IF NOT EXISTS other_draws (
+      game       TEXT,          -- 'fived','damacai33d','magnumlife','jackpotgold','sabahlotto','star','power','supreme'
+      draw_date  TEXT,          -- ISO date
+      draw_no    TEXT,          -- operator draw number (e.g. '6100/26'), nullable
+      payload    TEXT,          -- full JSON of that game's result
+      created_at TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (game, draw_date)
+    );
+    CREATE INDEX IF NOT EXISTS idx_other_draws_game_date ON other_draws(game, draw_date DESC);
   `);
 }
 
