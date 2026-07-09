@@ -74,13 +74,14 @@ async function scrapeRange(game, from, to) {
 // Returns true only if the next-draw values actually changed (so we don't
 // rewrite the DB — and trigger a commit — every single 5-min tick).
 function upsertSentinel(game, nextNo, next) {
-  const cur = db.prepare("SELECT next_draw_no, next_draw_at FROM next_draws WHERE game=?").get(game);
-  if (cur && cur.next_draw_no === nextNo && cur.next_draw_at === (next?.at ?? null)) return false;
-  db.prepare(`INSERT INTO next_draws (game,next_draw_no,next_draw_date,next_draw_time,next_draw_at,raw,updated_at)
-    VALUES (@g,@no,@d,@t,@at,@raw,datetime('now'))
+  const cur = db.prepare("SELECT next_draw_no, next_draw_at, jackpot FROM next_draws WHERE game=?").get(game);
+  const jp = next?.jackpot ?? null;
+  if (cur && cur.next_draw_no === nextNo && cur.next_draw_at === (next?.at ?? null) && cur.jackpot === jp) return false;
+  db.prepare(`INSERT INTO next_draws (game,next_draw_no,next_draw_date,next_draw_time,next_draw_at,raw,jackpot,updated_at)
+    VALUES (@g,@no,@d,@t,@at,@raw,@jp,datetime('now'))
     ON CONFLICT(game) DO UPDATE SET
-      next_draw_no=@no, next_draw_date=@d, next_draw_time=@t, next_draw_at=@at, raw=@raw, updated_at=datetime('now')`)
-    .run({ g: game, no: nextNo, d: next?.date ?? null, t: next?.time ?? null, at: next?.at ?? null, raw: next?.raw ?? null });
+      next_draw_no=@no, next_draw_date=@d, next_draw_time=@t, next_draw_at=@at, raw=@raw, jackpot=@jp, updated_at=datetime('now')`)
+    .run({ g: game, no: nextNo, d: next?.date ?? null, t: next?.time ?? null, at: next?.at ?? null, raw: next?.raw ?? null, jp });
   return true;
 }
 

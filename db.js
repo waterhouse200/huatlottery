@@ -66,6 +66,7 @@ function initSchema(db) {
       next_draw_time TEXT,                        -- HH:MM (SGT, 24h)
       next_draw_at   TEXT,                        -- ISO 8601 w/ +08:00 — the exact moment
       raw            TEXT,                        -- raw "Mon, 22 Jun 2026, 6.30pm"
+      jackpot        TEXT,                        -- next jackpot estimate (TOTO), e.g. "$10,000,000 est"
       updated_at     TEXT DEFAULT (datetime('now'))
     );
 
@@ -87,6 +88,11 @@ function initSchema(db) {
     );
     CREATE INDEX IF NOT EXISTS idx_other_draws_game_date ON other_draws(game, draw_date DESC);
   `);
+
+  // Migration: add next_draws.jackpot to pre-existing DBs (CREATE IF NOT EXISTS
+  // won't add a column to a table that already exists).
+  const cols = db.prepare("PRAGMA table_info(next_draws)").all().map((c) => c.name);
+  if (!cols.includes("jackpot")) db.exec("ALTER TABLE next_draws ADD COLUMN jackpot TEXT");
 }
 
 module.exports = { getDb, initSchema, DB_PATH };

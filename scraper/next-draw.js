@@ -32,7 +32,10 @@ function parseNextDraw(text) {
   if (/am/i.test(ap) && hr === 12) hr = 0;
   const date = `${yyyy}-${mm}-${String(dd).padStart(2, "0")}`;
   const time = `${String(hr).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
-  return { date, time, at: `${date}T${time}:00+08:00`, raw: m[0].replace(/\s+/g, " ").trim() };
+  // TOTO's estimate file also carries the next jackpot: "Next Jackpot $10,000,000 est"
+  const jm = t.match(/Next Jackpot[^$]*(\$[\d,]+(?:\.\d+)?)\s*(est)?/i);
+  const jackpot = jm ? (jm[1] + (jm[2] ? " est" : "")) : null;
+  return { date, time, at: `${date}T${time}:00+08:00`, raw: m[0].replace(/\s+/g, " ").trim(), jackpot };
 }
 
 // Fetch + parse the next-draw file for a game. Returns null on any failure

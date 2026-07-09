@@ -277,7 +277,11 @@ app.get("/api/latest", cache.withCache((req, res) => {
       };
     }
 
-    res.json({ success: true, data: { toto: formatTotoRow(t), fourd } });
+    // next-draw sentinels (date/time + TOTO jackpot estimate) for the footer
+    const nd = {};
+    db.prepare("SELECT game, next_draw_date, next_draw_time, jackpot FROM next_draws").all()
+      .forEach((r) => { nd[r.game] = { date: r.next_draw_date, time: r.next_draw_time, jackpot: r.jackpot }; });
+    res.json({ success: true, data: { toto: formatTotoRow(t), fourd, next_draws: nd } });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 }));
 
