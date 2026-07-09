@@ -903,14 +903,14 @@ function renderDashboard(region) {
   // Starter Prizes — clean 5 × 2 grid
   h += '<div style="margin-top:18px">';
   h += '<div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.starters','Starter Prizes')+'</div>';
-  h += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">';
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px">';
   (f.starter_prizes || []).forEach(function(p){ h += fourdPill(p); });
   h += '</div></div>';
 
   // Consolation Prizes — same 5 × 2 grid
   h += '<div style="margin-top:18px">';
   h += '<div style="font-size:12px;font-weight:700;color:var(--vi);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.consolation','Consolation Prizes')+'</div>';
-  h += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">';
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px">';
   (f.consolation_prizes || []).forEach(function(p){ h += fourdPill(p); });
   h += '</div></div>';
 
@@ -1021,7 +1021,7 @@ function damacai33dCard(g){
   g.prizes.forEach(function(p,i){ if(!p.number)return;
     h+='<div style="padding:8px 0;border-bottom:1px solid var(--bl)"><div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap"><span style="font-size:11px;font-weight:800;color:var(--t3);width:30px;text-transform:uppercase;flex-shrink:0">'+labels[i]+'</span><span style="font-family:var(--mo);font-size:22px;font-weight:800;color:'+cols[i]+';letter-spacing:.06em">'+p.number+'</span>'+(p.animal?'<span style="font-size:11.5px;font-weight:800;color:#7c3aed;background:#7c3aed15;padding:3px 10px;border-radius:6px">'+animalEmoji(p.animal)+' '+p.animal+'</span>':'')+'</div>'+(p.bonus?'<div style="font-size:11.5px;color:var(--t3);margin-top:4px;margin-left:41px;font-family:var(--mo);font-weight:600">'+L('others.bonus','Bonus')+' '+(i+1)+': '+p.bonus+'</div>':'')+'</div>';
   });
-  function grid(arr,label,col){ if(!arr||!arr.length)return ''; var g2='<div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:'+col+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'+label+'</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">'; arr.forEach(function(n){ g2+='<span style="padding:6px;text-align:center;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-family:var(--mo);font-weight:700;font-size:14px;letter-spacing:.06em">'+n+'</span>'; }); return g2+'</div></div>'; }
+  function grid(arr,label,col){ if(!arr||!arr.length)return ''; var g2='<div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:'+col+';text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'+label+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px">'; arr.forEach(function(n){ g2+='<span style="padding:6px 4px;text-align:center;border-radius:6px;background:var(--bg);border:1px solid var(--bd);font-family:var(--mo);font-weight:700;font-size:14px;letter-spacing:.04em;min-width:0">'+n+'</span>'; }); return g2+'</div></div>'; }
   h+=grid(g.special,'Special','var(--p)');
   h+=grid(g.consolation,L('dashboard.consolation','Consolation'),'var(--vi)');
   h+=nextDrawRow(g.date, 'lotto');
@@ -1248,8 +1248,8 @@ function histRow(d, kind){
     detail += '<div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('hist.winShares','Winning Shares')+'</div><div id="'+id+'_sh"><div style="color:var(--t3);font-size:13px">'+L('common.loading','Loading…')+'</div></div>';
   } else {
     var starter = d.starter_prizes || d.special_prizes || [], consol = d.consolation_prizes || [], stLabel = d.starter_prizes ? L('dashboard.starters','Starter Prizes') : L('results.special','Special Prizes');
-    detail += '<div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px">'+stLabel+'</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">'+starter.map(pillHist).join('')+'</div>';
-    detail += '<div style="font-size:11px;font-weight:700;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 9px">'+L('dashboard.consolation','Consolation Prizes')+'</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">'+consol.map(pillHist).join('')+'</div>';
+    detail += '<div style="font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px">'+stLabel+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px">'+starter.map(pillHist).join('')+'</div>';
+    detail += '<div style="font-size:11px;font-weight:700;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:14px 0 9px">'+L('dashboard.consolation','Consolation Prizes')+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px">'+consol.map(pillHist).join('')+'</div>';
   }
   detail += '</div>';
   return '<div class="card" style="padding:14px 18px">'+head+detail+'</div>';
@@ -1292,8 +1292,8 @@ function fourdResultCard(d, cfg){
   [[L('dashboard.first','1st Prize'),d.first_prize,cfg.color,t3.first],[L('dashboard.second','2nd Prize'),d.second_prize,'var(--t2)',t3.second],[L('dashboard.third','3rd Prize'),d.third_prize,'#b45309',t3.third]].forEach(function(it,i){
     h += '<div style="padding:10px 0;border-bottom:'+(i<2?'1px solid var(--bl)':'none')+';display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-size:12px;font-weight:700;color:'+it[2]+';text-transform:uppercase;letter-spacing:.05em;min-width:90px">'+it[0]+'</div><div style="font-family:var(--mo);font-size:26px;font-weight:800;color:'+it[2]+';letter-spacing:.05em">'+(it[1]||'—')+'</div>'+(it[3]!=null?'<span style="font-size:15px;font-weight:800;color:'+it[2]+';font-family:var(--mo)">× '+it[3]+'</span><span style="font-size:11px;color:var(--t3);font-weight:600">'+L('dashboard.top3hits','appeared in top-3')+'</span>':'')+'</div>';
   });
-  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+specialLabel+'</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">'+special.map(pill).join('')+'</div></div>';
-  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--vi);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.consolation','Consolation Prizes')+'</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">'+consol.map(pill).join('')+'</div></div>';
+  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+specialLabel+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px">'+special.map(pill).join('')+'</div></div>';
+  h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--vi);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.consolation','Consolation Prizes')+'</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px">'+consol.map(pill).join('')+'</div></div>';
   // 4D Jackpot footer — amount + winner status (Magnum / Sports Toto / Da Ma Cai)
   if (d.jackpot && (d.jackpot.j1 || d.jackpot.j2)) {
     var jk = d.jackpot;

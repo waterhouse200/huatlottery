@@ -1,0 +1,67 @@
+name: Auto scrape (Malaysia — 4D + 6D + Other games)
+
+# The main auto.js only covers Singapore Pools. This job keeps the Malaysia
+# games fresh: 4D (Magnum / Sports Toto / Da Ma Cai + Sabah/Sarawak/Sandakan),
+# 6D, and the non-4D "Other" games (5D, 3+3D, Magnum Life, Jackpot Gold,
+# Sabah Lotto, Star/Power/Supreme Toto) into the git-committed DB.
+#
+# MY draws are Wed/Sat/Sun evenings (SGT). We run a few times/day rather than
+# every 5 min — the sources are third-party and the games only draw ~3x/week.
+
+on:
+  schedule:
+    # 4x/day at 14:00, 15:30, 17:00, 21:00 UTC (≈ 10pm/11.30pm/1am/5am SGT) —
+    # covers the evening MY draw publish + a late catch-up. Each run is a cheap
+    # no-op when already current (INSERT OR IGNORE / OR REPLACE).
+    - cron: '0 14 * * *'
+    - cron: '30 15 * * *'
+    - cron: '0 17 * * *'
+    - cron: '0 21 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scrape-my
+  cancel-in-progress: false
+
+jobs:
+  scrape-my:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+
+      # MY 4D (all operators) — last 6 days catches any missed draw day
+      - name: Catch up Malaysia 4D
+        run: node scraper/my/backfill-gd4d.js 6
+
+      # Sports Toto 6D — last 6 days
+      - name: Catch up 6D
+        run: node scraper/my/backfill-6d.js 6
+
+      # Non-4D "Other" games → other_draws archive
+      - name: Scrape Other games (5D, 3+3D, Life, Gold, Sabah Lotto, Toto lottos)
+        run: node scraper/my/scrape-other.js
+
+      - name: Commit & push if updated
+        run: |
+          git config user.name  "Huatlottery Bot"
+          git config user.email "bot@huatlottery.local"
+          git add huatlottery.db
+          if git diff --staged --quiet; then
+            echo "No change — nothing to commit."
+          else
+            MY=$(sqlite3 huatlottery.db "SELECT COUNT(*) FROM my_draws")
+            OTHER=$(sqlite3 huatlottery.db "SELECT COUNT(*) FROM other_draws")
+            git commit -m "chore(scrape-my): $(date -u +%Y-%m-%dT%H:%MZ) — MY=${MY} other=${OTHER}"
+            # rebase onto any concurrent SG-scrape commit before pushing
+            git pull --rebase --autostash origin main || true
+            git push
+          fi
