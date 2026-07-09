@@ -146,8 +146,10 @@ body{display:flex}
 h1{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
 .desc{font-size:13.5px;color:var(--t2);margin-bottom:24px}
 .grid{display:grid;gap:14px}
-.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
-.card{background:var(--cd);border-radius:12px;padding:22px;border:1px solid var(--bd)}
+/* minmax(0,1fr) (not 1fr=minmax(auto,1fr)) so a wide card can't force the track — and every card — past the viewport */
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.grid>*{min-width:0}
+.card{background:var(--cd);border-radius:12px;padding:22px;border:1px solid var(--bd);min-width:0;overflow-wrap:break-word}
 /* result-grid cards stretch to equal height + lay out as columns so the Next-Draw footer aligns at the bottom */
 .grid.g2>.card,.grid.g3>.card{display:flex;flex-direction:column}
 .ball{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:700;font-family:var(--mo);flex-shrink:0;animation:popIn .35s cubic-bezier(.34,1.56,.64,1) both}
@@ -248,8 +250,8 @@ input[type=number]::placeholder{font-size:15px}
   .content>div{max-width:100%}
 
   /* Force all hard-coded multi-column grids to stack */
-  .grid.g2,.grid.g3,.grid.g4{grid-template-columns:1fr !important}
-  .grid.g5{grid-template-columns:repeat(2,1fr) !important}
+  .grid.g2,.grid.g3,.grid.g4{grid-template-columns:minmax(0,1fr) !important}
+  .grid.g5{grid-template-columns:repeat(2,minmax(0,1fr)) !important}
 
   /* Cards a bit tighter */
   .card{padding:18px 16px;border-radius:11px}
