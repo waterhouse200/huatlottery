@@ -2251,155 +2251,6 @@ function loadYearlyRegulars() {
   });
 }
 
-function loadSteadyHitters() {
-  var el = document.getElementById('steadyHitters'); if (!el) return;
-  fetch('/api/fourd/steady-hitters').then(r=>r.json()).then(function(j) {
-    if (!j.success) { el.innerHTML = 'Error'; return; }
-    var d = j.data;
-    var TIER = {
-      first:   { col: '#059669', label: L('fourd.firstAbbr','1st') },
-      second:  { col: '#ea580c', label: L('fourd.secondAbbr','2nd') },
-      third:   { col: '#2563eb', label: L('fourd.thirdAbbr','3rd') },
-      starter: { col: '#4b5563', label: L('fourd.startAbbr','Start') },
-      consol:  { col: '#0f172a', label: L('fourd.consAbbr','Cons') },
-    };
-    function row(x, rank) {
-      var profitCol = x.lifetime_profit >= 0 ? 'var(--em)' : 'var(--red)';
-      var smallCol  = x.profit_from_small_only >= 0 ? 'var(--em)' : 'var(--red)';
-      var html = '<div style="padding:12px 14px;background:var(--bg);border-left:3px solid var(--em);border-radius:6px;margin-bottom:8px">';
-      // Top row: rank · number · profit
-      html += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px">';
-      html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--em);min-width:28px">#'+rank+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:80px">'+x.number+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--t2)">'+x.total_hits+' '+L('common.draws','hits').replace('draws','hits')+' ('+x.hits_per_year+'/yr)</span>';
-      html += '<span style="font-family:var(--mo);font-size:13px;color:var(--t3)">'+L('fourd.smallOnly','small-only')+'='+x.small_hits_pct+'%</span>';
-      html += '<span style="margin-left:auto;font-family:var(--mo);font-size:15px;font-weight:800;color:'+profitCol+'">'+(x.lifetime_profit>=0?'+$':'-$')+Math.abs(x.lifetime_profit).toLocaleString()+'</span>';
-      html += '</div>';
-      // Gap stats row
-      html += '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">';
-      html += '<span style="color:var(--t3)">'+L('fourd.medianGap','median gap')+' <b style="font-family:var(--mo);color:var(--em);font-size:14px">'+x.median_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">'+L('fourd.shortest','shortest')+' <b style="font-family:var(--mo);color:var(--t2)">'+x.min_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">'+L('fourd.longestDry','longest dry')+' <b style="font-family:var(--mo);color:var(--red)">'+x.longest_gap+'</b></span>';
-      var curCol = x.current_gap > x.median_gap * 2 ? 'var(--red)' : (x.current_gap > x.median_gap ? 'var(--amb)' : 'var(--em)');
-      html += '<span style="color:var(--t3)">'+L('fourd.current','current')+' <b style="font-family:var(--mo);color:'+curCol+'">'+x.current_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">'+L('fourd.lastHit','last hit')+' <b style="font-family:var(--mo);color:var(--p)">'+x.last_hit_date+'</b> ('+(TIER[x.last_hit_tier]||{}).label+')</span>';
-      html += '<span style="margin-left:auto;color:var(--t3);font-size:11.5px">'+L('fourd.smallOnlyProfit','small-only profit')+' <b style="color:'+smallCol+';font-family:var(--mo);font-size:13px">'+(x.profit_from_small_only>=0?'+$':'-$')+Math.abs(x.profit_from_small_only).toLocaleString()+'</b></span>';
-      html += '</div>';
-      // Tier color chips
-      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;font-family:var(--mo);font-size:13px;font-weight:700;margin-bottom:6px">';
-      Object.keys(TIER).forEach(function(k) {
-        var t = TIER[k], n = x.tiers[k];
-        var col = n > 0 ? t.col : 'var(--t3)';
-        var op = n > 0 ? '1' : '.4';
-        html += '<span style="color:'+col+';opacity:'+op+'">'+t.label+':<b style="margin-left:3px">'+n+'</b></span>';
-      });
-      html += '</div>';
-      // Gap distribution mini-bar — labels in DRAWS plus human time hint
-      var maxBucket = Math.max(x.gap_buckets['<=50'], x.gap_buckets['51-150'], x.gap_buckets['151-300'], x.gap_buckets['301-700'], x.gap_buckets['700+']);
-      var DRAWS_SUFFIX = L('fourd.drawsBucket','draws');
-      html += '<div style="margin-top:8px"><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">'+L('fourd.gapDistribution','Gap distribution (count of gaps in each draw-range)')+'</div>';
-      html += '<div style="display:flex;align-items:flex-end;gap:4px;height:46px">';
-      [['≤50 '+DRAWS_SUFFIX,'~≤4mo',x.gap_buckets['<=50'],'#059669'],
-       ['51-150','4mo–1y',x.gap_buckets['51-150'],'#16a34a'],
-       ['151-300','1–2y',x.gap_buckets['151-300'],'#ea580c'],
-       ['301-700','2–4y',x.gap_buckets['301-700'],'#dc2626'],
-       ['700+','5y+',x.gap_buckets['700+'],'#7f1d1d']].forEach(function(b) {
-        var ht = maxBucket > 0 ? (b[2] / maxBucket * 100) : 0;
-        html += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
-        html += '<div style="font-size:10.5px;color:var(--t2);font-family:var(--mo);font-weight:700">'+b[2]+'</div>';
-        html += '<div style="width:100%;height:'+ht+'%;background:'+b[3]+';border-radius:2px 2px 0 0;min-height:1px" title="'+b[0]+' = '+b[1]+'"></div>';
-        html += '<div style="font-size:10px;color:var(--t2);font-family:var(--mo);font-weight:600;text-align:center">'+b[0]+'</div>';
-        html += '<div style="font-size:9px;color:var(--t3);text-align:center">'+b[1]+'</div>';
-        html += '</div>';
-      });
-      html += '</div></div>';
-      html += '</div>';
-      return html;
-    }
-    // iBet row renderer (different layout: shows perm count + set label)
-    function ibetRow(x, rank) {
-      var profitCol = x.lifetime_profit >= 0 ? 'var(--em)' : 'var(--red)';
-      var smallCol  = x.profit_from_small_only >= 0 ? 'var(--em)' : 'var(--red)';
-      var label = '{'+x.digits.split('').join(',')+'}';
-      var html = '<div style="padding:12px 14px;background:var(--bg);border-left:3px solid var(--vi);border-radius:6px;margin-bottom:8px">';
-      html += '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:8px">';
-      html += '<span style="font-family:var(--mo);font-size:14px;font-weight:800;color:var(--vi);min-width:28px">#'+rank+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:20px;font-weight:800;color:var(--tx);min-width:110px">'+label+'</span>';
-      html += '<span style="font-size:11px;color:var(--t3);background:var(--cd);padding:2px 7px;border-radius:10px">'+x.perms_count+' '+L('fourd.perms','perms')+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:12.5px;color:var(--t3)">e.g. '+x.example_perms.join(' · ')+'</span>';
-      html += '<span style="font-family:var(--mo);font-size:13px;font-weight:700;color:var(--t2)">'+x.total_hits+' '+L('common.draws','hits').replace('draws','hits')+' ('+x.hits_per_year+'/yr)</span>';
-      html += '<span style="margin-left:auto;font-family:var(--mo);font-size:15px;font-weight:800;color:'+profitCol+'">'+(x.lifetime_profit>=0?'+$':'-$')+Math.abs(x.lifetime_profit).toLocaleString()+'</span>';
-      html += '</div>';
-      html += '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:8px">';
-      html += '<span style="color:var(--t3)">'+L('fourd.medianGap','median gap')+' <b style="font-family:var(--mo);color:var(--vi);font-size:14px">'+x.median_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">'+L('fourd.longestDry','longest dry')+' <b style="font-family:var(--mo);color:var(--red)">'+x.longest_gap+'</b></span>';
-      var curCol = x.current_gap > x.median_gap * 2 ? 'var(--red)' : (x.current_gap > x.median_gap ? 'var(--amb)' : 'var(--em)');
-      html += '<span style="color:var(--t3)">'+L('fourd.current','current')+' <b style="font-family:var(--mo);color:'+curCol+'">'+x.current_gap+'</b></span>';
-      html += '<span style="color:var(--t3)">'+L('fourd.lastHit','last hit')+' <b style="font-family:var(--mo);color:var(--p)">'+x.last_hit_date+'</b> ('+(TIER[x.last_hit_tier]||{}).label+')</span>';
-      html += '<span style="margin-left:auto;color:var(--t3);font-size:11.5px">'+L('fourd.smallOnlyProfit','small-only profit')+' <b style="color:'+smallCol+';font-family:var(--mo);font-size:13px">'+(x.profit_from_small_only>=0?'+$':'-$')+Math.abs(x.profit_from_small_only).toLocaleString()+'</b></span>';
-      html += '</div>';
-      // Tier chips
-      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;font-family:var(--mo);font-size:13px;font-weight:700;margin-bottom:6px">';
-      Object.keys(TIER).forEach(function(k) {
-        var t = TIER[k], n = x.tiers[k];
-        var col = n > 0 ? t.col : 'var(--t3)';
-        var op = n > 0 ? '1' : '.4';
-        html += '<span style="color:'+col+';opacity:'+op+'">'+t.label+':<b style="margin-left:3px">'+n+'</b></span>';
-      });
-      html += '</div>';
-      // Gap distribution histogram (same as direct 4D row)
-      var maxBucket = Math.max(x.gap_buckets['<=50'], x.gap_buckets['51-150'], x.gap_buckets['151-300'], x.gap_buckets['301-700'], x.gap_buckets['700+']);
-      var DRAWS_SUFFIX = L('fourd.drawsBucket','draws');
-      html += '<div style="margin-top:8px"><div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">'+L('fourd.gapDistribution','Gap distribution (count of gaps in each draw-range)')+'</div>';
-      html += '<div style="display:flex;align-items:flex-end;gap:4px;height:46px">';
-      [['≤50 '+DRAWS_SUFFIX,'~≤4mo',x.gap_buckets['<=50'],'#059669'],
-       ['51-150','4mo–1y',x.gap_buckets['51-150'],'#16a34a'],
-       ['151-300','1–2y',x.gap_buckets['151-300'],'#ea580c'],
-       ['301-700','2–4y',x.gap_buckets['301-700'],'#dc2626'],
-       ['700+','5y+',x.gap_buckets['700+'],'#7f1d1d']].forEach(function(b) {
-        var ht = maxBucket > 0 ? (b[2] / maxBucket * 100) : 0;
-        html += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
-        html += '<div style="font-size:10.5px;color:var(--t2);font-family:var(--mo);font-weight:700">'+b[2]+'</div>';
-        html += '<div style="width:100%;height:'+ht+'%;background:'+b[3]+';border-radius:2px 2px 0 0;min-height:1px" title="'+b[0]+' = '+b[1]+'"></div>';
-        html += '<div style="font-size:10px;color:var(--t2);font-family:var(--mo);font-weight:600;text-align:center">'+b[0]+'</div>';
-        html += '<div style="font-size:9px;color:var(--t3);text-align:center">'+b[1]+'</div>';
-        html += '</div>';
-      });
-      html += '</div></div>';
-      html += '</div>';
-      return html;
-    }
-    // Header
-    var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
-    html += '<b>'+d.total_candidates.toLocaleString()+'</b> direct 4D numbers with ≥'+d.min_hits_threshold+' hits · <b>'+d.total_ibet_candidates.toLocaleString()+'</b> iBet sets qualify. <b style="color:var(--red)">Honest:</b> no number\'s small-only wins cover lifetime cost — small drips alone aren\'t a winning strategy.';
-    html += '</div>';
-    // Compact legend
-    html += '<div style="padding:10px 14px;background:rgba(55,48,163,.06);border-left:3px solid var(--p);border-radius:6px;margin-bottom:14px;font-size:12px;line-height:1.6;color:var(--t2)">';
-    html += '<div>'+L('fourd.gapsExplainer','<b>Gap</b> = draws between hits (~156 draws/yr). <b>Median gap</b> = 50th-percentile. <b>Current gap</b>: green ok, amber overdue, red 2× median.')+'</div>';
-    html += '<div>'+L('fourd.smallOnlyExplain','<b>Small-only profit</b> = profit counting only starter+consol. <b>iBet</b> divides payouts by # unique permutations (4 distinct digits = 24 perms; doubles = 12 perms etc.).')+'</div>';
-    html += '</div>';
-    // === DIRECT 4D — top 5 each ===
-    html += '<div style="font-size:13px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('fourd.steadyTopByMedianGap','Direct 4D · Steadiest hitters — top 5 by lowest median gap')+'</div>';
-    d.steadiest.forEach(function(x, i) { html += row(x, i+1); });
-    html += '<div style="font-size:13px;font-weight:800;color:var(--p);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px">Direct 4D · Most lifetime-profitable — top 5</div>';
-    d.most_profitable.forEach(function(x, i) { html += row(x, i+1); });
-    // === iBet — top 5 each ===
-    html += '<div style="font-size:13px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:24px 0 10px">'+L('fourd.steadyIbetByMedianGap','iBet · Steadiest hitters — top 5 by lowest median gap')+'</div>';
-    if (d.ibet_steadiest && d.ibet_steadiest.length > 0) {
-      d.ibet_steadiest.forEach(function(x, i) { html += ibetRow(x, i+1); });
-    } else {
-      html += '<div style="color:var(--t3);font-style:italic;padding:10px">No iBet sets meet threshold.</div>';
-    }
-    html += '<div style="font-size:13px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;margin:20px 0 10px">iBet sets · Most lifetime-profitable — top 5</div>';
-    if (d.ibet_most_profitable && d.ibet_most_profitable.length > 0) {
-      d.ibet_most_profitable.forEach(function(x, i) { html += ibetRow(x, i+1); });
-    } else {
-      html += '<div style="color:var(--t3);font-style:italic;padding:10px">No iBet sets meet threshold.</div>';
-    }
-    el.innerHTML = html;
-  });
-}
-
 function loadCalendarBias() {
   var el = document.getElementById('calendarBias'); if (!el) return;
   fetch('/api/fourd/calendar-bias').then(r=>r.json()).then(function(j) {
@@ -3097,39 +2948,6 @@ function renderAlpha4D() {
   var h = '<h1>'+L('tabs.alpha4d','Alpha 4D Simulator')+'</h1>';
   h += '<p class="desc">'+L('alpha4d.desc','Quantitative number-selection lab. Filter, backtest, and identify candidates with mathematical edges.')+'</p>';
 
-  // $1 Bet Simulator \u2014 most profitable numbers if $1 Big bet every draw
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('fourd.dollarSim','$1 4D Simulator')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.dollarSimDesc',"If you'd bet <b>$1 Big</b> on a number for every 4D draw, what would your profit be? Big-bet payouts: 1st <b>$2,000</b> \u00b7 2nd <b>$1,000</b> \u00b7 3rd <b>$490</b> \u00b7 starter <b>$250</b> \u00b7 consolation <b>$60</b>.")+'</p>';
-  h += '<div id="dollarSim">'+loadingCard()+'</div>';
-  h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
-  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn','CHECK YOUR OWN NUMBER')+'</div>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="text" id="simN" maxlength="4" placeholder="e.g. 1234" style="width:120px;font-family:var(--mo);font-size:18px;text-align:center">';
-  h += '<button class="btn btn-p" onclick="loadDollarSimLookup()">'+L('fourd.simulate','Simulate')+'</button></div>';
-  h += '<div id="simLookupResult" style="margin-top:14px"></div></div>';
-  h += '</div>';
-  lazyLoad('dollarSim', loadDollarSim);
-
-  // iBet $1 Simulator \u2014 moved up right after $1 4D Simulator
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.ibetSim','$1 iBet Simulator')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.ibetSimDesc','$1 iBet Big = bet on a 4-digit <b>set</b>, win if any permutation hits any prize. Payout divided by unique perms.')+'</p>';
-  h += '<div id="ibetSim">'+loadingCard()+'</div>';
-  h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
-  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn4digits','CHECK YOUR OWN 4 DIGITS')+'</div>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="text" id="ibetSimN" maxlength="4" placeholder="1234" style="width:140px;font-family:var(--mo);font-size:18px;text-align:center">';
-  h += '<button class="btn btn-p" onclick="loadIbetSimLookup()">'+L('fourd.simulateIbet','Simulate iBet')+'</button></div>';
-  h += '<div id="ibetSimLookupResult" style="margin-top:14px"></div></div>';
-  h += '</div>';
-  lazyLoad('ibetSim', loadIbetSim);
 
   // === Strategy Simulator — forward-only rolling pool ===
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
@@ -3294,16 +3112,6 @@ function renderAlpha4D() {
   h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('alpha4d.currentDryDesc','Numbers whose current gap (draws since last hit) falls inside your range. Sorted by gap. These are the numbers a "bet long-dry" strategy would play right now. Click any number to drill into its hit history.')+'</p>';
   h += '<div id="currentDry">'+loadingCard()+'</div></div>';
   lazyLoad('currentDry', loadCurrentDry);
-
-  // === Steady Hitters ===
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("activity",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('alpha4d.steady','Steady Hitters — Small Wins Strategy')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('alpha4d.steadyDesc','Numbers with frequent small wins. Theory: regular drips can sustain bets, less reliance on rare big prizes.')+'</p>';
-  h += '<div id="steadyHitters">'+loadingCard()+'</div></div>';
-  lazyLoad('steadyHitters', loadSteadyHitters);
 
   return h;
 }
@@ -4091,6 +3899,39 @@ function renderMoreAlpha(){
 // More 4D Stats — moved out of 4D Stats into the More Alpha 'Stats' mode
 function renderMore4DStats(){
   var h = '<h1>'+L('fourd.moreStatsTitle','More 4D Stats')+'</h1><p class="desc">'+L('fourd.moreStatsDesc','Deeper year-over-year analyses for Singapore 4D.')+'</p>';
+  // $1 Bet Simulator \u2014 most profitable numbers if $1 Big bet every draw
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
+  h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('fourd.dollarSim','$1 4D Profitable Number')+'</h3>';
+  h += '</div>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.dollarSimDesc',"If you'd bet <b>$1 Big</b> on a number for every 4D draw, what would your profit be? Big-bet payouts: 1st <b>$2,000</b> \u00b7 2nd <b>$1,000</b> \u00b7 3rd <b>$490</b> \u00b7 starter <b>$250</b> \u00b7 consolation <b>$60</b>.")+'</p>';
+  h += '<div id="dollarSim">'+loadingCard()+'</div>';
+  h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
+  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn','CHECK YOUR OWN NUMBER')+'</div>';
+  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
+  h += '<input type="text" id="simN" maxlength="4" placeholder="e.g. 1234" style="width:120px;font-family:var(--mo);font-size:18px;text-align:center">';
+  h += '<button class="btn btn-p" onclick="loadDollarSimLookup()">'+L('fourd.simulate','Simulate')+'</button></div>';
+  h += '<div id="simLookupResult" style="margin-top:14px"></div></div>';
+  h += '</div>';
+  lazyLoad('dollarSim', loadDollarSim);
+
+  // iBet $1 Simulator \u2014 moved up right after $1 4D Simulator
+  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
+  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
+  h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.ibetSim','$1 iBet Profitable Number')+'</h3>';
+  h += '</div>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.ibetSimDesc','$1 iBet Big = bet on a 4-digit <b>set</b>, win if any permutation hits any prize. Payout divided by unique perms.')+'</p>';
+  h += '<div id="ibetSim">'+loadingCard()+'</div>';
+  h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
+  h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn4digits','CHECK YOUR OWN 4 DIGITS')+'</div>';
+  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
+  h += '<input type="text" id="ibetSimN" maxlength="4" placeholder="1234" style="width:140px;font-family:var(--mo);font-size:18px;text-align:center">';
+  h += '<button class="btn btn-p" onclick="loadIbetSimLookup()">'+L('fourd.simulateIbet','Simulate iBet')+'</button></div>';
+  h += '<div id="ibetSimLookupResult" style="margin-top:14px"></div></div>';
+  h += '</div>';
+  lazyLoad('ibetSim', loadIbetSim);
   // Yearly Regulars — numbers that appear consistently year over year
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
