@@ -1419,6 +1419,7 @@ var STAT_OPS = [
   { id:'sandakan',   label:'Sandakan',        flag:'🇲🇾', region:'my', color:'#c2410c' }
 ];
 var currentStatOp = 'sg4d';
+var calBiasOp = 'sg4d';   // Calendar Bias tool — which operator's draws to analyze
 window.setStatOp = function(op){ currentStatOp = op; try{localStorage.setItem('huat_statop',op);}catch(e){} renderPage(); window.scrollTo(0,0); };
 function statOpSelector(){
   var h = '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px">', last=null;
@@ -2251,6 +2252,18 @@ function loadYearlyRegulars() {
   });
 }
 
+// Switch which operator's data the Calendar Bias tool analyzes (highlights source, re-runs)
+window.setCalBiasOp = function(op){
+  calBiasOp = op;
+  var meta = STAT_OPS.filter(function(o){return o.id===op;})[0] || STAT_OPS[0];
+  var banner = document.getElementById('calBiasSrcBanner');
+  if (banner){ banner.style.borderColor = meta.color; banner.style.background = 'color-mix(in srgb, '+meta.color+' 8%, transparent)'; }
+  var sel = document.getElementById('calBiasOpSel'); if (sel) { sel.value = op; sel.style.borderColor = meta.color; }
+  var lbl = document.getElementById('calBiasSrcLabel'); if (lbl){ lbl.style.color = meta.color; lbl.textContent = meta.flag+' '+meta.label; }
+  loadCalendarBias();                                  // refresh the strongest-biases list
+  var inp = document.getElementById('calBiasN'); if (inp && inp.value.trim()) loadCalBiasNumber();
+};
+
 // Calendar profile for one picked 4D number — month-by-month hit distribution
 window.loadCalBiasNumber = function() {
   var inp = document.getElementById('calBiasN'); if (!inp) return;
@@ -2259,7 +2272,7 @@ window.loadCalBiasNumber = function() {
   if (!inp.value.trim()) { el.innerHTML=''; return; }
   el.innerHTML = loadingCard();
   var MN = [L('common.month.jan','Jan'),L('common.month.feb','Feb'),L('common.month.mar','Mar'),L('common.month.apr','Apr'),L('common.month.may','May'),L('common.month.jun','Jun'),L('common.month.jul','Jul'),L('common.month.aug','Aug'),L('common.month.sep','Sep'),L('common.month.oct','Oct'),L('common.month.nov','Nov'),L('common.month.dec','Dec')];
-  fetch('/api/fourd/calendar-bias?number='+num).then(function(r){return r.json();}).then(function(resp){
+  fetch('/api/fourd/calendar-bias?number='+num+'&operator='+calBiasOp).then(function(r){return r.json();}).then(function(resp){
     if(!resp.success){ el.innerHTML='<div class="card" style="padding:16px;color:var(--red)">'+L('common.error','Error')+'</div>'; return; }
     var j = resp.data || {};
     if(!j.total_hits){ el.innerHTML='<div style="padding:14px;background:var(--cd);border:1px solid var(--bd);border-radius:8px;font-size:13px;color:var(--t3)"><b style="font-family:var(--mo);color:var(--tx);font-size:16px">'+j.number+'</b> — '+L('fourd.neverHit','never appeared in the archive.')+'</div>'; return; }
@@ -2279,7 +2292,7 @@ window.loadCalBiasNumber = function() {
       '</div>';
     });
     html += '</div><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:5px">';
-    j.months.forEach(function(m){ html += '<div style="font-size:9px;color:var(--t3);text-align:center;font-weight:600">'+MN[m.month-1].slice(0,1)+'</div>'; });
+    j.months.forEach(function(m){ html += '<div style="font-size:10px;color:'+((bm&&m.month===bm.month)?'var(--vi)':'var(--t3)')+';text-align:center;font-weight:700">'+MN[m.month-1]+'</div>'; });
     html += '</div>';
     html += '<p style="font-size:11px;color:var(--t3);margin:12px 0 0;line-height:1.5">'+L('fourd.calBiasNote','Distribution across all years combined. A tall bar is historical, not predictive — 4D stays random.')+'</p>';
     html += '</div>';
@@ -2289,7 +2302,8 @@ window.loadCalBiasNumber = function() {
 
 function loadCalendarBias() {
   var el = document.getElementById('calendarBias'); if (!el) return;
-  fetch('/api/fourd/calendar-bias').then(r=>r.json()).then(function(j) {
+  el.innerHTML = loadingCard();
+  fetch('/api/fourd/calendar-bias?operator='+calBiasOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
@@ -3985,6 +3999,14 @@ function renderMore4DStats(){
   h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.calendarBias','Calendar-Biased Numbers')+'</h3>';
   h += '</div>';
   h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.calendarBiasDesc','Numbers whose historical prize hits cluster in specific months. <b style="color:var(--red)">Honest warning:</b> with 10,000 numbers × 23 windows tested, ~1,400 false positives are expected even by pure chance. Strong (z≥4) results are interesting but not proven edges — past clusters don\'t guarantee future hits. Use as curiosity, not strategy.')+'</p>';
+  // ── DATA SOURCE selector — which operator's draws to analyze (highlighted) ──
+  var cbOp = STAT_OPS.filter(function(o){return o.id==='sg4d'||o.region==='my';});
+  var cbActive = STAT_OPS.filter(function(o){return o.id===calBiasOp;})[0] || STAT_OPS[0];
+  h += '<div id="calBiasSrcBanner" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:10px;margin-bottom:16px;border:1.5px solid '+cbActive.color+';background:color-mix(in srgb, '+cbActive.color+' 8%, transparent)">';
+  h += '<span style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.06em">'+L('fourd.dataSource','Data source')+'</span>';
+  h += '<select id="calBiasOpSel" onchange="setCalBiasOp(this.value)" style="'+SEL_STYLE+';border-color:'+cbActive.color+';font-weight:800">'+cbOp.map(function(o){return '<option value="'+o.id+'"'+(o.id===calBiasOp?' selected':'')+'>'+(o.flag||'')+' '+o.label+'</option>';}).join('')+'</select>';
+  h += '<span id="calBiasSrcLabel" style="margin-left:auto;font-size:12px;font-weight:800;color:'+cbActive.color+'">'+cbActive.flag+' '+cbActive.label+'</span>';
+  h += '</div>';
   // Pick-a-number search: month-by-month calendar profile for one chosen 4D number
   h += '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:14px;background:var(--bg);border-radius:8px;margin-bottom:16px">';
   h += '<span style="font-size:12.5px;font-weight:800;color:var(--t2)">'+L('fourd.pickNumber','Pick a number')+':</span>';

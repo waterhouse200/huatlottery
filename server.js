@@ -3571,13 +3571,25 @@ app.get("/api/fourd/yearly-regulars", cache.withCache((req, res) => {
 // HONEST CAVEAT: with 5,493 draws and 10,000 numbers, most "biases" we find
 // will be noise. We only return numbers where the bias is unlikely to be
 // random (chi-square or simple Z-score above threshold).
+const MY_4D_OPS = ["magnum", "sportstoto", "damacai", "sabah", "sarawak", "sandakan"];
+// Normalized 4D rows for any operator: sg4d → fourd_draws; MY → my_draws
+// (special_prizes serves the "starter" role — month counting is tier-agnostic).
+function fourdRowsFor(operator) {
+  const op = String(operator || "sg4d");
+  if (op === "sg4d") {
+    return db.prepare("SELECT draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws WHERE draw_date IS NOT NULL").all();
+  }
+  if (MY_4D_OPS.includes(op)) {
+    return db.prepare("SELECT draw_date, first_prize, second_prize, third_prize, special_prizes AS starter_prizes, consolation_prizes FROM my_draws WHERE operator=? AND draw_date IS NOT NULL").all(op);
+  }
+  return null;
+}
 app.get("/api/fourd/calendar-bias", cache.withCache((req, res) => {
   try {
     const MIN_HITS = parseInt(req.query.min_hits || "12", 10);
     const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
-    const rows = db.prepare(
-      "SELECT draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws WHERE draw_date IS NOT NULL"
-    ).all();
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     // Total draws per month (calendar month 1-12, all years combined)
     const drawsPerMonth = new Array(13).fill(0);
     for (const r of rows) {
