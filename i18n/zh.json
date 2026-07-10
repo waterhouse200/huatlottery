@@ -2,7 +2,7 @@
   "app": {
     "title": "发达彩票",
     "tagline": "新加坡4D与多多数据分析 + 每周专属幸运号码",
-    "status": "发达彩票 v1.1"
+    "status": "发达彩票 v2.2"
   },
   "common": {
     "loading": "加载中…",
@@ -155,7 +155,7 @@
     "repeatWinners": "多次头奖号码",
     "repeatWinnersDesc": "40 年间多次中得头奖的 4D 号码。",
     "dollarSim": "$1 4D 盈利号码",
-    "dollarSimDesc": "如果每期 4D 都用 <b>$1 大字</b> 投注同一号码，你的盈亏会是多少？大字派彩：头奖 <b>$2,000</b> · 二奖 <b>$1,000</b> · 三奖 <b>$490</b> · 安慰 <b>$250</b> · 特别 <b>$60</b>。",
+    "dollarSimDesc": "如果每期都用 <b>{cur}1 大字</b> 投注同一号码，你的盈亏会是多少？",
     "checkOwn": "查询你的号码",
     "simulate": "模拟",
     "ibetSim": "$1 iBet 盈利号码",
@@ -175,7 +175,7 @@
     "repeatWinnersSummary": "在 {total} 期开奖中共 {unique} 个不同的头奖号码，<b>其中 {repeat} 个号码至少中过 2 次头奖</b>。",
     "wonTimes": "中过 {n} 次",
     "top5MostProfitable": "前 5 最盈利",
-    "simulatedOverDraws": "模拟范围：<b>{draws} 期</b> — 成本 = ${draws}（每期 $1）",
+    "simulatedOverDraws": "模拟范围：<b>{draws} 期</b> — 成本 = {cur}{draws}（每期 {cur}1）",
     "topWorst": "前 5 最差（亏损最多）",
     "topWorstShort": "前 5 最差",
     "topProfitableIbet": "前 5 最盈利 iBet 组合",
@@ -201,7 +201,7 @@
     "firstAbbr": "头",
     "secondAbbr": "二",
     "thirdAbbr": "三",
-    "calBiasIntro": "<b>{count}</b> 个号码通过 z≥2 测试。模拟假设仅在<b>集中月份用 $1 大字</b>下注（其余时间不下注）。注意「一次性中奖」警告——一次 $2,000 头奖可覆盖 2,000 注；若移除最大中奖后利润转负，说明优势仅为一次性而非持续模式。",
+    "calBiasIntro": "<b>{count}</b> 个号码通过 z≥2 测试。模拟假设仅在<b>集中月份用 {cur}1 大字</b>下注（其余时间不下注）。注意「一次性中奖」警告——一次头奖可覆盖数千注；若移除最大中奖后利润转负，说明优势仅为一次性而非持续模式。",
     "calBiasBigCluster": "大字 · 仅集中期",
     "calBiasBigRemove": "大字 · 移除最大中奖",
     "calBiasIbet": "iBet ({n} 排列)",
@@ -245,7 +245,18 @@
     "digitQuadXXXX": "四连 XXXX",
     "expectedRandom": "若纯随机预期每个 <b>{pct}%</b>。",
     "hottestColon": "最热：",
-    "coldestColon": "最冷："
+    "coldestColon": "最冷：",
+    "payoutsFromHeader": "大字派彩以上方<b>数据来源</b>标题为准（随所选运营商变化）。",
+    "ibetFormula": "每个奖项 ÷ 排列数",
+    "ibet24": "24 排列",
+    "iboxLabel": "iBox",
+    "ibetLabel": "iBet",
+    "specialShort": "特别",
+    "consShort": "安慰",
+    "payoutTitle": "每注派彩明细",
+    "bigBet": "大字",
+    "smallBet": "小字",
+    "dataSource": "数据来源"
   },
   "alpha4d": {
     "desc": "量化选号实验室。筛选、回测、找出具有数学优势的候选号码。",

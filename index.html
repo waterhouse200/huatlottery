@@ -314,7 +314,7 @@ input[type=number]::placeholder{font-size:15px}
       <button class="tab" id="langEn" onclick="setLang('en')">EN</button>
       <button class="tab" id="langZh" onclick="setLang('zh')">中文</button>
     </div>
-    <div class="status" id="statusBadge">Huatlottery v2.1</div>
+    <div class="status" id="statusBadge">Huatlottery v2.2</div>
   </div>
   <div class="content" id="content"></div>
 
@@ -544,7 +544,7 @@ window.setLang = function(lang) {
 function renderAll() {
   document.getElementById('langEn').className = 'tab' + (LANG==='en' ? ' active' : '');
   document.getElementById('langZh').className = 'tab' + (LANG==='zh' ? ' active' : '');
-  document.getElementById('statusBadge').textContent = L('app.status', 'Huatlottery v2.1');
+  document.getElementById('statusBadge').textContent = L('app.status', 'Huatlottery v2.2');
   var menuLbl = document.querySelector('#menuTog .lbl');
   if (menuLbl) menuLbl.textContent = L('common.menu', 'More');
   renderNav();
@@ -1928,15 +1928,16 @@ function loadDollarSim() {
   fetch('/api/fourd/dollar-sim?operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
+    var cur = alphaCur();
     var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
-    html += L('fourd.simulatedOverDraws','Simulated over <b>{draws} draws</b> — cost = ${draws} for $1/draw').replace(/\{draws\}/g, d.total_draws_scanned.toLocaleString());
+    html += L('fourd.simulatedOverDraws','Simulated over <b>{draws} draws</b> — cost = {cur}{draws} for {cur}1/draw').replace(/\{draws\}/g, d.total_draws_scanned.toLocaleString()).replace(/\{cur\}/g, cur);
     html += '</div>';
     function renderRow(x, color) {
       var hits = x.first + x.second + x.third + x.starter + x.consol;
       var profitCol = x.profit >= 0 ? 'var(--em)' : 'var(--red)';
       return '<div style="display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--bg);border-left:3px solid '+profitCol+';border-radius:6px;margin-bottom:6px;flex-wrap:wrap">'+
         '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:70px">'+x.number+'</span>'+
-        '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:'+profitCol+';min-width:90px">'+(x.profit>=0?'+$':'-$')+Math.abs(x.profit).toLocaleString()+'</span>'+
+        '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:'+profitCol+';min-width:90px">'+(x.profit>=0?'+'+cur:'-'+cur)+Math.abs(x.profit).toLocaleString()+'</span>'+
         '<span style="font-size:12px;color:var(--t3);min-width:60px">'+x.roi_pct+'% ROI</span>'+
         '<span style="font-size:12px;color:var(--t2);font-family:var(--mo)">'+L('fourd.firstAbbr','1st')+':'+x.first+' · '+L('fourd.secondAbbr','2nd')+':'+x.second+' · '+L('fourd.thirdAbbr','3rd')+':'+x.third+' · S:'+x.starter+' · C:'+x.consol+'</span>'+
         '<span style="margin-left:auto;font-size:11.5px;color:var(--t3)">'+hits+' '+L('fourd.totalHits','total hits')+'</span>'+
@@ -1959,16 +1960,17 @@ window.loadDollarSimLookup = function() {
   fetch('/api/fourd/dollar-sim-lookup?num=' + raw + '&operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { out.innerHTML = 'Error'; return; }
     var d = j.data;
+    var cur = alphaCur();
     var profitCol = d.profit >= 0 ? 'var(--em)' : 'var(--red)';
     var html = '<div style="padding:14px;background:'+(d.profit>=0?'rgba(5,150,105,.08)':'rgba(220,38,38,.06)')+';border-radius:8px;border-left:3px solid '+profitCol+'">';
     html += '<div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:10px">';
     html += '<span style="font-family:var(--mo);font-size:28px;font-weight:800;color:var(--tx)">'+d.number+'</span>';
-    html += '<span style="font-family:var(--mo);font-size:24px;font-weight:800;color:'+profitCol+'">'+(d.profit>=0?'+$':'-$')+Math.abs(d.profit).toLocaleString()+'</span>';
+    html += '<span style="font-family:var(--mo);font-size:24px;font-weight:800;color:'+profitCol+'">'+(d.profit>=0?'+'+cur:'-'+cur)+Math.abs(d.profit).toLocaleString()+'</span>';
     html += '<span style="font-size:13px;color:var(--t3)">'+d.roi_pct+'% ROI</span>';
     html += '</div>';
     html += '<div style="font-size:13px;color:var(--t2);line-height:1.7">';
-    html += 'Cost: <b>$'+d.cost.toLocaleString()+'</b> ($1 × '+d.total_draws_scanned.toLocaleString()+' draws)<br>';
-    html += 'Revenue: <b>$'+d.revenue.toLocaleString()+'</b> from '+d.total_hits+' prize hits<br>';
+    html += 'Cost: <b>'+cur+d.cost.toLocaleString()+'</b> ('+cur+'1 × '+d.total_draws_scanned.toLocaleString()+' draws)<br>';
+    html += 'Revenue: <b>'+cur+d.revenue.toLocaleString()+'</b> from '+d.total_hits+' prize hits<br>';
     html += '<span style="color:var(--t3)">1st:'+d.first+' · 2nd:'+d.second+' · 3rd:'+d.third+' · starter:'+d.starter+' · consolation:'+d.consol+'</span>';
     html += '</div></div>';
     out.innerHTML = html;
@@ -2294,8 +2296,9 @@ function loadCalendarBias() {
   fetch('/api/fourd/calendar-bias?operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
+    var cur = alphaCur();
     var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
-    html += L('fourd.calBiasIntro','<b>{count}</b> numbers cleared z≥2. Sim assumes <b>$1 Big bet ONLY during cluster months</b> (you skip the rest of the year). Watch the "lucky-strike" warning — one $2,000 first prize covers 2,000 bets; if remove-biggest-hit profit turns negative, the apparent edge is a one-off, not a recurring pattern.').replace('{count}', d.total_candidates.toLocaleString());
+    html += L('fourd.calBiasIntro','<b>{count}</b> numbers cleared z≥2. Sim assumes <b>{cur}1 Big bet ONLY during cluster months</b> (you skip the rest of the year). Watch the "lucky-strike" warning — one big first prize can cover thousands of bets; if remove-biggest-hit profit turns negative, the apparent edge is a one-off, not a recurring pattern.').replace('{count}', d.total_candidates.toLocaleString()).replace(/\{cur\}/g, cur);
     html += '</div>';
     var months = ['',
       L('common.month.jan','Jan'),L('common.month.feb','Feb'),L('common.month.mar','Mar'),L('common.month.apr','Apr'),
@@ -2337,9 +2340,9 @@ function loadCalendarBias() {
 
       // Profit row — Big, Big without biggest hit, iBet
       html += '<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12.5px;margin-bottom:10px">';
-      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+bigCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasBigCluster','BIG · CLUSTER ONLY')+'</div><b style="color:'+bigCol+';font-family:var(--mo);font-size:15px">'+(x.big_profit_only_window>=0?'+$':'-$')+Math.abs(x.big_profit_only_window).toLocaleString()+'</b></div>';
-      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+withoutBigCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasBigRemove','BIG · REMOVE BIGGEST HIT')+'</div><b style="color:'+withoutBigCol+';font-family:var(--mo);font-size:15px">'+(x.big_profit_without_biggest_hit>=0?'+$':'-$')+Math.abs(x.big_profit_without_biggest_hit).toLocaleString()+'</b></div>';
-      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+ibetCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasIbet','IBET ({n} PERMS)').replace('{n}', x.ibet_perms)+'</div><b style="color:'+ibetCol+';font-family:var(--mo);font-size:15px">'+(x.ibet_profit_only_window>=0?'+$':'-$')+Math.abs(x.ibet_profit_only_window).toLocaleString()+'</b></div>';
+      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+bigCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasBigCluster','BIG · CLUSTER ONLY')+'</div><b style="color:'+bigCol+';font-family:var(--mo);font-size:15px">'+(x.big_profit_only_window>=0?'+'+cur:'-'+cur)+Math.abs(x.big_profit_only_window).toLocaleString()+'</b></div>';
+      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+withoutBigCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasBigRemove','BIG · REMOVE BIGGEST HIT')+'</div><b style="color:'+withoutBigCol+';font-family:var(--mo);font-size:15px">'+(x.big_profit_without_biggest_hit>=0?'+'+cur:'-'+cur)+Math.abs(x.big_profit_without_biggest_hit).toLocaleString()+'</b></div>';
+      html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;border-left:3px solid '+ibetCol+'"><div style="color:var(--t3);font-weight:600;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em">'+L('fourd.calBiasIbet','IBET ({n} PERMS)').replace('{n}', x.ibet_perms)+'</div><b style="color:'+ibetCol+';font-family:var(--mo);font-size:15px">'+(x.ibet_profit_only_window>=0?'+'+cur:'-'+cur)+Math.abs(x.ibet_profit_only_window).toLocaleString()+'</b></div>';
       html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;align-self:center"><span style="color:var(--t3);font-weight:600;font-size:11.5px">'+L('fourd.calBiasRecent10y','Recent cluster (last 10y):')+'</span> <b style="font-family:var(--mo);color:'+(x.cluster_hits_recent_10y>0?'var(--em)':'var(--red)')+';font-size:13px">'+x.cluster_hits_recent_10y+'</b></div>';
       html += '<div style="padding:7px 12px;background:var(--cd);border-radius:6px;align-self:center"><span style="color:var(--t3);font-weight:600;font-size:11.5px">'+L('fourd.calBiasOutside','Outside cluster:')+'</span> <b style="font-family:var(--mo);color:var(--t2);font-size:13px">'+x.hits_outside+'/'+x.draws_outside.toLocaleString()+' '+L('fourd.calBiasDraws','draws')+'</b></div>';
       html += '</div>';
@@ -2372,16 +2375,17 @@ function loadIbetSim() {
     html += L('fourd.simulatedOver','Simulated over <b>{draws} draws</b> · <b>{sets} iBet sets</b> ranked.').replace('{draws}', d.total_draws_scanned.toLocaleString()).replace('{sets}', d.total_unique_sets.toLocaleString());
     html += '</div>';
     // Match the $1 4D Simulator layout — single line per row
+    var cur = alphaCur();
     function renderRow(x) {
       var hits = x.first + x.second + x.third + x.starter + x.consol;
       var profitCol = x.profit >= 0 ? 'var(--em)' : 'var(--red)';
       return '<div style="display:flex;align-items:center;gap:14px;padding:10px 12px;background:var(--bg);border-left:3px solid '+profitCol+';border-radius:6px;margin-bottom:6px;flex-wrap:wrap">'+
         '<span style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);min-width:70px">'+x.number+'</span>'+
         '<span style="font-size:11px;color:var(--t3);background:var(--cd);padding:2px 7px;border-radius:10px">'+x.unique_perms+' '+L('fourd.perms','perms')+'</span>'+
-        '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:'+profitCol+';min-width:90px">'+(x.profit>=0?'+$':'-$')+Math.abs(x.profit).toLocaleString()+'</span>'+
+        '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:'+profitCol+';min-width:90px">'+(x.profit>=0?'+'+cur:'-'+cur)+Math.abs(x.profit).toLocaleString()+'</span>'+
         '<span style="font-size:12px;color:var(--t3);min-width:60px">'+x.roi_pct+'% ROI</span>'+
         '<span style="font-size:12px;color:var(--t2);font-family:var(--mo)">'+L('fourd.firstAbbr','1st')+':'+x.first+' · '+L('fourd.secondAbbr','2nd')+':'+x.second+' · '+L('fourd.thirdAbbr','3rd')+':'+x.third+' · S:'+x.starter+' · C:'+x.consol+'</span>'+
-        '<span style="margin-left:auto;font-size:11.5px;color:var(--t3)">'+hits+' '+L('fourd.permHits','perm hits')+' · '+L('fourd.revPrefix','rev')+' $'+(x.revenue||0).toLocaleString()+'</span>'+
+        '<span style="margin-left:auto;font-size:11.5px;color:var(--t3)">'+hits+' '+L('fourd.permHits','perm hits')+' · '+L('fourd.revPrefix','rev')+' '+cur+(x.revenue||0).toLocaleString()+'</span>'+
         '</div>';
     }
     html += '<div style="font-size:12.5px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('fourd.topProfitableIbet','TOP 5 MOST PROFITABLE IBET SETS')+'</div>';
@@ -2401,16 +2405,17 @@ window.loadIbetSimLookup = function() {
   fetch('/api/fourd/ibet-sim-lookup?num=' + raw + '&operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { out.innerHTML = 'Error'; return; }
     var d = j.data;
+    var cur = alphaCur();
     var profitCol = d.profit >= 0 ? 'var(--em)' : 'var(--red)';
     var html = '<div style="padding:14px;background:'+(d.profit>=0?'rgba(5,150,105,.08)':'rgba(220,38,38,.06)')+';border-radius:8px;border-left:3px solid '+profitCol+'">';
     html += '<div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:10px">';
     html += '<span style="font-family:var(--mo);font-size:28px;font-weight:800;color:var(--tx)">'+d.number+'</span>';
     html += '<span style="font-size:13px;color:var(--t3)">'+d.unique_perms+' permutations</span>';
-    html += '<span style="font-family:var(--mo);font-size:24px;font-weight:800;color:'+profitCol+'">'+(d.profit>=0?'+$':'-$')+Math.abs(d.profit).toLocaleString()+'</span>';
+    html += '<span style="font-family:var(--mo);font-size:24px;font-weight:800;color:'+profitCol+'">'+(d.profit>=0?'+'+cur:'-'+cur)+Math.abs(d.profit).toLocaleString()+'</span>';
     html += '<span style="font-size:13px;color:var(--t3)">'+d.roi_pct+'% ROI</span>';
     html += '</div>';
     html += '<div style="font-size:13px;color:var(--t2);line-height:1.7">';
-    html += 'Cost: <b>$'+d.cost.toLocaleString()+'</b> · Revenue: <b>$'+d.revenue.toLocaleString()+'</b> from '+d.total_hits+' permutation hits<br>';
+    html += 'Cost: <b>'+cur+d.cost.toLocaleString()+'</b> · Revenue: <b>'+cur+d.revenue.toLocaleString()+'</b> from '+d.total_hits+' permutation hits<br>';
     html += '<span style="color:var(--t3)">1st:'+d.first+' · 2nd:'+d.second+' · 3rd:'+d.third+' · starter:'+d.starter+' · consolation:'+d.consol+'</span>';
     html += '</div></div>';
     out.innerHTML = html;
@@ -2422,6 +2427,7 @@ function loadYearlyWinners() {
   fetch('/api/fourd/dollar-sim-yearly-winners?operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var years = j.data.years;
+    var cur = alphaCur();
     // Tier colors (chosen for clarity on dark/light backgrounds, readable for older eyes)
     var TIER = [
       { label: L('fourd.firstAbbr','1st'),   col: '#059669', key: 'first' },     // green
@@ -2448,7 +2454,7 @@ function loadYearlyWinners() {
       html += '<div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px">';
       html += '<span style="flex:1;text-align:left;font-family:var(--mo);font-size:11px;font-weight:800;color:var(--p)">'+y.year+'</span>';
       html += '<span style="font-family:var(--mo);font-size:18px;font-weight:800;color:var(--tx);letter-spacing:.02em">'+y.number+'</span>';
-      html += '<span style="flex:1;text-align:right;font-family:var(--mo);font-size:11px;font-weight:800;color:#059669">+$'+y.profit.toLocaleString()+'</span>';
+      html += '<span style="flex:1;text-align:right;font-family:var(--mo);font-size:11px;font-weight:800;color:#059669">+'+cur+y.profit.toLocaleString()+'</span>';
       html += '</div>';
       // Row 2: 1st / 2nd / 3rd
       html += '<div style="display:flex;gap:9px;font-family:var(--mo);font-size:11px;font-weight:700;margin-bottom:4px">';
@@ -3927,6 +3933,8 @@ var currentAlphaMode = 'simulator';
 // switches, navigation and tool runs (never auto-resets to default).
 var alphaOp = (function(){ try { return localStorage.getItem('huat_alpha_op') || 'sg4d'; } catch(e){ return 'sg4d'; } })();
 function alphaOpMeta(){ return STAT_OPS.filter(function(o){return o.id===alphaOp;})[0] || STAT_OPS[0]; }
+// Currency symbol for the selected data source ($ for SG Pools, RM for all MY operators)
+function alphaCur(){ return alphaOpMeta().region === 'my' ? 'RM' : '$'; }
 window.setAlphaMode = function(m){ currentAlphaMode = m; renderPage(); window.scrollTo(0,0); };
 window.setAlphaOp = function(op){ alphaOp = op; try{ localStorage.setItem('huat_alpha_op', op); }catch(e){} renderPage(); window.scrollTo(0,0); };
 // Live draw count + date range for the selected operator (updates after scraping)
@@ -3941,12 +3949,16 @@ function loadAlphaRange(){
     var pay = document.getElementById('alphaPayout');
     if(pay && d.payout){ var c=d.currency||'$'; var b=d.payout.big, sm=d.payout.small;
       function amt(v){ return c+v.toLocaleString(); }
+      function ibx(v){ return c+Math.round(v/24).toLocaleString(); }   // iBet/iBox on a 24-perm number = prize ÷ 24
       pay.innerHTML =
         '<div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">'+L('fourd.payoutTitle','Payout per '+c+'1 stake')+'</div>'+
         '<div style="display:flex;gap:9px;flex-wrap:wrap;align-items:baseline;margin-bottom:5px"><span style="font-size:10.5px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;min-width:44px">'+L('fourd.bigBet','Big')+'</span>'+
           '<span style="font-size:11.5px;color:var(--t2);font-family:var(--mo)">1st '+amt(b.first)+' · 2nd '+amt(b.second)+' · 3rd '+amt(b.third)+' · '+L('fourd.specialShort','Sp')+' '+amt(b.starter)+' · '+L('fourd.consShort','Cons')+' '+amt(b.consol)+'</span></div>'+
-        '<div style="display:flex;gap:9px;flex-wrap:wrap;align-items:baseline"><span style="font-size:10.5px;font-weight:800;color:var(--amb);text-transform:uppercase;letter-spacing:.05em;min-width:44px">'+L('fourd.smallBet','Small')+'</span>'+
-          '<span style="font-size:11.5px;color:var(--t2);font-family:var(--mo)">1st '+amt(sm.first)+' · 2nd '+amt(sm.second)+' · 3rd '+amt(sm.third)+'</span></div>';
+        '<div style="display:flex;gap:9px;flex-wrap:wrap;align-items:baseline;margin-bottom:5px"><span style="font-size:10.5px;font-weight:800;color:var(--amb);text-transform:uppercase;letter-spacing:.05em;min-width:44px">'+L('fourd.smallBet','Small')+'</span>'+
+          '<span style="font-size:11.5px;color:var(--t2);font-family:var(--mo)">1st '+amt(sm.first)+' · 2nd '+amt(sm.second)+' · 3rd '+amt(sm.third)+'</span></div>'+
+        // iBet (SG) / iBox (MY) — same mechanic: the Big/Small prize is split across the number's permutations
+        '<div style="display:flex;gap:9px;flex-wrap:wrap;align-items:baseline"><span style="font-size:10.5px;font-weight:800;color:var(--vi);text-transform:uppercase;letter-spacing:.05em;min-width:44px">'+(alphaCur()==='RM'?L('fourd.iboxLabel','iBox'):L('fourd.ibetLabel','iBet'))+'</span>'+
+          '<span style="font-size:11.5px;color:var(--t2);font-family:var(--mo)">'+L('fourd.ibetFormula','every prize ÷ permutations')+' — '+L('fourd.ibet24','24-perm')+' 1st ≈ '+ibx(b.first)+' · 2nd ≈ '+ibx(b.second)+' · 3rd ≈ '+ibx(b.third)+' · '+L('fourd.specialShort','Sp')+' ≈ '+ibx(b.starter)+' · '+L('fourd.consShort','Cons')+' ≈ '+ibx(b.consol)+'</span></div>';
     }
   }).catch(function(){ el.textContent=''; });
 }
@@ -3975,14 +3987,14 @@ function renderMoreAlpha(){
 
 // More 4D Stats — moved out of 4D Stats into the More Alpha 'Stats' mode
 function renderMore4DStats(){
-  var h = '<h1>'+L('fourd.moreStatsTitle','More 4D Stats')+'</h1><p class="desc">'+L('fourd.moreStatsDesc','Deeper year-over-year analyses for Singapore 4D.')+'</p>';
+  var h = '<h1>'+L('fourd.moreStatsTitle','More 4D Stats')+'</h1><p class="desc">'+L('fourd.moreStatsDesc','Deeper year-over-year analyses for {op} 4D.').replace('{op}', alphaOpMeta().label)+'</p>';
   // $1 Bet Simulator \u2014 most profitable numbers if $1 Big bet every draw
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#05966911;color:var(--em);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('fourd.dollarSim','$1 4D Profitable Number')+'</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--em);margin:0">'+L('fourd.dollarSim','$1 4D Profitable Number').replace('$1',alphaCur()+'1')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.dollarSimDesc',"If you'd bet <b>$1 Big</b> on a number for every 4D draw, what would your profit be? Big-bet payouts: 1st <b>$2,000</b> \u00b7 2nd <b>$1,000</b> \u00b7 3rd <b>$490</b> \u00b7 starter <b>$250</b> \u00b7 consolation <b>$60</b>.")+'</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.dollarSimDesc',"If you'd bet <b>{cur}1 Big</b> on a number for every draw, what would your profit be?").replace(/\{cur\}/g,alphaCur())+' '+L('fourd.payoutsFromHeader','Big-bet payouts are the ones shown in the <b>Data Source</b> header above (they change with the selected operator).')+'</p>';
   h += '<div id="dollarSim">'+loadingCard()+'</div>';
   h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
   h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn','CHECK YOUR OWN NUMBER')+'</div>';
@@ -3997,9 +4009,9 @@ function renderMore4DStats(){
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
   h += '<div style="background:#7c3aed11;color:var(--vi);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("trophy",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.ibetSim','$1 iBet Profitable Number')+'</h3>';
+  h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.ibetSim','$1 iBet Profitable Number').replace('$1',alphaCur()+'1')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.ibetSimDesc','$1 iBet Big = bet on a 4-digit <b>set</b>, win if any permutation hits any prize. Payout divided by unique perms.')+'</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.ibetSimDesc','$1 iBet Big = bet on a 4-digit <b>set</b>, win if any permutation hits any prize. Payout divided by unique perms.').replace('$1',alphaCur()+'1')+'</p>';
   h += '<div id="ibetSim">'+loadingCard()+'</div>';
   h += '<div style="margin-top:18px;padding:14px;background:var(--bg);border-radius:8px">';
   h += '<div style="font-size:12.5px;font-weight:800;color:var(--t2);margin-bottom:8px">'+L('fourd.checkOwn4digits','CHECK YOUR OWN 4 DIGITS')+'</div>';
@@ -4115,7 +4127,7 @@ function render4DStats() {
   h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
   h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('fourd.yearlyWinners','Year-by-Year Winners')+'</h3>';
   h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.yearlyWinnersDesc',"The single most-profitable number each year under $1 Big bet \u2014 the number that would have won the most over that year's draws.")+'</p>';
+  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.yearlyWinnersDesc',"The single most-profitable number each year under $1 Big bet \u2014 the number that would have won the most over that year's draws.").replace('$1',alphaCur()+'1')+'</p>';
   h += '<div id="yearlyWinners">'+loadingCard()+'</div></div>';
   lazyLoad('yearlyWinners', loadYearlyWinners);
 

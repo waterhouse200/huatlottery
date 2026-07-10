@@ -2,7 +2,7 @@
   "app": {
     "title": "Huatlottery",
     "tagline": "Singapore 4D & TOTO data + your weekly lucky picks",
-    "status": "Huatlottery v2.1"
+    "status": "Huatlottery v2.2"
   },
   "common": {
     "loading": "Loading…",
@@ -155,7 +155,7 @@
     "repeatWinners": "Repeat 1st Prize Winners",
     "repeatWinnersDesc": "4D numbers that have won 1st prize more than once across 40 years.",
     "dollarSim": "$1 4D Profitable Number",
-    "dollarSimDesc": "If you'd bet <b>$1 Big</b> on a number for every 4D draw, what would your profit be? Big-bet payouts: 1st <b>$2,000</b> · 2nd <b>$1,000</b> · 3rd <b>$490</b> · starter <b>$250</b> · consolation <b>$60</b>.",
+    "dollarSimDesc": "If you'd bet <b>{cur}1 Big</b> on a number for every draw, what would your profit be?",
     "checkOwn": "CHECK YOUR OWN NUMBER",
     "simulate": "Simulate",
     "ibetSim": "$1 iBet Profitable Number",
@@ -175,7 +175,7 @@
     "repeatWinnersSummary": "Out of {unique} unique 1st-prize winners over {total} draws, <b>{repeat} numbers have won 2 or more times</b>.",
     "wonTimes": "won {n} times",
     "top5MostProfitable": "TOP 5 MOST PROFITABLE",
-    "simulatedOverDraws": "Simulated over <b>{draws} draws</b> — cost = ${draws} for $1/draw",
+    "simulatedOverDraws": "Simulated over <b>{draws} draws</b> — cost = {cur}{draws} for {cur}1/draw",
     "topWorst": "TOP 5 WORST (MOST LOST)",
     "topWorstShort": "TOP 5 WORST",
     "topProfitableIbet": "TOP 5 MOST PROFITABLE IBET SETS",
@@ -201,7 +201,7 @@
     "firstAbbr": "1st",
     "secondAbbr": "2nd",
     "thirdAbbr": "3rd",
-    "calBiasIntro": "<b>{count}</b> numbers cleared z≥2. Sim assumes <b>$1 Big bet ONLY during cluster months</b> (you skip the rest of the year). Watch the \"lucky-strike\" warning — one $2,000 first prize covers 2,000 bets; if remove-biggest-hit profit turns negative, the apparent edge is a one-off, not a recurring pattern.",
+    "calBiasIntro": "<b>{count}</b> numbers cleared z≥2. Sim assumes <b>{cur}1 Big bet ONLY during cluster months</b> (you skip the rest of the year). Watch the \"lucky-strike\" warning — one big first prize can cover thousands of bets; if remove-biggest-hit profit turns negative, the apparent edge is a one-off, not a recurring pattern.",
     "calBiasBigCluster": "BIG · CLUSTER ONLY",
     "calBiasBigRemove": "BIG · REMOVE BIGGEST HIT",
     "calBiasIbet": "IBET ({n} PERMS)",
@@ -245,7 +245,8 @@
     "digitQuadXXXX": "Quad XXXX",
     "expectedRandom": "Expected <b>{pct}%</b> each if random.",
     "hottestColon": "Hottest:",
-    "coldestColon": "Coldest:"
+    "coldestColon": "Coldest:",
+    "payoutsFromHeader": "Big-bet payouts are the ones shown in the <b>Data Source</b> header above (they change with the selected operator)."
   },
   "alpha4d": {
     "desc": "Quantitative number-selection lab. Filter, backtest, and identify candidates with mathematical edges.",

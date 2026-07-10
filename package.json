@@ -1,6 +1,6 @@
 {
   "name": "huatlottery-backend",
-  "version": "1.1.0",
+  "version": "2.2.0",
   "description": "Huatlottery Express + SQLite backend for Singapore 4D & TOTO",
   "main": "server.js",
   "scripts": {
