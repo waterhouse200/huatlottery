@@ -3608,6 +3608,24 @@ app.get("/api/fourd/calendar-bias", cache.withCache((req, res) => {
       try { JSON.parse(r.consolation_prizes || "[]").forEach(p => bump(p, m, "consol", r.draw_date)); } catch {}
     }
     const monthNames = ["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    // ── Single-number lookup: full month-by-month calendar profile for a picked 4D number ──
+    if (req.query.number != null && String(req.query.number).trim() !== "") {
+      const k = String(req.query.number).replace(/\D/g, "").padStart(4, "0").slice(0, 4);
+      const h = numHits[k];
+      const total = h ? h.months.reduce((a, b) => a + b, 0) : 0;
+      const months = [];
+      for (let m = 1; m <= 12; m++) {
+        const drawsInMonth = drawsPerMonth[m];
+        const expected = total * (drawsInMonth / totalDraws);
+        months.push({ month: m, name: monthNames[m], hits: h ? h.months[m] : 0, expected: +expected.toFixed(1), lift: +((h ? h.months[m] : 0) - expected).toFixed(2) });
+      }
+      const bestMonth = total > 0 ? months.reduce((b, x) => (x.lift > b.lift ? x : b)) : null;
+      return res.json({ success: true, data: { number: k, total_hits: total, avg_per_month: +(total / 12).toFixed(1),
+        tiers: h ? h.tiers : { first: 0, second: 0, third: 0, starter: 0, consol: 0 },
+        best_month: bestMonth && bestMonth.hits > 0 ? bestMonth : null, months } });
+    }
+
     const results = [];
     for (const k of Object.keys(numHits)) {
       const h = numHits[k];

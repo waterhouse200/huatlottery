@@ -2251,6 +2251,42 @@ function loadYearlyRegulars() {
   });
 }
 
+// Calendar profile for one picked 4D number — month-by-month hit distribution
+window.loadCalBiasNumber = function() {
+  var inp = document.getElementById('calBiasN'); if (!inp) return;
+  var num = (inp.value || '').replace(/\D/g,'').padStart(4,'0').slice(0,4);
+  var el = document.getElementById('calBiasNumResult'); if (!el) return;
+  if (!inp.value.trim()) { el.innerHTML=''; return; }
+  el.innerHTML = loadingCard();
+  var MN = [L('common.month.jan','Jan'),L('common.month.feb','Feb'),L('common.month.mar','Mar'),L('common.month.apr','Apr'),L('common.month.may','May'),L('common.month.jun','Jun'),L('common.month.jul','Jul'),L('common.month.aug','Aug'),L('common.month.sep','Sep'),L('common.month.oct','Oct'),L('common.month.nov','Nov'),L('common.month.dec','Dec')];
+  fetch('/api/fourd/calendar-bias?number='+num).then(function(r){return r.json();}).then(function(resp){
+    if(!resp.success){ el.innerHTML='<div class="card" style="padding:16px;color:var(--red)">'+L('common.error','Error')+'</div>'; return; }
+    var j = resp.data || {};
+    if(!j.total_hits){ el.innerHTML='<div style="padding:14px;background:var(--cd);border:1px solid var(--bd);border-radius:8px;font-size:13px;color:var(--t3)"><b style="font-family:var(--mo);color:var(--tx);font-size:16px">'+j.number+'</b> — '+L('fourd.neverHit','never appeared in the archive.')+'</div>'; return; }
+    var maxHits = Math.max.apply(null, j.months.map(function(m){return m.hits;})) || 1;
+    var bm = j.best_month;
+    var html = '<div style="padding:16px;background:var(--cd);border:1px solid var(--bd);border-radius:10px">';
+    html += '<div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px"><span style="font-family:var(--mo);font-size:26px;font-weight:800;color:var(--tx);letter-spacing:.06em">'+j.number+'</span><span style="font-size:12.5px;color:var(--t2)"><b>'+j.total_hits+'</b> '+L('history.hits','hits').replace('win(s)','hits')+' · '+L('fourd.avgPerMonth','avg')+' '+j.avg_per_month+'/'+L('common.month.mon','mo')+'</span></div>';
+    if(bm) html += '<div style="font-size:12.5px;color:var(--vi);font-weight:700;margin-bottom:14px">'+L('fourd.leansToward','Leans toward')+' '+MN[bm.month-1]+' — '+bm.hits+' '+L('history.hits','hits').replace('win(s)','hits')+' ('+(bm.lift>0?'+':'')+bm.lift+' '+L('fourd.vsExpected','vs expected')+')</div>';
+    // month bars
+    html += '<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:5px;align-items:end;height:120px;margin-bottom:6px">';
+    j.months.forEach(function(m){
+      var pct = Math.round((m.hits/maxHits)*100);
+      var hot = bm && m.month===bm.month;
+      html += '<div style="display:flex;flex-direction:column;justify-content:flex-end;height:100%" title="'+MN[m.month-1]+': '+m.hits+' hits (expected '+m.expected+')">'+
+        '<span style="font-size:9.5px;font-weight:700;color:'+(hot?'var(--vi)':'var(--t3)')+';text-align:center;margin-bottom:3px;font-family:var(--mo)">'+m.hits+'</span>'+
+        '<div style="width:100%;height:'+Math.max(pct,3)+'%;background:'+(hot?'var(--vi)':'color-mix(in srgb, var(--vi) 35%, transparent)')+';border-radius:4px 4px 0 0;min-height:3px"></div>'+
+      '</div>';
+    });
+    html += '</div><div style="display:grid;grid-template-columns:repeat(12,1fr);gap:5px">';
+    j.months.forEach(function(m){ html += '<div style="font-size:9px;color:var(--t3);text-align:center;font-weight:600">'+MN[m.month-1].slice(0,1)+'</div>'; });
+    html += '</div>';
+    html += '<p style="font-size:11px;color:var(--t3);margin:12px 0 0;line-height:1.5">'+L('fourd.calBiasNote','Distribution across all years combined. A tall bar is historical, not predictive — 4D stays random.')+'</p>';
+    html += '</div>';
+    el.innerHTML = html;
+  }).catch(function(e){ el.innerHTML='<div class="card" style="padding:16px;color:var(--red)">'+e.message+'</div>'; });
+};
+
 function loadCalendarBias() {
   var el = document.getElementById('calendarBias'); if (!el) return;
   fetch('/api/fourd/calendar-bias').then(r=>r.json()).then(function(j) {
@@ -3949,6 +3985,14 @@ function renderMore4DStats(){
   h += '<h3 style="font-size:20px;font-weight:800;color:var(--vi);margin:0">'+L('fourd.calendarBias','Calendar-Biased Numbers')+'</h3>';
   h += '</div>';
   h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.calendarBiasDesc','Numbers whose historical prize hits cluster in specific months. <b style="color:var(--red)">Honest warning:</b> with 10,000 numbers × 23 windows tested, ~1,400 false positives are expected even by pure chance. Strong (z≥4) results are interesting but not proven edges — past clusters don\'t guarantee future hits. Use as curiosity, not strategy.')+'</p>';
+  // Pick-a-number search: month-by-month calendar profile for one chosen 4D number
+  h += '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:14px;background:var(--bg);border-radius:8px;margin-bottom:16px">';
+  h += '<span style="font-size:12.5px;font-weight:800;color:var(--t2)">'+L('fourd.pickNumber','Pick a number')+':</span>';
+  h += '<input type="text" id="calBiasN" maxlength="4" placeholder="e.g. 1234" style="width:120px;font-family:var(--mo);font-size:16px;text-align:center" onkeydown="if(event.key===\'Enter\')loadCalBiasNumber()">';
+  h += '<button class="btn btn-p" style="margin-left:auto" onclick="loadCalBiasNumber()">'+L('common.lookup','Look up')+'</button>';
+  h += '</div>';
+  h += '<div id="calBiasNumResult" style="margin-bottom:20px"></div>';
+  h += '<div style="font-size:12px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+L('fourd.strongestBiases','Strongest biases across all numbers')+'</div>';
   h += '<div id="calendarBias">'+loadingCard()+'</div></div>';
   lazyLoad('calendarBias', loadCalendarBias);
   return h;
