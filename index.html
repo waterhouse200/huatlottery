@@ -479,6 +479,11 @@ function fmtDate(iso) {
   var m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   return m ? m[3] + '-' + m[2] + '-' + m[1] : iso;
 }
+// Draw date + day-of-week pill — one consistent style for every result card.
+function dateDayPill(iso, color) {
+  if (!iso) return '';
+  return '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:12px"><span>'+fmtDate(iso)+'</span><span style="font-size:12.5px;font-weight:700;color:'+color+';background:color-mix(in srgb, '+color+' 10%, transparent);padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(iso)+'</span></div>';
+}
 function dayOfWeek(iso) {
   if (!iso) return '';
   var d = new Date(iso + 'T00:00:00');
@@ -1031,7 +1036,7 @@ function damacai33dCard(g){
   if(!g||!g.prizes||!g.prizes.length) return '';
   var h='<div class="card" style="padding:20px">'+cardHeader('damacai','Da Ma Cai 3+3D','🇲🇾 Da Ma Cai 3+3D','#7c3aed','damacai33d',19);
   if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
-  if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+fmtDate(g.date)+' · '+dayOfWeek(g.date)+'</div>';
+  if(g.date) h+=dateDayPill(g.date,"#7c3aed");
   var labels=['1st','2nd','3rd'], cols=['#7c3aed','var(--t2)','#b45309'];
   g.prizes.forEach(function(p,i){ if(!p.number)return;
     h+='<div style="padding:8px 0;border-bottom:1px solid var(--bl)"><div style="display:flex;align-items:baseline;gap:11px;flex-wrap:wrap"><span style="font-size:11px;font-weight:800;color:var(--t3);width:30px;text-transform:uppercase;flex-shrink:0">'+labels[i]+'</span><span style="font-family:var(--mo);font-size:22px;font-weight:800;color:'+cols[i]+';letter-spacing:.06em">'+p.number+'</span>'+(p.animal?'<span style="font-size:11.5px;font-weight:800;color:#7c3aed;background:#7c3aed15;padding:3px 10px;border-radius:6px">'+animalEmoji(p.animal)+' '+p.animal+'</span>':'')+'</div>'+(p.bonus?'<div style="font-size:11.5px;color:var(--t3);margin-top:4px;margin-left:41px;font-family:var(--mo);font-weight:600">'+L('others.bonus','Bonus')+' '+(i+1)+': '+p.bonus+'</div>':'')+'</div>';
@@ -1046,7 +1051,7 @@ function jackpotGoldCard(g){
   if(!g||!g.number) return '';
   var h='<div class="card" style="padding:20px">'+cardHeader('magnum','Magnum 4D Jackpot Gold','🇲🇾 Magnum 4D Jackpot Gold','#d97706','jackpotgold',18);
   if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
-  if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:14px">'+fmtDate(g.date)+' · '+dayOfWeek(g.date)+'</div>';
+  if(g.date) h+=dateDayPill(g.date,"#d97706");
   h+='<div style="text-align:center;padding:8px 0"><div style="font-size:11px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Jackpot 1</div><div style="font-family:var(--mo);font-size:34px;font-weight:800;color:#d97706;letter-spacing:.08em">'+g.number+(g.bonus?' <span style="color:var(--red);font-size:24px">+'+g.bonus+'</span>':'')+'</div>';
   if(g.prize) h+='<div style="font-family:var(--mo);font-size:15px;font-weight:800;color:var(--tx);margin-top:8px">'+g.prize+'</div>';
   h+='</div>';
@@ -1057,7 +1062,7 @@ function magnumLifeCard(g){
   if(!g||!g.winning||!g.winning.length) return '';
   var h='<div class="card" style="padding:20px">'+cardHeader('magnum','Magnum Life','🇲🇾 Magnum Life','#dc2626','magnumlife',19);
   if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
-  if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+fmtDate(g.date)+' · '+dayOfWeek(g.date)+'</div>';
+  if(g.date) h+=dateDayPill(g.date,"#dc2626");
   h+='<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Winning Numbers</div><div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px">'; g.winning.forEach(function(n){ h+=ballSm(n,'#dc2626'); }); h+='</div>';
   if(g.bonus&&g.bonus.length){ h+='<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Bonus</div><div style="display:flex;gap:7px;flex-wrap:wrap">'; g.bonus.forEach(function(n){ h+=ballSm(n,'var(--amb)'); }); h+='</div>'; }
   h+=nextDrawRow(g.date, 'lotto');
@@ -1067,7 +1072,7 @@ function sabahLottoCard(g){
   if(!g||!g.nums||!g.nums.length) return '';
   var h='<div class="card" style="padding:20px">'+cardHeader('sabah','Sabah Lotto 6/45','🇲🇾 Sabah Lotto 6/45','#15803d','sabahlotto',19);
   if(g.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px">#'+g.drawNo+'</div>';
-  if(g.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+fmtDate(g.date)+' · '+dayOfWeek(g.date)+'</div>';
+  if(g.date) h+=dateDayPill(g.date,"#15803d");
   h+='<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:6px 0 14px">'; g.nums.forEach(function(n){ h+=ballSm(n,'#15803d'); }); if(g.bonus) h+='<span style="font-size:22px;font-weight:800;color:var(--red);margin:0 3px">+</span>'+ballSm(g.bonus,'var(--red)'); h+='</div>';
   if(g.jackpot1){ h+='<div style="border-top:1px solid var(--bl);padding-top:12px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:3px 0;font-size:13px"><span style="font-weight:700;color:var(--t2)">Jackpot 1</span><span style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+g.jackpot1+'</span></div>'; if(g.jackpot2) h+='<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:3px 0;font-size:13px"><span style="font-weight:700;color:var(--t2)">Jackpot 2</span><span style="font-family:var(--mo);font-weight:700;color:var(--tx)">'+g.jackpot2+'</span></div>'; h+='</div>'; }
   h+=nextDrawRow(g.date, 'lotto');
@@ -1079,7 +1084,7 @@ function fiveDCard(fd){
   var p=fd.prizes||{};
   var h='<div class="card" style="padding:20px">'+cardHeader('sportstoto','Sports Toto 5D','🇲🇾 Sports Toto 5D','#0369a1','fived',20);
   if(fd.drawNo) h+='<div style="font-family:var(--mo);font-size:24px;font-weight:800;color:var(--tx);margin-bottom:3px;line-height:1">#'+fd.drawNo+'</div>';
-  if(fd.date) h+='<div style="font-size:14px;color:var(--t2);font-weight:600;margin-bottom:10px">'+fmtDate(fd.date)+' · '+dayOfWeek(fd.date)+'</div>';
+  if(fd.date) h+=dateDayPill(fd.date,"#0369a1");
   [['1st',p['1st'],'#0369a1',24],['2nd',p['2nd'],'var(--t2)',22],['3rd',p['3rd'],'#b45309',22],['4th',p['4th'],'var(--t2)',18],['5th',p['5th'],'var(--t2)',18],['6th',p['6th'],'var(--t2)',18]].forEach(function(it,i){
     if(it[1]==null) return;
     h+='<div style="display:flex;align-items:baseline;gap:12px;padding:7px 0;border-bottom:'+(i<5?'1px solid var(--bl)':'none')+'"><span style="font-size:11px;font-weight:800;color:var(--t3);width:30px;text-transform:uppercase">'+it[0]+'</span><span style="font-family:var(--mo);font-size:'+it[3]+'px;font-weight:800;color:'+it[2]+';letter-spacing:.06em">'+it[1]+'</span></div>';
@@ -1091,7 +1096,7 @@ function lottoCard(name, ld, color, key){
   if(!ld || !ld.nums || !ld.nums.length) return '';
   var h='<div class="card" style="padding:20px">'+cardHeader('sportstoto',name,'🇲🇾 '+name,color,key,19);
   if(ld.drawNo) h+='<div style="font-family:var(--mo);font-size:22px;font-weight:800;color:var(--tx);margin-bottom:3px;line-height:1">#'+ld.drawNo+'</div>';
-  if(ld.date) h+='<div style="font-size:13.5px;color:var(--t2);font-weight:600;margin-bottom:12px">'+fmtDate(ld.date)+' · '+dayOfWeek(ld.date)+'</div>';
+  if(ld.date) h+=dateDayPill(ld.date,color);
   h+='<div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin:6px 0 14px">';
   ld.nums.forEach(function(n){ h+=ballSm(n,color); });
   if(ld.additional) h+='<span style="font-size:22px;font-weight:800;color:var(--red);margin:0 3px">+</span>'+ballSm(ld.additional,'var(--red)');
@@ -1389,7 +1394,7 @@ function load6D(){
     var h = cardHeader('sportstoto','Sports Toto 6D','🇲🇾 '+L('home.sixd','Sports Toto 6D'),'#0891b2','sixd',22);
     var stoto=window.MY_DRAWNOS&&window.MY_DRAWNOS.sportstoto, dno=stoto&&stoto.no;   // 6D shares Sports Toto's draw number
     if(dno) h += '<div style="font-family:var(--mo);font-size:30px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+dno+'</div>';
-    h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span>'+fmtDate(d.draw_date)+'</span><span style="font-size:12.5px;font-weight:700;color:#0891b2;background:color-mix(in srgb, #0891b2 10%, transparent);padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(d.draw_date)+'</span></div>';
+    h += dateDayPill(d.draw_date, '#0891b2');
     h += '<div style="padding:8px 0 18px;border-bottom:1px solid var(--bl);margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:#0891b2;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px;text-align:center">'+L('home.sixd1st','1st Prize · Match all 6')+'</div><div style="font-family:var(--mo);font-size:54px;font-weight:800;color:#0891b2;letter-spacing:.1em;text-align:center;line-height:1">'+n+'</div></div>';
     [['2nd',5,n.slice(0,5),n.slice(1)],['3rd',4,n.slice(0,4),n.slice(2)],['4th',3,n.slice(0,3),n.slice(3)],['5th',2,n.slice(0,2),n.slice(4)]].forEach(function(t){
       h += '<div style="display:flex;align-items:center;gap:10px;padding:9px 0;flex-wrap:wrap"><div style="font-size:12px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.04em;min-width:96px">'+t[0]+' · '+t[1]+' '+L('home.sixdDigits','digits')+'</div>'+
