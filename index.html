@@ -182,7 +182,7 @@ h1{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
 .ncell{display:flex;flex-direction:column;align-items:center;padding:6px 2px;border-radius:8px}
 .ncell b{font-size:13.5px;font-weight:800;font-family:var(--mo)}.ncell small{font-size:9px;color:var(--t3);font-weight:600}
 .hero{background:linear-gradient(140deg,var(--p),var(--pl),#818cf8);border-radius:12px;padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:20px}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;border:1px solid var(--bd);background:var(--cd);color:var(--t2);font:600 13px 'Plus Jakarta Sans';cursor:pointer;transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 18px;border-radius:8px;border:1px solid var(--bd);background:var(--cd);color:var(--t2);font:600 13px 'Plus Jakarta Sans';cursor:pointer;box-sizing:border-box;transition:transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s}
 .btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.10)}
 .btn:active{transform:translateY(0) scale(.96);box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .btn-p{background:var(--p);color:#fff;border-color:var(--p)}
@@ -192,7 +192,7 @@ h1{font-size:24px;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
 .tab:active{transform:scale(.95);box-shadow:0 1px 2px rgba(0,0,0,.1)}
 .tab.active{background:var(--p);color:#fff}
 .tab.active:hover{box-shadow:0 4px 10px rgba(55,48,163,.28)}
-input[type=text],input[type=date],input[type=time]{padding:9px 14px;border-radius:8px;border:1px solid var(--bd);font:13px 'Plus Jakarta Sans';outline:none;background:var(--cd);color:var(--tx);height:36px;line-height:1}
+input[type=text],input[type=date],input[type=time],input[type=number]{padding:9px 14px;border-radius:8px;border:1px solid var(--bd);font:13px 'Plus Jakarta Sans';outline:none;background:var(--cd);color:var(--tx);height:36px;line-height:1;box-sizing:border-box}
 input:focus{border-color:var(--p)}
 input::placeholder{font-size:15px;opacity:.55;font-weight:500}
 input[type=number]::placeholder{font-size:15px}
@@ -1201,7 +1201,7 @@ var HIST_META = {
   magnumlife: { label:'🇲🇾 Magnum Life',           liveOnly:true },
   sabahlotto: { label:'🇲🇾 Sabah Lotto 6/45',      liveOnly:true }
 };
-var SEL_STYLE = 'padding:8px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--cd);color:var(--tx);font-size:13px;font-weight:700;cursor:pointer';
+var SEL_STYLE = 'height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--bd);background:var(--cd);color:var(--tx);font-size:13px;font-weight:700;cursor:pointer;box-sizing:border-box';
 var HIST_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 var currentHistGame = 'toto', currentHistYear = '', currentHistMonth = '';
 window.goHistory = function(game){ currentHistGame = game; currentHistYear = ''; currentHistMonth = ''; goTab('drawhistory'); };
@@ -4294,8 +4294,8 @@ function renderHistory() {
     L('fourd.anniversaryShort','Every 4D draw on a chosen month-day, across all years.'),
     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
       '<select id="annivOp4d" style="'+SEL_STYLE+'">'+STAT_OPS.map(function(o){return '<option value="'+o.id+'"'+(o.id===histOp?' selected':'')+'>'+(o.flag||'')+' '+o.label+'</option>';}).join('')+'</select>'+
-      '<input type="date" id="anniversaryDate4d" style="flex:1;min-width:150px">'+
-      '<button class="btn btn-p" onclick="loadAnniversary4d()">'+L('common.lookup','Look up')+'</button>'+
+      '<input type="date" id="anniversaryDate4d" style="flex:1;min-width:160px">'+
+      '<button class="btn btn-p" style="margin-left:auto" onclick="loadAnniversary4d()">'+L('common.lookup','Look up')+'</button>'+
     '</div><div id="anniversaryResult4d" style="margin-top:12px"></div>');
 
   // ── More TOTO Lookups · SG Pools ──
@@ -4303,20 +4303,20 @@ function renderHistory() {
   h += lookupCard('search', 'var(--p)', L('toto.numberDeepDive','Number Deep Dive'),
     L('history.numberDeepDiveShort','First/last appearance, best month & day-of-week, cold streaks, yearly breakdown.'),
     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
-      '<input type="number" id="ndN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:90px">'+
-      '<button class="btn btn-p" onclick="loadNumberDetail()">'+L('common.lookup','Look up')+'</button>'+
+      '<input type="number" id="ndN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:110px">'+
+      '<button class="btn btn-p" style="margin-left:auto" onclick="loadNumberDetail()">'+L('common.lookup','Look up')+'</button>'+
     '</div><div id="ndResult" style="margin-top:12px"></div>');
   h += lookupCard('activity', 'var(--red)', L('toto.additionalPartners','Additional Partners'),
     L('history.additionalPartnersShort','Which main numbers co-appeared when this was the additional (the +7th).'),
     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
-      '<input type="number" id="addPartnerN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:90px">'+
-      '<button class="btn btn-p" onclick="loadAddPartners()">'+L('common.lookup','Look up')+'</button>'+
+      '<input type="number" id="addPartnerN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:110px">'+
+      '<button class="btn btn-p" style="margin-left:auto" onclick="loadAddPartners()">'+L('common.lookup','Look up')+'</button>'+
     '</div><div id="addPartnerResult" style="margin-top:12px"></div>');
   h += lookupCard('cal', 'var(--p)', L('toto.anniversaryLookup','TOTO Anniversary Lookup'),
     L('history.totoAnniversaryShort','Every TOTO draw on a chosen month-day, across all years.'),
     '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
-      '<input type="date" id="anniversaryDateToto" style="flex:1;min-width:170px">'+
-      '<button class="btn btn-p" onclick="loadAnniversaryToto()">'+L('common.lookup','Look up')+'</button>'+
+      '<input type="date" id="anniversaryDateToto" style="flex:1;min-width:160px">'+
+      '<button class="btn btn-p" style="margin-left:auto" onclick="loadAnniversaryToto()">'+L('common.lookup','Look up')+'</button>'+
     '</div><div id="anniversaryResultToto" style="margin-top:12px"></div>');
 
   return h;
