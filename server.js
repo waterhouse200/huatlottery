@@ -269,11 +269,21 @@ app.get("/api/latest", cache.withCache((req, res) => {
     const top3Count = db.prepare(
       "SELECT COUNT(*) AS cnt FROM fourd_draws WHERE first_prize = ? OR second_prize = ? OR third_prize = ?"
     );
+    // …and how many of those hits landed on the SAME weekday as this draw
+    // (players track day-of-week luck). strftime('%w') = 0(Sun)–6(Sat).
+    const top3Dow = db.prepare(
+      "SELECT COUNT(*) AS cnt FROM fourd_draws WHERE (first_prize = ? OR second_prize = ? OR third_prize = ?) AND strftime('%w', draw_date) = strftime('%w', ?)"
+    );
     if (fourd) {
       fourd.top3_counts = {
         first:  top3Count.get(fourd.first_prize,  fourd.first_prize,  fourd.first_prize).cnt,
         second: top3Count.get(fourd.second_prize, fourd.second_prize, fourd.second_prize).cnt,
         third:  top3Count.get(fourd.third_prize,  fourd.third_prize,  fourd.third_prize).cnt,
+      };
+      fourd.top3_dow = {
+        first:  top3Dow.get(fourd.first_prize,  fourd.first_prize,  fourd.first_prize,  f.draw_date).cnt,
+        second: top3Dow.get(fourd.second_prize, fourd.second_prize, fourd.second_prize, f.draw_date).cnt,
+        third:  top3Dow.get(fourd.third_prize,  fourd.third_prize,  fourd.third_prize,  f.draw_date).cnt,
       };
     }
 
@@ -295,13 +305,22 @@ app.get("/api/my/latest", (req, res) => {
   try {
     const data = {};
     const top3 = db.prepare("SELECT COUNT(*) AS n FROM my_draws WHERE operator=? AND (first_prize=? OR second_prize=? OR third_prize=?)");
+    // same number, but only on the SAME weekday as this operator's latest draw
+    const top3Dow = db.prepare("SELECT COUNT(*) AS n FROM my_draws WHERE operator=? AND (first_prize=? OR second_prize=? OR third_prize=?) AND strftime('%w', draw_date)=strftime('%w', ?)");
     for (const op of MY_OPS) {
       const row = parseMyRow(db.prepare("SELECT * FROM my_draws WHERE operator=? ORDER BY draw_date DESC LIMIT 1").get(op));
-      if (row) row.top3_counts = {
-        first:  top3.get(op, row.first_prize,  row.first_prize,  row.first_prize).n,
-        second: top3.get(op, row.second_prize, row.second_prize, row.second_prize).n,
-        third:  top3.get(op, row.third_prize,  row.third_prize,  row.third_prize).n,
-      };
+      if (row) {
+        row.top3_counts = {
+          first:  top3.get(op, row.first_prize,  row.first_prize,  row.first_prize).n,
+          second: top3.get(op, row.second_prize, row.second_prize, row.second_prize).n,
+          third:  top3.get(op, row.third_prize,  row.third_prize,  row.third_prize).n,
+        };
+        row.top3_dow = {
+          first:  top3Dow.get(op, row.first_prize,  row.first_prize,  row.first_prize,  row.draw_date).n,
+          second: top3Dow.get(op, row.second_prize, row.second_prize, row.second_prize, row.draw_date).n,
+          third:  top3Dow.get(op, row.third_prize,  row.third_prize,  row.third_prize,  row.draw_date).n,
+        };
+      }
       data[op] = row;
     }
     res.json({ success: true, data });

@@ -480,6 +480,14 @@ function dayOfWeek(iso) {
   var k = keys[d.getDay()];
   return L('common.dow.' + k, k.charAt(0).toUpperCase() + k.slice(1));
 }
+// "how many of those top-3 hits were on THIS draw's weekday" — a subtle chip.
+// Highlighted when >0 (day-of-week luck), muted "0×" when it never hit on this day.
+function dowChip(dowCount, dayName){
+  var on = dowCount > 0;
+  return '<div style="margin-left:12px;font-size:11px;font-weight:700;font-family:var(--mo);padding:2px 8px;border-radius:5px;'+
+    (on ? 'color:var(--amb);background:#d9770614' : 'color:var(--t3);background:var(--bg)')+'">'+
+    dowCount+'× '+L('dashboard.onDay','on')+' '+dayName+'</div>';
+}
 
 // ═══ i18n ════════════════════════════════════════════════════
 var LANG = (localStorage.getItem('huat_lang')) || ((navigator.language||'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
@@ -877,9 +885,11 @@ function renderDashboard(region) {
 
   // Top 3 prizes \u2014 same size, with top-3 archive hit count beside each
   var top3 = f.top3_counts || {};
-  [{l:L('dashboard.first','1st Prize'),v:f.first_prize,c:"var(--amb)",cnt:top3.first},
-   {l:L('dashboard.second','2nd Prize'),v:f.second_prize,c:"var(--t2)",cnt:top3.second},
-   {l:L('dashboard.third','3rd Prize'),v:f.third_prize,c:"#b45309",cnt:top3.third}].forEach(function(item,i) {
+  var top3d = f.top3_dow || {};
+  var f_day = dayOfWeek(f.draw_date);
+  [{l:L('dashboard.first','1st Prize'),v:f.first_prize,c:"var(--amb)",cnt:top3.first,dow:top3d.first},
+   {l:L('dashboard.second','2nd Prize'),v:f.second_prize,c:"var(--t2)",cnt:top3.second,dow:top3d.second},
+   {l:L('dashboard.third','3rd Prize'),v:f.third_prize,c:"#b45309",cnt:top3.third,dow:top3d.third}].forEach(function(item,i) {
     h += '<div style="padding:10px 0;border-bottom:'+(i<2?'1px solid var(--bl)':'none')+';display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">';
     h += '<div style="font-size:12px;font-weight:700;color:'+item.c+';text-transform:uppercase;letter-spacing:.05em;min-width:90px">'+item.l+'</div>';
     h += '<div style="font-family:var(--mo);font-size:26px;font-weight:800;color:'+item.c+';letter-spacing:.05em">'+item.v+'</div>';
@@ -887,6 +897,8 @@ function renderDashboard(region) {
       // Bigger \u00d7 N indicator + double-spacing before the descriptor text
       h += '<div style="font-size:18px;font-weight:800;color:'+item.c+';font-family:var(--mo);margin-left:18px">\u00d7 '+item.cnt+'</div>';
       h += '<div style="font-size:11.5px;color:var(--t3);font-weight:600;margin-left:18px">'+L('dashboard.top3hits','appeared in top-3')+'</div>';
+      // \u2026 of which this many landed on the SAME weekday as this draw
+      if (item.dow != null) h += dowChip(item.dow, f_day);
     }
     h += '</div>';
   });
@@ -1294,8 +1306,10 @@ function fourdResultCard(d, cfg){
   if (d.draw_no) h += '<div style="font-family:var(--mo);font-size:30px;font-weight:800;color:var(--tx);letter-spacing:.02em;margin-bottom:4px;line-height:1">#'+d.draw_no+'</div>';
   h += '<div style="font-size:16px;color:var(--t2);font-weight:600;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span>'+d.draw_date+'</span><span style="font-size:12.5px;font-weight:700;color:'+cfg.color+';background:color-mix(in srgb, '+cfg.color+' 10%, transparent);padding:2px 9px;border-radius:5px;letter-spacing:.02em">'+dayOfWeek(d.draw_date)+'</span></div>';
   var t3 = d.top3_counts || {};
-  [[L('dashboard.first','1st Prize'),d.first_prize,cfg.color,t3.first],[L('dashboard.second','2nd Prize'),d.second_prize,'var(--t2)',t3.second],[L('dashboard.third','3rd Prize'),d.third_prize,'#b45309',t3.third]].forEach(function(it,i){
-    h += '<div style="padding:10px 0;border-bottom:'+(i<2?'1px solid var(--bl)':'none')+';display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-size:12px;font-weight:700;color:'+it[2]+';text-transform:uppercase;letter-spacing:.05em;min-width:90px">'+it[0]+'</div><div style="font-family:var(--mo);font-size:26px;font-weight:800;color:'+it[2]+';letter-spacing:.05em">'+(it[1]||'—')+'</div>'+(it[3]!=null?'<span style="font-size:15px;font-weight:800;color:'+it[2]+';font-family:var(--mo)">× '+it[3]+'</span><span style="font-size:11px;color:var(--t3);font-weight:600">'+L('dashboard.top3hits','appeared in top-3')+'</span>':'')+'</div>';
+  var t3d = d.top3_dow || {};
+  var d_day = dayOfWeek(d.draw_date);
+  [[L('dashboard.first','1st Prize'),d.first_prize,cfg.color,t3.first,t3d.first],[L('dashboard.second','2nd Prize'),d.second_prize,'var(--t2)',t3.second,t3d.second],[L('dashboard.third','3rd Prize'),d.third_prize,'#b45309',t3.third,t3d.third]].forEach(function(it,i){
+    h += '<div style="padding:10px 0;border-bottom:'+(i<2?'1px solid var(--bl)':'none')+';display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><div style="font-size:12px;font-weight:700;color:'+it[2]+';text-transform:uppercase;letter-spacing:.05em;min-width:90px">'+it[0]+'</div><div style="font-family:var(--mo);font-size:26px;font-weight:800;color:'+it[2]+';letter-spacing:.05em">'+(it[1]||'—')+'</div>'+(it[3]!=null?'<span style="font-size:15px;font-weight:800;color:'+it[2]+';font-family:var(--mo)">× '+it[3]+'</span><span style="font-size:11px;color:var(--t3);font-weight:600">'+L('dashboard.top3hits','appeared in top-3')+'</span>'+(it[4]!=null?dowChip(it[4],d_day):''):'')+'</div>';
   });
   h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--p);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+specialLabel+'</div><div class="przgrid" style="gap:8px">'+special.map(pill).join('')+'</div></div>';
   h += '<div style="margin-top:18px"><div style="font-size:12px;font-weight:700;color:var(--vi);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">'+L('dashboard.consolation','Consolation Prizes')+'</div><div class="przgrid" style="gap:8px">'+consol.map(pill).join('')+'</div></div>';
