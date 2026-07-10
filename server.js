@@ -703,6 +703,17 @@ app.get("/api/toto/search", (req, res) => {
     const { number, date, from, to } = req.query;
     if (date) { const r = db.prepare("SELECT * FROM toto_draws WHERE draw_date = ? ORDER BY draw_no DESC").all(date); return res.json({ success: true, query: date, total_matches: r.length, data: r.map(formatTotoRow) }); }
     if (from && to) { const r = db.prepare("SELECT * FROM toto_draws WHERE draw_date BETWEEN ? AND ? ORDER BY draw_no DESC").all(from, to); return res.json({ success: true, query: `${from} to ${to}`, total_matches: r.length, data: r.map(formatTotoRow) }); }
+    // Multi-number combination search: 1–6 numbers → draws whose 6-ball combination
+    // contains ALL of them (each entered number must be among num1..num6).
+    if (req.query.numbers) {
+      const uniq = [...new Set(String(req.query.numbers).split(/[\s,]+/).map((x) => parseInt(x, 10)).filter((x) => x >= 1 && x <= 49))].slice(0, 6);
+      if (!uniq.length) return res.status(400).json({ success: false, error: "Enter 1–6 numbers (1–49)." });
+      const cond = uniq.map(() => "(num1=? OR num2=? OR num3=? OR num4=? OR num5=? OR num6=?)").join(" AND ");
+      const params = [];
+      uniq.forEach((n) => { for (let i = 0; i < 6; i++) params.push(n); });
+      const r = db.prepare(`SELECT * FROM toto_draws WHERE ${cond} ORDER BY draw_no DESC`).all(...params);
+      return res.json({ success: true, query: uniq.join(","), searched: uniq, total_matches: r.length, data: r.map(formatTotoRow) });
+    }
     if (number) {
       const n = parseInt(number);
       const r = db.prepare("SELECT * FROM toto_draws WHERE num1=? OR num2=? OR num3=? OR num4=? OR num5=? OR num6=? OR additional_num=? ORDER BY draw_no DESC").all(n, n, n, n, n, n, n);

@@ -4285,7 +4285,9 @@ function renderHistory() {
   // Primary search bar
   h += '<div class="card" style="margin-bottom:28px"><div style="display:flex;gap:6px;margin-bottom:14px"><button class="tab active" id="tab4d" onclick="setHistGame(\'4d\')">4D</button><button class="tab" id="tabtoto" onclick="setHistGame(\'toto\')">TOTO</button></div>';
   h += '<div id="histOpRow" style="margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap'+(histGame==='4d'?'':';display:none')+'"><span style="font-size:12.5px;font-weight:700;color:var(--t2)">'+L('history.source4d','4D operator')+':</span><select id="histOpSel" onchange="setHistOp(this.value)" style="'+SEL_STYLE+'">'+STAT_OPS.map(function(o){return '<option value="'+o.id+'"'+(o.id===histOp?' selected':'')+'>'+(o.flag||'')+' '+o.label+'</option>';}).join('')+'</select></div>';
-  h += '<div style="display:flex;gap:8px"><input type="text" id="histQ" class="imo" placeholder="'+L('history.placeholder4d','4D number (e.g. 1234)')+'" style="flex:1"><button class="btn btn-p" onclick="doHistSearch()">'+svgIcon("search",13)+' '+L('common.search','Search')+'</button></div></div>';
+  // TOTO is Singapore Pools only — show a fixed source label with the SG flag
+  h += '<div id="histTotoSrc" style="margin-bottom:12px;align-items:center;gap:8px;flex-wrap:wrap;display:'+(histGame==='toto'?'flex':'none')+'"><span style="font-size:12.5px;font-weight:700;color:var(--t2)">'+L('history.source','Source')+':</span><span style="font-size:13px;font-weight:700;color:var(--p);background:#3730a311;padding:6px 12px;border-radius:8px;line-height:1">🇸🇬 '+L('fourd.sgLabel','SG Pools')+'</span></div>';
+  h += '<div style="display:flex;gap:8px"><input type="text" id="histQ" placeholder="'+(histGame==='4d'?L('history.placeholder4d','4D number (e.g. 1234)'):L('history.placeholderTotoMulti','TOTO numbers — e.g. 5 23 42'))+'" style="flex:1"><button class="btn btn-p" onclick="doHistSearch()">'+svgIcon("search",13)+' '+L('common.search','Search')+'</button></div></div>';
   h += '<div id="histResults" style="margin-bottom:28px"></div>';
 
   // ── More 4D Lookups ──
@@ -4444,9 +4446,10 @@ window.setHistGame = function(g) {
   histGame = g;
   document.getElementById("tab4d").className = "tab" + (g==="4d"?" active":"");
   document.getElementById("tabtoto").className = "tab" + (g==="toto"?" active":"");
-  document.getElementById("histQ").placeholder = g==="4d" ? L('history.placeholder4d','4D number (e.g. 1234)') : L('history.placeholderToto','TOTO number (1-49)');
+  document.getElementById("histQ").placeholder = g==="4d" ? L('history.placeholder4d','4D number (e.g. 1234)') : L('history.placeholderTotoMulti','TOTO numbers — e.g. 5 23 42');
   document.getElementById("histResults").innerHTML = "";
   var opRow=document.getElementById('histOpRow'); if(opRow) opRow.style.display = g==='4d' ? 'flex' : 'none';
+  var totoSrc=document.getElementById('histTotoSrc'); if(totoSrc) totoSrc.style.display = g==='toto' ? 'flex' : 'none';
 };
 
 window.doHistSearch = function() {
@@ -4469,11 +4472,14 @@ window.doHistSearch = function() {
     }).catch(function(e){ resEl.innerHTML='<div class="card">'+L('common.error','Error')+': '+e.message+'</div>'; });
     return;
   }
-  var url = '/api/' + (histGame === '4d' ? 'fourd' : 'toto') + '/search?number=' + encodeURIComponent(q);
+  var url = histGame === '4d'
+    ? ('/api/fourd/search?number=' + encodeURIComponent(q))
+    : ('/api/toto/search?numbers=' + encodeURIComponent(q));   // TOTO: 1–6 numbers, combination match
   fetch(url).then(function(r){return r.json();}).then(function(j) {
     if (!j.success) { resEl.innerHTML = '<div class="card">'+L('common.error','Error')+': '+(j.error||'unknown')+'</div>'; return; }
     var rows = j.data || [];
-    var html = '<div class="card" style="margin-top:16px"><div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:12px">'+rows.length+' '+L('history.results','result(s)')+'</div>';
+    var hdrExtra = (histGame!=='4d' && j.searched && j.searched.length) ? ' · '+L('history.containing','containing')+' '+j.searched.join(', ') : '';
+    var html = '<div class="card" style="margin-top:16px"><div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:12px">'+rows.length+' '+L('history.results','result(s)')+hdrExtra+'</div>';
     if (rows.length === 0) {
       html += '<p style="font-size:12.5px;color:var(--t3)">'+L('history.noMatches','No matches.')+'</p>';
     } else if (histGame === '4d') {
@@ -4482,10 +4488,22 @@ window.doHistSearch = function() {
         html += '<div style="padding:8px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:12.5px;align-items:center;flex-wrap:wrap"><span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span><span style="color:var(--t2);min-width:90px">'+fmtDate(r.draw_date)+'</span><span style="font-size:11px;font-weight:700;color:var(--amb);background:#d9770611;padding:1px 7px;border-radius:4px">'+dow+'</span><span style="font-weight:600">'+r.prizes.join(', ')+'</span></div>';
       });
     } else {
-      rows.slice(0,30).forEach(function(r) {
-        var nums = [r.num1, r.num2, r.num3, r.num4, r.num5, r.num6].filter(function(n){return n!=null;}).join(', ');
-        var dow = dayOfWeek(r.draw_date);
-        html += '<div style="padding:8px 0;border-bottom:1px solid var(--bl);display:flex;gap:14px;font-size:12.5px;align-items:center;flex-wrap:wrap"><span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:60px">#'+r.draw_no+'</span><span style="color:var(--t2);min-width:90px">'+(r.draw_date||'—')+'</span>'+(dow?'<span style="font-size:11px;font-weight:700;color:var(--p);background:#3730a311;padding:1px 7px;border-radius:4px">'+dow+'</span>':'')+'<span style="font-weight:600">'+nums+(r.additional_num?' + '+r.additional_num:'')+'</span></div>';
+      // highlight the searched numbers within each 6-ball combination
+      var searched = (j.searched || []).map(Number);
+      function totoChip(n, kind){
+        var s = kind==='hit' ? 'background:var(--p);color:#fff'
+              : kind==='add' ? 'background:#dc262611;color:var(--red)'
+              : 'background:var(--bg);color:var(--t2);border:1px solid var(--bd)';
+        return '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:27px;height:25px;border-radius:6px;font-family:var(--mo);font-weight:800;font-size:12px;'+s+'">'+n+'</span>';
+      }
+      rows.slice(0,40).forEach(function(r) {
+        var chips = [r.num1,r.num2,r.num3,r.num4,r.num5,r.num6].map(function(n){ return totoChip(n, searched.indexOf(Number(n))>=0?'hit':''); }).join('');
+        html += '<div style="padding:9px 0;border-bottom:1px solid var(--bl);display:flex;gap:12px;font-size:12.5px;align-items:center;flex-wrap:wrap">'+
+          '<span style="font-weight:700;color:var(--p);font-family:var(--mo);min-width:56px">#'+r.draw_no+'</span>'+
+          '<span style="color:var(--t2);min-width:90px">'+fmtDate(r.draw_date)+'</span>'+
+          '<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">'+chips+
+            (r.additional_num?'<span style="color:var(--red);font-weight:800;margin:0 1px">+</span>'+totoChip(r.additional_num,'add'):'')+
+          '</div></div>';
       });
     }
     html += '</div>';
