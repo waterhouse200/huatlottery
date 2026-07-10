@@ -4264,6 +4264,21 @@ function loadRepeatWinners() {
   });
 }
 
+// Compact, consistent lookup-tool card (icon · title · one-line desc · inputs).
+function lookupCard(icon, color, title, desc, body) {
+  return '<div class="card" style="margin-bottom:14px;padding:18px">'+
+    '<div style="display:flex;align-items:center;gap:11px;margin-bottom:9px">'+
+      '<div style="background:color-mix(in srgb, '+color+' 11%, transparent);color:'+color+';width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon(icon,18)+'</div>'+
+      '<h3 style="font-size:15.5px;font-weight:800;color:'+color+';margin:0">'+title+'</h3>'+
+    '</div>'+
+    '<p style="font-size:12px;color:var(--t3);margin:0 0 12px;line-height:1.55">'+desc+'</p>'+
+    body+
+  '</div>';
+}
+// Compact section header for the lookup groups.
+function lookHead(txt, extra) {
+  return '<h2 style="font-size:14.5px;font-weight:800;color:var(--t2);margin:24px 0 12px;border-top:1px solid var(--bd);padding-top:18px">'+txt+(extra||'')+'</h2>';
+}
 function renderHistory() {
   var h = '<h1>'+L('history.title','History Search')+'</h1><p class="desc">'+L('history.desc','Search past 4D & TOTO draws by number, then dig deeper with the lookup tools below.')+'</p>';
 
@@ -4273,60 +4288,36 @@ function renderHistory() {
   h += '<div style="display:flex;gap:8px"><input type="text" id="histQ" class="imo" placeholder="'+L('history.placeholder4d','4D number (e.g. 1234)')+'" style="flex:1"><button class="btn btn-p" onclick="doHistSearch()">'+svgIcon("search",13)+' '+L('common.search','Search')+'</button></div></div>';
   h += '<div id="histResults" style="margin-bottom:28px"></div>';
 
-  // ═══ TOTO LOOKUP TOOLS — moved here from Alpha TOTO ═══════════════
-  // 4D lookup tools — moved here from 4D Stats
-  h += '<h2 style="font-size:18px;font-weight:800;color:var(--t2);margin:32px 0 14px;border-top:2px solid var(--bd);padding-top:24px">'+L('history.more4dLookups','More 4D Lookups')+'</h2>';
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#d9770611;color:var(--amb);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--amb);margin:0">'+L('fourd.anniversary','4D Anniversary Lookup')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('fourd.anniversaryDesc','Pick an operator and a date. See every 4D draw on that month-day across all years.')+'</p>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<select id="annivOp4d" style="'+SEL_STYLE+'">'+STAT_OPS.map(function(o){return '<option value="'+o.id+'"'+(o.id===histOp?' selected':'')+'>'+(o.flag||'')+' '+o.label+'</option>';}).join('')+'</select>';
-  h += '<input type="date" id="anniversaryDate4d" style="flex:1;min-width:180px">';
-  h += '<button class="btn btn-p" onclick="loadAnniversary4d()">'+L('common.lookup','Look up')+'</button></div>';
-  h += '<div id="anniversaryResult4d" style="margin-top:14px"></div>';
-  h += '</div>';
+  // ── More 4D Lookups ──
+  h += lookHead(L('history.more4dLookups','More 4D Lookups'));
+  h += lookupCard('cal', 'var(--amb)', L('fourd.anniversary','4D Anniversary Lookup'),
+    L('fourd.anniversaryShort','Every 4D draw on a chosen month-day, across all years.'),
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+      '<select id="annivOp4d" style="'+SEL_STYLE+'">'+STAT_OPS.map(function(o){return '<option value="'+o.id+'"'+(o.id===histOp?' selected':'')+'>'+(o.flag||'')+' '+o.label+'</option>';}).join('')+'</select>'+
+      '<input type="date" id="anniversaryDate4d" style="flex:1;min-width:150px">'+
+      '<button class="btn btn-p" onclick="loadAnniversary4d()">'+L('common.lookup','Look up')+'</button>'+
+    '</div><div id="anniversaryResult4d" style="margin-top:12px"></div>');
 
-  h += '<h2 style="font-size:18px;font-weight:800;color:var(--t2);margin:32px 0 14px;border-top:2px solid var(--bd);padding-top:24px">'+L('history.moreTotoLookups','More TOTO Lookups')+' · 🇸🇬 '+L('fourd.sgLabel','SG Pools')+'</h2>';
-
-  // Number Deep Dive
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("search",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('toto.numberDeepDive','Number Deep Dive')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('history.numberDeepDiveDesc','Pick any TOTO number (1-49). See first/last appearance, best month, best day-of-week, longest cold streak, and yearly breakdown.')+'</p>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="number" id="ndN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:90px">';
-  h += '<button class="btn btn-p" onclick="loadNumberDetail()">'+L('common.lookup','Look up')+'</button></div>';
-  h += '<div id="ndResult" style="margin-top:14px"></div>';
-  h += '</div>';
-
-  // Additional Number Partners
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#dc262611;color:var(--red);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("activity",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--red);margin:0">'+L('toto.additionalPartners','Additional Partners')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('history.additionalPartnersDesc','Pick a TOTO number 1-49. See which main numbers co-appeared when THIS was the additional (the +7th).')+'</p>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="number" id="addPartnerN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:90px">';
-  h += '<button class="btn btn-p" onclick="loadAddPartners()">'+L('common.lookup','Look up')+'</button></div>';
-  h += '<div id="addPartnerResult" style="margin-top:14px"></div></div>';
-
-  // TOTO Anniversary Lookup
-  h += '<div class="card" style="margin-bottom:28px;padding:24px">';
-  h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
-  h += '<div style="background:#3730a311;color:var(--p);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+svgIcon("cal",26)+'</div>';
-  h += '<h3 style="font-size:20px;font-weight:800;color:var(--p);margin:0">'+L('toto.anniversaryLookup','TOTO Anniversary Lookup')+'</h3>';
-  h += '</div>';
-  h += '<p style="font-size:13px;color:var(--t2);margin:0 0 14px">'+L('history.totoAnniversaryDesc','Pick any date. See every TOTO draw on that month-day across all years.')+'</p>';
-  h += '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">';
-  h += '<input type="date" id="anniversaryDateToto" style="flex:1;min-width:200px">';
-  h += '<button class="btn btn-p" onclick="loadAnniversaryToto()">'+L('common.lookup','Look up')+'</button></div>';
-  h += '<div id="anniversaryResultToto" style="margin-top:14px"></div></div>';
+  // ── More TOTO Lookups · SG Pools ──
+  h += lookHead(L('history.moreTotoLookups','More TOTO Lookups'), ' · 🇸🇬 '+L('fourd.sgLabel','SG Pools'));
+  h += lookupCard('search', 'var(--p)', L('toto.numberDeepDive','Number Deep Dive'),
+    L('history.numberDeepDiveShort','First/last appearance, best month & day-of-week, cold streaks, yearly breakdown.'),
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+      '<input type="number" id="ndN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:90px">'+
+      '<button class="btn btn-p" onclick="loadNumberDetail()">'+L('common.lookup','Look up')+'</button>'+
+    '</div><div id="ndResult" style="margin-top:12px"></div>');
+  h += lookupCard('activity', 'var(--red)', L('toto.additionalPartners','Additional Partners'),
+    L('history.additionalPartnersShort','Which main numbers co-appeared when this was the additional (the +7th).'),
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+      '<input type="number" id="addPartnerN" min="1" max="49" placeholder="'+L('history.placeholder1to49','1-49')+'" style="width:90px">'+
+      '<button class="btn btn-p" onclick="loadAddPartners()">'+L('common.lookup','Look up')+'</button>'+
+    '</div><div id="addPartnerResult" style="margin-top:12px"></div>');
+  h += lookupCard('cal', 'var(--p)', L('toto.anniversaryLookup','TOTO Anniversary Lookup'),
+    L('history.totoAnniversaryShort','Every TOTO draw on a chosen month-day, across all years.'),
+    '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'+
+      '<input type="date" id="anniversaryDateToto" style="flex:1;min-width:170px">'+
+      '<button class="btn btn-p" onclick="loadAnniversaryToto()">'+L('common.lookup','Look up')+'</button>'+
+    '</div><div id="anniversaryResultToto" style="margin-top:12px"></div>');
 
   return h;
 }
