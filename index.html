@@ -1888,7 +1888,7 @@ window.loadNumberDetail = function() {
 
 function loadClassByYear() {
   var el = document.getElementById('classByYear'); if (!el) return;
-  fetch('/api/fourd/class-by-year').then(r=>r.json()).then(function(j) {
+  fetch('/api/fourd/class-by-year?operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var overall = j.data.overall;
 
@@ -1925,7 +1925,7 @@ function loadClassByYear() {
 
 function loadDollarSim() {
   var el = document.getElementById('dollarSim'); if (!el) return;
-  fetch('/api/fourd/dollar-sim').then(r=>r.json()).then(function(j) {
+  fetch('/api/fourd/dollar-sim?operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
@@ -1956,7 +1956,7 @@ window.loadDollarSimLookup = function() {
   if (raw.length !== 4) { alert('Enter exactly 4 digits'); return; }
   var out = document.getElementById('simLookupResult');
   out.innerHTML = loadingCard();
-  fetch('/api/fourd/dollar-sim-lookup?num=' + raw).then(r=>r.json()).then(function(j) {
+  fetch('/api/fourd/dollar-sim-lookup?num=' + raw + '&operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { out.innerHTML = 'Error'; return; }
     var d = j.data;
     var profitCol = d.profit >= 0 ? 'var(--em)' : 'var(--red)';
@@ -2162,7 +2162,7 @@ window.loadDryBacktest = function() {
 
 function loadYearlyRegulars() {
   var el = document.getElementById('yearlyRegulars'); if (!el) return;
-  fetch('/api/fourd/yearly-regulars').then(r=>r.json()).then(function(j) {
+  fetch('/api/fourd/yearly-regulars?operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var TIER = {
@@ -2365,7 +2365,7 @@ function loadCalendarBias() {
 
 function loadIbetSim() {
   var el = document.getElementById('ibetSim'); if (!el) return;
-  fetch('/api/fourd/ibet-sim').then(r=>r.json()).then(function(j) {
+  fetch('/api/fourd/ibet-sim?operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var d = j.data;
     var html = '<div style="padding:10px 14px;background:var(--bg);border-radius:6px;font-size:13px;color:var(--t2);margin-bottom:14px">';
@@ -2398,7 +2398,7 @@ window.loadIbetSimLookup = function() {
   if (raw.length !== 4) { alert('Enter exactly 4 digits'); return; }
   var out = document.getElementById('ibetSimLookupResult');
   out.innerHTML = loadingCard();
-  fetch('/api/fourd/ibet-sim-lookup?num=' + raw).then(r=>r.json()).then(function(j) {
+  fetch('/api/fourd/ibet-sim-lookup?num=' + raw + '&operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { out.innerHTML = 'Error'; return; }
     var d = j.data;
     var profitCol = d.profit >= 0 ? 'var(--em)' : 'var(--red)';
@@ -2419,7 +2419,7 @@ window.loadIbetSimLookup = function() {
 
 function loadYearlyWinners() {
   var el = document.getElementById('yearlyWinners'); if (!el) return;
-  fetch('/api/fourd/dollar-sim-yearly-winners').then(r=>r.json()).then(function(j) {
+  fetch('/api/fourd/dollar-sim-yearly-winners?operator='+alphaOp).then(r=>r.json()).then(function(j) {
     if (!j.success) { el.innerHTML = 'Error'; return; }
     var years = j.data.years;
     // Tier colors (chosen for clarity on dark/light backgrounds, readable for older eyes)
@@ -3937,16 +3937,30 @@ function loadAlphaRange(){
     var d=j.data;
     el.innerHTML = '<span style="font-size:16px;font-weight:800;color:var(--tx);font-family:var(--mo)">'+(d.count||0).toLocaleString()+'</span> <span style="font-size:11.5px;color:var(--t3)">'+L('dashboard.draws','draws')+'</span><div style="font-size:11.5px;color:var(--t2);font-family:var(--mo);margin-top:2px">'+fmtDate(d.from)+' → '+fmtDate(d.to)+'</div>';
     window.ALPHA_RANGE = d;   // tools can read the current range for their copy
+    // Written-out payout table (per 1 unit stake) — Big + Small, for this provider
+    var pay = document.getElementById('alphaPayout');
+    if(pay && d.payout){ var c=d.currency||'$'; var b=d.payout.big, sm=d.payout.small;
+      function amt(v){ return c+v.toLocaleString(); }
+      pay.innerHTML =
+        '<div style="font-size:10px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">'+L('fourd.payoutTitle','Payout per '+c+'1 stake')+'</div>'+
+        '<div style="display:flex;gap:9px;flex-wrap:wrap;align-items:baseline;margin-bottom:5px"><span style="font-size:10.5px;font-weight:800;color:var(--em);text-transform:uppercase;letter-spacing:.05em;min-width:44px">'+L('fourd.bigBet','Big')+'</span>'+
+          '<span style="font-size:11.5px;color:var(--t2);font-family:var(--mo)">1st '+amt(b.first)+' · 2nd '+amt(b.second)+' · 3rd '+amt(b.third)+' · '+L('fourd.specialShort','Sp')+' '+amt(b.starter)+' · '+L('fourd.consShort','Cons')+' '+amt(b.consol)+'</span></div>'+
+        '<div style="display:flex;gap:9px;flex-wrap:wrap;align-items:baseline"><span style="font-size:10.5px;font-weight:800;color:var(--amb);text-transform:uppercase;letter-spacing:.05em;min-width:44px">'+L('fourd.smallBet','Small')+'</span>'+
+          '<span style="font-size:11.5px;color:var(--t2);font-family:var(--mo)">1st '+amt(sm.first)+' · 2nd '+amt(sm.second)+' · 3rd '+amt(sm.third)+'</span></div>';
+    }
   }).catch(function(){ el.textContent=''; });
 }
 function renderMoreAlpha(){
   var meta = alphaOpMeta();
   var ops = STAT_OPS.filter(function(o){return o.id==='sg4d'||o.region==='my';});
   // ── BIG global DATA SOURCE header — controls every tool below ──
-  var h = '<div style="border:2px solid '+meta.color+';background:color-mix(in srgb, '+meta.color+' 7%, transparent);border-radius:16px;padding:18px 20px;margin-bottom:18px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">';
+  var h = '<div style="border:2px solid '+meta.color+';background:color-mix(in srgb, '+meta.color+' 7%, transparent);border-radius:16px;padding:18px 20px;margin-bottom:18px">';
+  h += '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">';
   h += '<div><div style="font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px">'+L('fourd.dataSource','Data source')+'</div>';
   h += '<select id="alphaOpSel" onchange="setAlphaOp(this.value)" style="height:46px;padding:0 16px;border-radius:11px;border:2px solid '+meta.color+';background:var(--cd);color:'+meta.color+';font-size:19px;font-weight:800;cursor:pointer">'+ops.map(function(o){return '<option value="'+o.id+'"'+(o.id===alphaOp?' selected':'')+'>'+(o.flag||'')+' '+o.label+'</option>';}).join('')+'</select></div>';
   h += '<div id="alphaRange" style="margin-left:auto;text-align:right"></div>';
+  h += '</div>';
+  h += '<div id="alphaPayout" style="margin-top:14px;padding-top:14px;border-top:1px solid color-mix(in srgb, '+meta.color+' 25%, transparent)"></div>';
   h += '</div>';
   lazyLoad('alphaRange', loadAlphaRange);
   // mode toggle

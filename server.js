@@ -1606,9 +1606,8 @@ app.get("/api/fourd/digit-positions", (req, res) => {
 // signal because there are 23 numbers/draw × 4 digits = 92 digits to sample.
 app.get("/api/fourd/class-by-year", cache.withCache((req, res) => {
   try {
-    const rows = db.prepare(
-      "SELECT draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws WHERE draw_date IS NOT NULL"
-    ).all();
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     const byYear = {};
     function digitClass(s) {
       const c = {};
@@ -3418,10 +3417,9 @@ app.get("/api/fourd/dry-spell-backtest", (req, res) => {
 // prevents the metric from being skewed by clusters.
 app.get("/api/fourd/yearly-regulars", cache.withCache((req, res) => {
   try {
-    const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
-    const rows = db.prepare(
-      "SELECT draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws"
-    ).all();
+    const PAY = payFor(req.query.operator, req.query.bet);
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     const totalDraws = rows.length;
     const numHistory = {};        // num → [{year, date, tier, payout}]
     const yearDraws = {};
@@ -3573,16 +3571,36 @@ app.get("/api/fourd/yearly-regulars", cache.withCache((req, res) => {
 // random (chi-square or simple Z-score above threshold).
 const MY_4D_OPS = ["magnum", "sportstoto", "damacai", "sabah", "sarawak", "sandakan"];
 // Normalized 4D rows for any operator: sg4d → fourd_draws; MY → my_draws
-// (special_prizes serves the "starter" role — month counting is tier-agnostic).
-function fourdRowsFor(operator) {
+// (special_prizes fills the "starter" role). MY has no draw_no → NULL + order by date.
+function fourdRowsFor(operator, order) {
   const op = String(operator || "sg4d");
+  const ord = order || "draw_date ASC";
   if (op === "sg4d") {
-    return db.prepare("SELECT draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws WHERE draw_date IS NOT NULL").all();
+    return db.prepare(`SELECT draw_no, draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws WHERE draw_date IS NOT NULL ORDER BY ${ord}`).all();
   }
   if (MY_4D_OPS.includes(op)) {
-    return db.prepare("SELECT draw_date, first_prize, second_prize, third_prize, special_prizes AS starter_prizes, consolation_prizes FROM my_draws WHERE operator=? AND draw_date IS NOT NULL").all(op);
+    return db.prepare(`SELECT NULL AS draw_no, draw_date, first_prize, second_prize, third_prize, special_prizes AS starter_prizes, consolation_prizes FROM my_draws WHERE operator=? AND draw_date IS NOT NULL ORDER BY ${ord.replace(/draw_no/g, "draw_date")}`).all(op);
   }
   return null;
+}
+// Per-operator prize payouts per 1 unit stake (SGD for SG Pools, MYR for Malaysia).
+// BIG pays across 23 positions (1st/2nd/3rd + 10 starter/special + 10 consolation);
+// SMALL pays only the top 3 but higher. Standard published rates.
+const MY_PAYOUT = { cur: "RM", big: { first: 2500, second: 1000, third: 500, starter: 180, consol: 60 }, small: { first: 3300, second: 2000, third: 1000 } };
+const PAYOUT_TABLE = {
+  sg4d:       { cur: "$",  big: { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 }, small: { first: 3000, second: 2000, third: 800 } },
+  magnum:     MY_PAYOUT,
+  sportstoto: MY_PAYOUT,
+  damacai:    MY_PAYOUT,
+  sabah:      MY_PAYOUT,
+  sarawak:    MY_PAYOUT,
+  sandakan:   MY_PAYOUT,
+};
+// Payout set used by the sims (defaults to Big; Small pays only 1st/2nd/3rd).
+function payFor(operator, betType) {
+  const t = PAYOUT_TABLE[String(operator || "sg4d")] || PAYOUT_TABLE.sg4d;
+  if (betType === "small") return { first: t.small.first, second: t.small.second, third: t.small.third, starter: 0, consol: 0 };
+  return t.big;
 }
 // Draw count + date range for the selected 4D operator (drives the More Alpha
 // data-source header + tool copy; always reflects the latest scraped data).
@@ -3593,7 +3611,8 @@ app.get("/api/fourd/range", (req, res) => {
     if (op === "sg4d") row = db.prepare("SELECT COUNT(*) AS n, MIN(draw_date) AS f, MAX(draw_date) AS t FROM fourd_draws WHERE draw_date IS NOT NULL").get();
     else if (MY_4D_OPS.includes(op)) row = db.prepare("SELECT COUNT(*) AS n, MIN(draw_date) AS f, MAX(draw_date) AS t FROM my_draws WHERE operator=? AND draw_date IS NOT NULL").get(op);
     else return res.status(400).json({ success: false, error: "unknown operator" });
-    res.json({ success: true, data: { count: row.n, from: row.f, to: row.t } });
+    const pt = PAYOUT_TABLE[op] || PAYOUT_TABLE.sg4d;
+    res.json({ success: true, data: { count: row.n, from: row.f, to: row.t, currency: pt.cur, payout: { big: pt.big, small: pt.small } } });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 app.get("/api/fourd/calendar-bias", cache.withCache((req, res) => {
@@ -3751,10 +3770,9 @@ app.get("/api/fourd/calendar-bias", cache.withCache((req, res) => {
 // consolation $60 per hit.
 app.get("/api/fourd/dollar-sim", cache.withCache((req, res) => {
   try {
-    const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
-    const rows = db.prepare(
-      "SELECT first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws"
-    ).all();
+    const PAY = payFor(req.query.operator, req.query.bet);
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     const totalDraws = rows.length;
     // Tally hits per 4-digit number across all prize tiers
     const hits = {};
@@ -3794,10 +3812,9 @@ app.get("/api/fourd/dollar-sim-yearly", (req, res) => {
   try {
     const num = String(req.query.num || "").replace(/\D/g, "").padStart(4, "0").slice(0, 4);
     if (num.length !== 4) return res.status(400).json({ success: false, error: "Need 4 digits" });
-    const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
-    const rows = db.prepare(
-      "SELECT draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws"
-    ).all();
+    const PAY = payFor(req.query.operator, req.query.bet);
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     const byYear = {};
     for (const r of rows) {
       const y = new Date(r.draw_date).getUTCFullYear();
@@ -3823,10 +3840,9 @@ app.get("/api/fourd/dollar-sim-yearly", (req, res) => {
 // For each year, the single most-profitable number under $1 Big bet
 app.get("/api/fourd/dollar-sim-yearly-winners", (req, res) => {
   try {
-    const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
-    const rows = db.prepare(
-      "SELECT draw_date, first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws"
-    ).all();
+    const PAY = payFor(req.query.operator, req.query.bet);
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     const byYear = {};       // year → { drawCount, hits[num] }
     for (const r of rows) {
       const y = new Date(r.draw_date).getUTCFullYear();
@@ -3861,10 +3877,9 @@ app.get("/api/fourd/dollar-sim-lookup", (req, res) => {
   try {
     const num = String(req.query.num || "").replace(/\D/g, "").padStart(4, "0").slice(0, 4);
     if (num.length !== 4) return res.status(400).json({ success: false, error: "Need 4 digits" });
-    const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
-    const rows = db.prepare(
-      "SELECT first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws"
-    ).all();
+    const PAY = payFor(req.query.operator, req.query.bet);
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     let h = { first: 0, second: 0, third: 0, starter: 0, consol: 0 };
     for (const r of rows) {
       if (String(r.first_prize).padStart(4,"0") === num) h.first++;
@@ -3942,10 +3957,9 @@ function simulateIbet(num, rows, PAY) {
 
 app.get("/api/fourd/ibet-sim", cache.withCache((req, res) => {
   try {
-    const PAY = { first: 2000, second: 1000, third: 500, starter: 250, consol: 60 };
-    const rows = db.prepare(
-      "SELECT first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws"
-    ).all();
+    const PAY = payFor(req.query.operator, req.query.bet);
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     // Rank by profit across distinct iBet *sets* (sorted digits = unique set)
     const seen = new Set();
     const results = [];
@@ -3970,10 +3984,9 @@ app.get("/api/fourd/ibet-sim-lookup", (req, res) => {
   try {
     const num = String(req.query.num || "").replace(/\D/g, "").padStart(4, "0").slice(0, 4);
     if (num.length !== 4) return res.status(400).json({ success: false, error: "Need 4 digits" });
-    const PAY = { first: 2000, second: 1000, third: 490, starter: 250, consol: 60 };
-    const rows = db.prepare(
-      "SELECT first_prize, second_prize, third_prize, starter_prizes, consolation_prizes FROM fourd_draws"
-    ).all();
+    const PAY = payFor(req.query.operator, req.query.bet);
+    const rows = fourdRowsFor(req.query.operator);
+    if (!rows) return res.status(400).json({ success: false, error: "unknown operator" });
     res.json({ success: true, data: { ...simulateIbet(num, rows, PAY), total_draws_scanned: rows.length }});
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
