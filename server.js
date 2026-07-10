@@ -3584,6 +3584,18 @@ function fourdRowsFor(operator) {
   }
   return null;
 }
+// Draw count + date range for the selected 4D operator (drives the More Alpha
+// data-source header + tool copy; always reflects the latest scraped data).
+app.get("/api/fourd/range", (req, res) => {
+  try {
+    const op = String(req.query.operator || "sg4d");
+    let row;
+    if (op === "sg4d") row = db.prepare("SELECT COUNT(*) AS n, MIN(draw_date) AS f, MAX(draw_date) AS t FROM fourd_draws WHERE draw_date IS NOT NULL").get();
+    else if (MY_4D_OPS.includes(op)) row = db.prepare("SELECT COUNT(*) AS n, MIN(draw_date) AS f, MAX(draw_date) AS t FROM my_draws WHERE operator=? AND draw_date IS NOT NULL").get(op);
+    else return res.status(400).json({ success: false, error: "unknown operator" });
+    res.json({ success: true, data: { count: row.n, from: row.f, to: row.t } });
+  } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+});
 app.get("/api/fourd/calendar-bias", cache.withCache((req, res) => {
   try {
     const MIN_HITS = parseInt(req.query.min_hits || "12", 10);
