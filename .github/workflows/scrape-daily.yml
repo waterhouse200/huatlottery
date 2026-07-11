@@ -37,6 +37,15 @@ jobs:
       - name: Auto scrape (TOTO + 4D)
         run: node scraper/auto.js --once
 
+      # Push new results to the Telegram channel the moment they land.
+      # No-op until TELEGRAM_* secrets exist; state lives in the DB so it is
+      # committed below and each draw notifies exactly once across runs.
+      - name: Notify Telegram channel
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scraper/notify-telegram.js || true
+
       # Commit ONLY when the DB actually changed (a new draw, or the next-draw
       # sentinel advanced). The sentinel is change-detecting, so idle ticks are
       # no-ops and never commit.

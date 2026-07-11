@@ -61,6 +61,15 @@ jobs:
       - name: Regenerate weekly AI picks
         run: python -m analysis.serve || echo "prediction gen skipped (non-fatal)"
 
+      # Push new results to the Telegram channel the moment they land.
+      # No-op until TELEGRAM_* secrets exist; state lives in the DB so it is
+      # committed below and each draw notifies exactly once across runs.
+      - name: Notify Telegram channel
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scraper/notify-telegram.js || true
+
       - name: Commit & push if updated
         run: |
           git config user.name  "Huatlottery Bot"
