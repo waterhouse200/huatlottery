@@ -14,7 +14,7 @@ const db = new Database(DB);
 const ins = db.prepare("INSERT OR REPLACE INTO my_draws (operator,draw_date,first_prize,second_prize,third_prize,special_prizes,consolation_prizes,source) VALUES (?,?,?,?,?,?,?,?)");
 let fetched = 0, hitDays = 0, rows = 0, empty = 0;
 const t0 = Date.now();
-for (let i = 1; i <= daysBack; i++) {
+for (let i = 0; i <= daysBack; i++) {
   const d = new Date(Date.now() - i * 864e5);
   if (!DRAW_DAYS.has(d.getUTCDay())) continue;
   const ds = `${String(d.getUTCDate()).padStart(2,"0")}-${String(d.getUTCMonth()+1).padStart(2,"0")}-${d.getUTCFullYear()}`;
