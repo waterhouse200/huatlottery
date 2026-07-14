@@ -33,7 +33,8 @@
       "sep": "Sep",
       "oct": "Oct",
       "nov": "Nov",
-      "dec": "Dec"
+      "dec": "Dec",
+      "mon": "mo"
     },
     "dow": {
       "mon": "Mon",
@@ -43,7 +44,13 @@
       "fri": "Fri",
       "sat": "Sat",
       "sun": "Sun"
-    }
+    },
+    "ad": "Advertisement",
+    "nextDraw": "Next Draw",
+    "nextJackpot": "Next Jackpot",
+    "times": "times",
+    "viewHistory": "View History",
+    "won": "won"
   },
   "tabs": {
     "dashboard": "Results",
@@ -54,7 +61,22 @@
     "research": "Research Lab",
     "prediction": "AI Prediction",
     "lucky": "Lucky Numbers",
-    "mynumbers": "My Numbers"
+    "mynumbers": "My Numbers",
+    "results": "Results",
+    "others": "Other Results",
+    "more": "More",
+    "morealpha": "More Alpha"
+  },
+  "stats": {
+    "overdue": "Most Overdue",
+    "ago": "ago",
+    "bottom3": "Bottom 3",
+    "doubles": "Doubles",
+    "quads": "Quads",
+    "single": "Single",
+    "top3": "Top 3",
+    "total": "total",
+    "triples": "Triples"
   },
   "dashboard": {
     "title": "Results",
@@ -72,7 +94,8 @@
     "consolation": "Consolation Prizes",
     "first": "1st Prize",
     "second": "2nd Prize",
-    "third": "3rd Prize"
+    "third": "3rd Prize",
+    "onDay": "on"
   },
   "toto": {
     "title": "TOTO Stats",
@@ -145,11 +168,18 @@
       "nationalDay": "National Day",
       "midAutumn": "Mid-Autumn",
       "allSpecial": "All Special"
-    }
+    },
+    "group": "Group",
+    "pool": "Pool",
+    "share": "Share",
+    "snowball": "No Group 1 winner — jackpot snowballs to the next draw.",
+    "winners": "Winners",
+    "winningShares": "Winning Shares"
   },
   "fourd": {
     "title": "4D Stats",
     "desc": "Top hot numbers, exact and permutation matches.",
+    "overdueDesc": "Numbers with the longest gap since their last appearance in any prize position.",
     "top10Hot": "Top 10 Hot 4D Numbers",
     "top10HotDesc": "Ranked by appearances in <b>any prize position</b> (23 per draw). Archive: <b>{from}</b> → <b>{to}</b> · {count} draws.",
     "repeatWinners": "Repeat 1st Prize Winners",
@@ -246,7 +276,26 @@
     "expectedRandom": "Expected <b>{pct}%</b> each if random.",
     "hottestColon": "Hottest:",
     "coldestColon": "Coldest:",
-    "payoutsFromHeader": "Big-bet payouts are the ones shown in the <b>Data Source</b> header above (they change with the selected operator)."
+    "payoutsFromHeader": "Big-bet payouts are the ones shown in the <b>Data Source</b> header above (they change with the selected operator).",
+    "anniversaryShort": "Every 4D draw on a chosen month-day, across all years.",
+    "avgPerMonth": "avg",
+    "calBiasNote": "Distribution across all years combined. A tall bar is historical, not predictive — 4D stays random.",
+    "digitFreqMyDesc": "How often each digit pattern appears across all 23 prize positions per draw. <b>Total</b> (top-right) = that category’s occurrences; each <b>%</b> is the item’s share of its own category — e.g. 44 vs all doubles (uniform ≈ 10% each).",
+    "hotDesc": "Ranked by appearances in any prize position (23 per draw).",
+    "leansToward": "Leans toward",
+    "moreStatsDesc": "Deeper year-over-year analyses for {op} 4D.",
+    "moreStatsTitle": "More 4D Stats",
+    "neverHit": "never appeared in the archive.",
+    "noRepeat": "No number has won 1st prize more than once yet.",
+    "pickNumber": "Pick a number",
+    "prizeNumbers": "prize numbers",
+    "repeatWinnersMy": "numbers have won 1st prize more than once.",
+    "sgLabel": "SG Pools",
+    "strongestBiases": "Strongest biases across all numbers",
+    "top10Cold": "Top 10 Cold 4D Numbers",
+    "top10ColdDesc": "The least-frequent numbers — fewest appearances across the archive.",
+    "vsExpected": "vs expected",
+    "yearlyMy": "The most-frequent number each year, across all 23 prize positions."
   },
   "alpha4d": {
     "desc": "Quantitative number-selection lab. Filter, backtest, and identify candidates with mathematical edges.",
@@ -322,7 +371,19 @@
     "moreTotoLookups": "More TOTO Lookups",
     "numberDeepDiveDesc": "Pick any TOTO number (1-49). See first/last appearance, best month, best day-of-week, longest cold streak, and yearly breakdown.",
     "additionalPartnersDesc": "Pick a TOTO number 1-49. See which main numbers co-appeared when THIS was the additional (the +7th).",
-    "totoAnniversaryDesc": "Pick any date. See every TOTO draw on that month-day across all years."
+    "totoAnniversaryDesc": "Pick any date. See every TOTO draw on that month-day across all years.",
+    "acrossDraws": "across",
+    "additionalPartnersShort": "Which main numbers co-appeared when this was the additional (the +7th).",
+    "containing": "containing",
+    "hits": "hits",
+    "more4dLookups": "More 4D Lookups",
+    "numberDeepDiveShort": "First/last appearance, best month & day-of-week, cold streaks, yearly breakdown.",
+    "placeholderTotoMulti": "TOTO numbers — e.g. 5 23 42",
+    "recentWins": "Recent wins",
+    "source": "Source",
+    "source4d": "4D operator",
+    "totoAnniversaryShort": "Every TOTO draw on a chosen month-day, across all years.",
+    "wins": "win(s)"
   },
   "research": {
     "title": "Research Lab",
@@ -413,5 +474,71 @@
     "p4": "Gambling is intended for persons of <b>legal age only</b>. If you choose to play, please play responsibly: only ever spend what you can comfortably afford to lose, decide on a budget and time limit in advance, never borrow money to gamble, and never chase your losses. Gambling should be a form of entertainment — never a way to make money, solve financial problems, or cope with stress.",
     "help": "Play responsibly — for gambling support in Singapore, call the NCPG helpline on <b style=\"color:var(--p);font-family:var(--mo)\">1800-6-668-668</b> or visit <a href=\"https://www.ncpg.org.sg\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--p)\">ncpg.org.sg</a>.",
     "link": "Disclaimer"
+  },
+  "alpha": {
+    "simulator": "4D Simulators",
+    "stats": "More Stats"
+  },
+  "cookie": {
+    "accept": "Accept all",
+    "learn": "Privacy Policy",
+    "reject": "Reject",
+    "text": "We use cookies for analytics and advertising to keep Huatlottery free. Accept to allow them, or reject non-essential cookies — the site works either way."
+  },
+  "hist": {
+    "allMonths": "Whole year",
+    "backOthers": "See the latest result",
+    "desc": "Every past draw with its date.",
+    "liveMsg": "This game is fetched live, so only the latest result is available right now — its full past-results archive is being collected and will show here soon.",
+    "liveTitle": "Archive coming soon",
+    "month": "Month",
+    "noShares": "Winning shares are not available for this draw.",
+    "noneYear": "No draws for this period.",
+    "past": "Past Results",
+    "pool": "Pool",
+    "recent": "Recent (last 20)",
+    "snowball": "No Group 1 winner — jackpot snowballs to the next draw.",
+    "tap": "Tap any draw to reveal its full Starter &amp; Consolation prizes.",
+    "tapToto": "Tap any draw to see the Group 1–7 winners &amp; prize pool.",
+    "winShares": "Winning Shares",
+    "year": "Year"
+  },
+  "home": {
+    "desc": "Every Singapore & Malaysia draw at a glance.",
+    "jackpot": "4D Jackpot",
+    "mySub": "West Malaysia · Sabah & Sarawak",
+    "myTitle": "Malaysia Results",
+    "nextDrawEst": "Next draw est.",
+    "or": "or",
+    "sixd": "Sports Toto 6D",
+    "sixd1st": "1st Prize · Match all 6",
+    "sixdDigits": "digits",
+    "sixdNone": "No recent 6D result.",
+    "sixdNote": "6D pays by matching the front or back of the winning number — no group winners like TOTO.",
+    "title": "Latest Results"
+  },
+  "more": {
+    "desc": "Tools & information.",
+    "disclaimerDesc": "Legal notice & responsible play.",
+    "historyDesc": "Search any 4-digit number across every past draw."
+  },
+  "others": {
+    "bonus": "Bonus",
+    "desc": "Non-4D games — 6D, 5D, Lotto, 3+3D, Jackpot Gold, Life & more.",
+    "title": "Other Malaysia Lotteries"
+  },
+  "privacy": {
+    "manage": "Manage cookies",
+    "title": "Privacy & Cookie Policy",
+    "updated": "Last updated: July 2026"
+  },
+  "region": {
+    "all": "All",
+    "east": "Sabah & Sarawak",
+    "my": "Malaysia",
+    "sg": "Singapore Pools"
+  },
+  "results": {
+    "special": "Special Prizes"
   }
 }

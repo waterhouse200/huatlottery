@@ -432,8 +432,15 @@ app.get("/api/toto/shares", async (req, res) => {
     const latest = db.prepare("SELECT draw_no FROM toto_draws ORDER BY draw_no DESC LIMIT 1").get();
     if (!latest) return res.json({ success: true, data: null });
     const drawNo = req.query.draw ? parseInt(req.query.draw, 10) : latest.draw_no;
+    // Adaptive TTL: a just-drawn result — especially a large jackpot (>~$7M) — can have
+    // its Group 1 winners published by SG Pools several hours late. Re-check recent draws
+    // often so a late update appears within minutes; settle to a long TTL once the draw is
+    // >36h old and its shares can no longer change.
+    const drawRow = db.prepare("SELECT draw_date FROM toto_draws WHERE draw_no=?").get(drawNo);
+    const drawMs = drawRow && drawRow.draw_date ? new Date(drawRow.draw_date + "T18:30:00+08:00").getTime() : 0;
+    const ttl = (drawMs && Date.now() - drawMs < 36 * 3600e3) ? 10 * 60e3 : 6 * 3600e3;
     const cached = _totoShares[drawNo];
-    if (cached && Date.now() - cached.ts < 3600e3) return res.json({ success: true, data: cached.data });
+    if (cached && Date.now() - cached.ts < ttl) return res.json({ success: true, data: cached.data });
     const sppl = Buffer.from("DrawNumber=" + drawNo).toString("base64");
     const url = "https://www.singaporepools.com.sg/en/product/sr/Pages/toto_results.aspx?sppl=" + sppl;
     const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36" } });
@@ -443,7 +450,10 @@ app.get("/api/toto/shares", async (req, res) => {
       if (!/Prize Group|Group 1/i.test($(t).text())) return;
       $(t).find("tr").each((j, tr) => {
         const c = $(tr).find("td,th").map((k, x) => $(x).text().replace(/\s+/g, " ").trim()).get();
-        const m = c[0] && c[0].match(/Group ([1-7])/);
+        // Anchor the match: the page also has a summary "Group 1 Prize" row
+        // (share/winners blank) that must NOT be mistaken for the real Group 1
+        // shares row, or a genuine jackpot win gets misread as a snowball.
+        const m = c[0] && c[0].match(/^Group ([1-7])$/);
         if (m) groups.push({ group: +m[1], share: c[1] || "-", winners: c[2] || "-" });
       });
     });

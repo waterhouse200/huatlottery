@@ -33,7 +33,8 @@
       "sep": "9月",
       "oct": "10月",
       "nov": "11月",
-      "dec": "12月"
+      "dec": "12月",
+      "mon": "月"
     },
     "dow": {
       "mon": "周一",
@@ -43,7 +44,13 @@
       "fri": "周五",
       "sat": "周六",
       "sun": "周日"
-    }
+    },
+    "ad": "广告",
+    "nextDraw": "下期开奖",
+    "nextJackpot": "下期头奖",
+    "times": "次",
+    "viewHistory": "查看历史",
+    "won": "中奖"
   },
   "tabs": {
     "dashboard": "开奖结果",
@@ -54,7 +61,22 @@
     "research": "研究实验室",
     "prediction": "AI 预测",
     "lucky": "幸运号码",
-    "mynumbers": "我的号码"
+    "mynumbers": "我的号码",
+    "results": "开奖结果",
+    "others": "其他开奖结果",
+    "more": "更多",
+    "morealpha": "更多 Alpha"
+  },
+  "stats": {
+    "overdue": "最久未开",
+    "ago": "期前",
+    "bottom3": "末三名",
+    "doubles": "对子",
+    "quads": "四同号",
+    "single": "单号",
+    "top3": "前三名",
+    "total": "总计",
+    "triples": "三同号"
   },
   "dashboard": {
     "title": "开奖结果",
@@ -72,7 +94,8 @@
     "consolation": "特别奖",
     "first": "一等奖",
     "second": "二等奖",
-    "third": "三等奖"
+    "third": "三等奖",
+    "onDay": "在"
   },
   "toto": {
     "title": "多多统计",
@@ -145,11 +168,18 @@
       "nationalDay": "国庆日",
       "midAutumn": "中秋节",
       "allSpecial": "全部特别开奖"
-    }
+    },
+    "group": "组",
+    "pool": "奖池",
+    "share": "每份奖金",
+    "snowball": "无一等奖得主 — 头奖累积至下一期。",
+    "winners": "中奖人数",
+    "winningShares": "中奖份额"
   },
   "fourd": {
     "title": "4D 统计",
     "desc": "热门号码、精确与排列匹配。",
+    "overdueDesc": "距离上次出现在任何奖位以来间隔最久的号码。",
     "top10Hot": "4D 十大热门号码",
     "top10HotDesc": "按 <b>任意奖项位置</b>（每期 23 个）出现次数排名。档案：<b>{from}</b> → <b>{to}</b> · {count} 期。",
     "repeatWinners": "多次头奖号码",
@@ -256,7 +286,26 @@
     "payoutTitle": "每注派彩明细",
     "bigBet": "大字",
     "smallBet": "小字",
-    "dataSource": "数据来源"
+    "dataSource": "数据来源",
+    "anniversaryShort": "历年来在选定月份日期的每一期 4D 开奖。",
+    "avgPerMonth": "平均",
+    "calBiasNote": "所有年份合并的分布。较高的柱状仅代表历史，不具预测性 — 4D 依然是随机的。",
+    "digitFreqMyDesc": "每期开奖中各数字模式在全部 23 个奖位出现的频率。<b>总计</b>（右上角）= 该类别的出现次数；每个 <b>%</b> 为该项目在其类别中的占比 — 例如 44 相对于所有对子（均匀分布约为各 10%）。",
+    "hotDesc": "按在任何奖位的出现次数排名（每期 23 个）。",
+    "leansToward": "偏向",
+    "moreStatsDesc": "{op} 4D 更深入的逐年分析。",
+    "moreStatsTitle": "更多 4D 统计",
+    "neverHit": "从未在记录中出现。",
+    "noRepeat": "尚无号码中过一次以上的头奖。",
+    "pickNumber": "选择一个号码",
+    "prizeNumbers": "中奖号码",
+    "repeatWinnersMy": "个号码中过一次以上的头奖。",
+    "sgLabel": "新加坡博彩",
+    "strongestBiases": "所有号码中最强的偏差",
+    "top10Cold": "十大冷门 4D 号码",
+    "top10ColdDesc": "出现频率最低的号码 — 在记录中出现次数最少。",
+    "vsExpected": "对比预期",
+    "yearlyMy": "每年在全部 23 个奖位中出现最频繁的号码。"
   },
   "alpha4d": {
     "desc": "量化选号实验室。筛选、回测、找出具有数学优势的候选号码。",
@@ -332,7 +381,19 @@
     "moreTotoLookups": "更多多多查询",
     "numberDeepDiveDesc": "选择任意多多号码 (1–49)，查看首次/最近出现、最佳月份、最佳星期、最长冷却期及逐年分布。",
     "additionalPartnersDesc": "选择一个多多号码 1–49，查看当它作为特别号码（第 7 球）时与之同时出现的主号码。",
-    "totoAnniversaryDesc": "选择任意日期，查看所有年份中该月日的每期多多开奖。"
+    "totoAnniversaryDesc": "选择任意日期，查看所有年份中该月日的每期多多开奖。",
+    "acrossDraws": "跨越",
+    "additionalPartnersShort": "当此号码为特别号码（第 7 个 +）时，哪些主要号码一同出现。",
+    "containing": "包含",
+    "hits": "次命中",
+    "more4dLookups": "更多 4D 查询",
+    "numberDeepDiveShort": "首次/最后出现、最佳月份与星期、冷门连续期数、逐年细分。",
+    "placeholderTotoMulti": "多多号码 — 例如 5 23 42",
+    "recentWins": "最近中奖",
+    "source": "来源",
+    "source4d": "4D 运营商",
+    "totoAnniversaryShort": "历年来在选定月份日期的每一期多多开奖。",
+    "wins": "次中奖"
   },
   "research": {
     "title": "研究实验室",
@@ -423,5 +484,71 @@
     "p4": "博彩仅供<b>达到法定年龄者</b>参与。如果你选择参与，请负责任地博彩：只花费你能够轻松承受损失的金额，事先设定预算与时间限制，切勿借钱博彩，也切勿试图追回损失。博彩应是一种娱乐方式——绝不应成为赚钱、解决财务问题或排解压力的手段。",
     "help": "请负责任地博彩——如需协助，可拨打新加坡 NCPG 求助热线 <b style=\"color:var(--p);font-family:var(--mo)\">1800-6-668-668</b> 或浏览 <a href=\"https://www.ncpg.org.sg\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--p)\">ncpg.org.sg</a>。",
     "link": "免责声明"
+  },
+  "alpha": {
+    "simulator": "4D 模拟器",
+    "stats": "更多统计"
+  },
+  "cookie": {
+    "accept": "全部接受",
+    "learn": "隐私政策",
+    "reject": "拒绝",
+    "text": "我们使用 Cookie 进行分析和广告，以保持发达彩票免费。接受即允许使用，或拒绝非必要 Cookie — 网站均可正常使用。"
+  },
+  "hist": {
+    "allMonths": "全年",
+    "backOthers": "查看最新结果",
+    "desc": "每一期过往开奖及其日期。",
+    "liveMsg": "此游戏为实时抓取，目前仅提供最新结果 — 其完整的历史开奖记录正在收集中，稍后将显示于此。",
+    "liveTitle": "历史记录即将推出",
+    "month": "月份",
+    "noShares": "此期开奖暂无中奖份额资料。",
+    "noneYear": "此期间没有开奖。",
+    "past": "历史开奖",
+    "pool": "奖池",
+    "recent": "最近（近 20 期）",
+    "snowball": "无一等奖得主 — 头奖累积至下一期。",
+    "tap": "点击任意开奖以查看完整的特别奖与安慰奖。",
+    "tapToto": "点击任意开奖以查看一至七等奖得主及奖池。",
+    "winShares": "中奖份额",
+    "year": "年份"
+  },
+  "home": {
+    "desc": "一览新加坡与马来西亚每一期开奖。",
+    "jackpot": "4D 累积奖",
+    "mySub": "西马 · 沙巴与砂拉越",
+    "myTitle": "马来西亚开奖",
+    "nextDrawEst": "下期预估",
+    "or": "或",
+    "sixd": "多多 6D",
+    "sixd1st": "首奖 · 全中 6 位",
+    "sixdDigits": "位数字",
+    "sixdNone": "暂无最近的 6D 结果。",
+    "sixdNote": "6D 根据匹配中奖号码的前段或后段派彩 — 不像多多有等级得主。",
+    "title": "最新开奖"
+  },
+  "more": {
+    "desc": "工具与信息。",
+    "disclaimerDesc": "法律声明与理性投注。",
+    "historyDesc": "在所有过往开奖中搜索任意 4 位号码。"
+  },
+  "others": {
+    "bonus": "额外",
+    "desc": "非 4D 游戏 — 6D、5D、Lotto、3+3D、Jackpot Gold、Life 等。",
+    "title": "其他马来西亚彩票"
+  },
+  "privacy": {
+    "manage": "管理 Cookie",
+    "title": "隐私与 Cookie 政策",
+    "updated": "最后更新：2026 年 7 月"
+  },
+  "region": {
+    "all": "全部",
+    "east": "沙巴与砂拉越",
+    "my": "马来西亚",
+    "sg": "新加坡博彩"
+  },
+  "results": {
+    "special": "特别奖"
   }
 }
