@@ -710,12 +710,13 @@ function updateSEO(tabId) {
   setMeta('og:description', seo.desc, true);
   setMeta('twitter:title', seo.title);
   setMeta('twitter:description', seo.desc);
-  // Update canonical to reflect tab — helps search engines treat tabs as discrete pages
-  var SITE_URL = 'https://huatlottery.com';
-  var tabUrl = SITE_URL + '/?tab=' + tabId;
+  // Keep canonical/og:url on the CLEAN current path. The server already sets the
+  // correct per-page canonical for clean URLs (e.g. /magnum-4d-result); rewriting
+  // it to a ?tab= URL collapsed every page onto the homepage and blocked indexing.
+  var canonUrl = 'https://huatlottery.com' + (location.pathname || '/');
   var canon = document.querySelector('link[rel="canonical"]');
-  if (canon) canon.setAttribute('href', tabUrl);
-  setMeta('og:url', tabUrl, true);
+  if (canon) canon.setAttribute('href', canonUrl);
+  setMeta('og:url', canonUrl, true);
 }
 function setMeta(name, content, isProperty) {
   var attr = isProperty ? 'property' : 'name';

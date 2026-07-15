@@ -102,7 +102,10 @@ if (process.env.DISABLE_SELFHEAL !== "1") {
 // ─── SEO: robots.txt + sitemap.xml (declare these BEFORE static so they
 // take precedence over any same-named file in the directory) ───────────
 // In production, use the canonical public domain. Override via SITE_URL env.
-const SITE_URL = process.env.SITE_URL || "https://huatlottery.com";
+// Normalize so a malformed value (e.g. missing colon "https//…" from the env)
+// can't leak into robots.txt / links — always yields "https://<host>".
+const SITE_URL = "https://" + (process.env.SITE_URL || "https://huatlottery.com")
+  .replace(/^https?:?\/\/?/, "").replace(/\/+$/, "");
 
 app.get("/robots.txt", (req, res) => {
   // Lab subdomain — block all crawlers. Same hostname check used by the
