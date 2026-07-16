@@ -414,7 +414,8 @@ var DATA = {
   ready: false,
   latest: null,         // { toto: {...}, fourd: {...} }
   totoStats: null,      // /api/toto/stats payload
-  fourdStats: null      // /api/fourd/stats payload
+  fourdStats: null,     // /api/fourd/stats payload
+  myStats: {}           // per-operator /api/my/<op>/stats payloads, keyed by op id
 };
 
 function loadData(then) {
@@ -423,6 +424,7 @@ function loadData(then) {
   var B = window.__BOOT__;
   if (B && B.latest && B.totoStats && B.fourdStats) {
     DATA.latest = B.latest; DATA.totoStats = B.totoStats; DATA.fourdStats = B.fourdStats;
+    if (B.myStats) DATA.myStats = B.myStats;
     DATA.ready = true;
     if (then) then();
     return;
@@ -1472,13 +1474,15 @@ function renderStats(){
   if (currentStatOp === 'sg4d') return h + render4DStats();       // SG 4D engine
   var cfg = opCfg(currentStatOp);                                 // MY operator → deep stats
   h += '<h1>'+L('tabs.fourd','4D Stats')+' · '+cfg.flag+' '+cfg.label+'</h1>';
-  h += '<div id="myStats">'+loadingCard()+'</div>';
-  lazyLoad('myStats', function(){ loadMyStats(currentStatOp); });
+  var pre = DATA.myStats[currentStatOp];
+  if (pre) { h += '<div id="myStats">'+myStatsHTML(pre, cfg)+'</div>'; }
+  else { h += '<div id="myStats">'+loadingCard()+'</div>'; lazyLoad('myStats', function(){ loadMyStats(currentStatOp); }); }
   return h;
 }
 function loadMyStats(op){
   var cfg = opCfg(op);
   fetchJSON('/api/my/'+op+'/stats').then(function(j){
+    DATA.myStats[op] = j.data;
     var el=document.getElementById('myStats'); if(el) el.innerHTML = myStatsHTML(j.data, cfg);
   }).catch(function(){ var el=document.getElementById('myStats'); if(el) el.innerHTML='<div class="card" style="padding:20px;color:var(--red)">Could not load stats.</div>'; });
 }

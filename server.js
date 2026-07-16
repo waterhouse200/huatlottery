@@ -215,9 +215,9 @@ const SEO_PAGES = {
   "/":                       { title:"4D & TOTO Results Today — Singapore & Malaysia | Huatlottery", desc:"Live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Latest winning numbers, jackpots and past results.", block:()=> sg4dBlock()+totoBlock()+_seoLinks },
   "/singapore-4d-results":   { title:"Singapore 4D Results Today — Live Winning Numbers | Huatlottery", desc:"Today's Singapore Pools 4D results and winning numbers — 1st, 2nd, 3rd, Starter and Consolation prizes. Live draws Wed, Sat & Sun.", block:()=> sg4dBlock()+_seoLinks },
   "/singapore-toto-results": { title:"Singapore TOTO Results Today — Winning Numbers | Huatlottery", desc:"Today's Singapore Pools TOTO winning numbers and additional number. Live TOTO draws every Monday and Thursday.", block:()=> totoBlock()+_seoLinks },
-  "/magnum-4d-result":       { title:"Magnum 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Magnum 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes. Live Malaysia 4D draws.", block:()=> myBlock("magnum","Magnum")+_seoLinks },
-  "/sports-toto-4d-result":  { title:"Sports Toto 4D Result Today — Winning Numbers | Huatlottery", desc:"Today's Sports Toto 4D result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sportstoto","Sports Toto")+_seoLinks },
-  "/da-ma-cai-result":       { title:"Da Ma Cai 1+3D Result Today — Winning Numbers | Huatlottery", desc:"Today's Da Ma Cai (1+3D) result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("damacai","Da Ma Cai")+_seoLinks },
+  "/magnum-4d-result":       { statop:"magnum", title:"Magnum 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Magnum 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes. Live Malaysia 4D draws.", block:()=> myBlock("magnum","Magnum")+_seoLinks },
+  "/sports-toto-4d-result":  { statop:"sportstoto", title:"Sports Toto 4D Result Today — Winning Numbers | Huatlottery", desc:"Today's Sports Toto 4D result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sportstoto","Sports Toto")+_seoLinks },
+  "/da-ma-cai-result":       { statop:"damacai", title:"Da Ma Cai 1+3D Result Today — Winning Numbers | Huatlottery", desc:"Today's Da Ma Cai (1+3D) result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("damacai","Da Ma Cai")+_seoLinks },
   "/malaysia-4d-results":    { title:"Malaysia 4D Results Today — Magnum, Sports Toto, Da Ma Cai | Huatlottery", desc:"Live Malaysia 4D results — Magnum, Sports Toto and Da Ma Cai winning numbers, plus 5D, 6D, Lotto and jackpots.", block:()=> myBlock("magnum","Magnum")+myBlock("sportstoto","Sports Toto")+myBlock("damacai","Da Ma Cai")+_seoLinks },
 };
 async function serveSeo(routePath, res){
@@ -237,14 +237,15 @@ async function serveSeo(routePath, res){
   // client fetches exactly as before. Uses the app's own API for shape safety.
   try {
     const base = "http://127.0.0.1:" + PORT;
-    const [lt, tt, ft, i18] = await Promise.all([
+    const [lt, tt, ft, i18, ms] = await Promise.all([
       fetch(base + "/api/latest").then(r => r.json()),
       fetch(base + "/api/toto/stats").then(r => r.json()),
       fetch(base + "/api/fourd/stats").then(r => r.json()),
       fetch(base + "/api/i18n?lang=en").then(r => r.json()),
+      cfg.statop ? fetch(base + "/api/my/" + cfg.statop + "/stats").then(r => r.json()).catch(() => null) : Promise.resolve(null),
     ]);
     if (lt && lt.data && tt && tt.data && ft && ft.data) {
-      const boot = { latest: lt.data, totoStats: tt.data, fourdStats: ft.data, strings: (i18 && i18.strings) || null, lang: "en" };
+      const boot = { latest: lt.data, totoStats: tt.data, fourdStats: ft.data, myStats: (cfg.statop && ms && ms.data) ? { [cfg.statop]: ms.data } : null, strings: (i18 && i18.strings) || null, lang: "en" };
       const bootJson = JSON.stringify(boot).replace(/</g, "\\u003c");
       html = html.replace("</head>", () => "<script>window.__BOOT__=" + bootJson + "</script></head>");
     }
