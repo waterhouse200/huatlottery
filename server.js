@@ -131,14 +131,24 @@ app.get("/sitemap.xml", (req, res) => {
   // safe to list (no duplicate-canonical problem the old single-URL map avoided).
   const cleanUrl = SITE_URL.replace(/^https?:?\/\/?/, "").replace(/\/$/, "");
   const base = `https://${cleanUrl}`;
-  const today = new Date().toISOString().slice(0, 10);
+  // lastmod must be TRUE per page (Google verifies it against observed change
+  // and discards the signal site-wide when it lies). Each page's lastmod is the
+  // date of the newest draw it displays — not "today". changefreq/priority are
+  // ignored by Google and omitted.
+  const last = (sql) => { try { const r = db.prepare(sql).get(); return r && r.d ? String(r.d).slice(0, 10) : null; } catch (e) { return null; } };
+  const sg4d = last("SELECT MAX(draw_date) d FROM fourd_draws");
+  const toto = last("SELECT MAX(draw_date) d FROM toto_draws");
+  const myOp = (op) => last(`SELECT MAX(draw_date) d FROM my_draws WHERE operator='${op}'`);
+  const magnum = myOp("magnum"), sportstoto = myOp("sportstoto"), damacai = myOp("damacai");
+  const myAll = [magnum, sportstoto, damacai].filter(Boolean).sort().pop() || null;
+  const homeLast = [sg4d, toto, myAll].filter(Boolean).sort().pop() || null;
   const pages = [
-    ["/", "1.0"], ["/singapore-4d-results", "0.9"], ["/singapore-toto-results", "0.9"],
-    ["/malaysia-4d-results", "0.9"], ["/magnum-4d-result", "0.9"],
-    ["/sports-toto-4d-result", "0.9"], ["/da-ma-cai-result", "0.9"],
+    ["/", homeLast], ["/singapore-4d-results", sg4d], ["/singapore-toto-results", toto],
+    ["/malaysia-4d-results", myAll], ["/magnum-4d-result", magnum],
+    ["/sports-toto-4d-result", sportstoto], ["/da-ma-cai-result", damacai],
   ];
-  const urls = pages.map(([loc, pri]) =>
-    `<url><loc>${base}${loc}</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>${pri}</priority></url>`
+  const urls = pages.map(([loc, lm]) =>
+    `<url><loc>${base}${loc}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ""}</url>`
   ).join("\n");
   res.type("application/xml").send(
 `<?xml version="1.0" encoding="UTF-8"?>
@@ -228,9 +238,10 @@ async function serveSeo(routePath, res){
     .replace(/(<meta name="description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
     .replace(/(<link rel="canonical" href=")[^"]*(">)/, (m,a,b)=> a+canon+b)
     .replace(/(<meta property="og:title" content=")[^"]*(">)/, (m,a,b)=> a+cfg.title+b)
-    .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
-    // Keep a hidden sibling copy of the content as a non-JS fallback for crawlers.
-    .replace('<div class="content" id="content"></div>', () => '<div class="content" id="content"></div><div id="seoLander" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);border:0">'+cfg.block()+'</div>');
+    .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b);
+  // (No hidden content block: the page renders its real content synchronously
+  // from window.__BOOT__ below. A visually-hidden crawler-only copy would be
+  // cloaking — text served to bots that users can't see — with no remaining benefit.)
   // Inline the initial data so the SPA renders the real page synchronously —
   // crawlers see a full page immediately (no empty shell → no soft-404) with
   // ZERO visual change for users. Best-effort: any failure skips this and the
