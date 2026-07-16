@@ -220,7 +220,7 @@ const SEO_PAGES = {
   "/da-ma-cai-result":       { title:"Da Ma Cai 1+3D Result Today — Winning Numbers | Huatlottery", desc:"Today's Da Ma Cai (1+3D) result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("damacai","Da Ma Cai")+_seoLinks },
   "/malaysia-4d-results":    { title:"Malaysia 4D Results Today — Magnum, Sports Toto, Da Ma Cai | Huatlottery", desc:"Live Malaysia 4D results — Magnum, Sports Toto and Da Ma Cai winning numbers, plus 5D, 6D, Lotto and jackpots.", block:()=> myBlock("magnum","Magnum")+myBlock("sportstoto","Sports Toto")+myBlock("damacai","Da Ma Cai")+_seoLinks },
 };
-function serveSeo(routePath, res){
+async function serveSeo(routePath, res){
   const cfg = SEO_PAGES[routePath]; if(!cfg) return false;
   const canon = "https://huatlottery.com" + routePath;
   let html = seoBase()
@@ -229,18 +229,32 @@ function serveSeo(routePath, res){
     .replace(/(<link rel="canonical" href=")[^"]*(">)/, (m,a,b)=> a+canon+b)
     .replace(/(<meta property="og:title" content=")[^"]*(">)/, (m,a,b)=> a+cfg.title+b)
     .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
-    // Put the real content in a PERSISTENT sibling (#seoLander) the SPA never
-    // overwrites — crawlers (and Googlebot after running JS) always read this
-    // rich result content. It must be VISIBLE: Google discounts sr-only/clipped
-    // text, so a hidden block left the rendered page looking empty → soft-404.
-    // Styled as a tidy "latest result" summary section at the bottom.
+    // Keep a hidden sibling copy of the content as a non-JS fallback for crawlers.
     .replace('<div class="content" id="content"></div>', () => '<div class="content" id="content"></div><div id="seoLander" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);border:0">'+cfg.block()+'</div>');
+  // Inline the initial data so the SPA renders the real page synchronously —
+  // crawlers see a full page immediately (no empty shell → no soft-404) with
+  // ZERO visual change for users. Best-effort: any failure skips this and the
+  // client fetches exactly as before. Uses the app's own API for shape safety.
+  try {
+    const base = "http://127.0.0.1:" + PORT;
+    const [lt, tt, ft, i18] = await Promise.all([
+      fetch(base + "/api/latest").then(r => r.json()),
+      fetch(base + "/api/toto/stats").then(r => r.json()),
+      fetch(base + "/api/fourd/stats").then(r => r.json()),
+      fetch(base + "/api/i18n?lang=en").then(r => r.json()),
+    ]);
+    if (lt && lt.data && tt && tt.data && ft && ft.data) {
+      const boot = { latest: lt.data, totoStats: tt.data, fourdStats: ft.data, strings: (i18 && i18.strings) || null, lang: "en" };
+      const bootJson = JSON.stringify(boot).replace(/</g, "\\u003c");
+      html = html.replace("</head>", () => "<script>window.__BOOT__=" + bootJson + "</script></head>");
+    }
+  } catch (e) { /* fall back to client-side fetch */ }
   res.setHeader("Content-Type","text/html; charset=utf-8");
   res.setHeader("Cache-Control","public, max-age=300");
   res.send(html);
   return true;
 }
-Object.keys(SEO_PAGES).forEach((rp) => app.get(rp, (req, res) => { try { if(!serveSeo(rp,res)) res.status(404).end(); } catch(e){ res.status(500).end(); } }));
+Object.keys(SEO_PAGES).forEach((rp) => app.get(rp, async (req, res) => { try { if(!(await serveSeo(rp,res))) res.status(404).end(); } catch(e){ res.status(500).end(); } }));
 
 app.use(express.static(path.join(__dirname)));
 

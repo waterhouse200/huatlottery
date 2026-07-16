@@ -418,6 +418,15 @@ var DATA = {
 };
 
 function loadData(then) {
+  // Server-inlined data (SEO pages) → render synchronously so crawlers see a
+  // full page instantly. Falls back to fetch if absent/incomplete (no change).
+  var B = window.__BOOT__;
+  if (B && B.latest && B.totoStats && B.fourdStats) {
+    DATA.latest = B.latest; DATA.totoStats = B.totoStats; DATA.fourdStats = B.fourdStats;
+    DATA.ready = true;
+    if (then) then();
+    return;
+  }
   Promise.all([
     fetch('/api/latest').then(r => r.json()),
     fetch('/api/toto/stats').then(r => r.json()),
@@ -513,6 +522,13 @@ function L(path, fallback) {
 }
 
 function loadStrings(then) {
+  // Use server-inlined strings when they match the current language (SEO render).
+  var B = window.__BOOT__;
+  if (B && B.strings && B.lang === LANG) {
+    STRINGS = B.strings;
+    if (then) then();
+    return;
+  }
   fetch('/api/i18n?lang='+LANG).then(function(r){return r.json();}).then(function(j) {
     if (j && j.strings) { STRINGS = j.strings; }
     if (then) then();
