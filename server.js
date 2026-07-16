@@ -4648,6 +4648,14 @@ app.listen(PORT, () => {
   console.log("  TOTO: " + tc + " draws · 4D: " + fc + " draws");
   console.log("  Open the URL above in your browser!\n");
 
+  // Free-plan keep-warm: ping our own URL every 10 min so Render never spins the
+  // service down — a sleeping server makes crawlers/live-tests hit a cold start.
+  const _kwBase = (process.env.RENDER_EXTERNAL_URL || (process.env.NODE_ENV === "production" ? SITE_URL : "")).replace(/\/+$/, "");
+  if (_kwBase) {
+    const _kw = setInterval(() => { fetch(_kwBase + "/api/health").catch(() => {}); }, 10 * 60 * 1000);
+    if (_kw.unref) _kw.unref();
+  }
+
   if (process.env.AUTO_SCRAPE !== "0") {
     autoScrape.startAutoScrape({ everyMs: 2 * 60 * 60 * 1000 });
   } else {
