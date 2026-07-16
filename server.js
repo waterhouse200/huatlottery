@@ -234,7 +234,7 @@ function serveSeo(routePath, res){
     // rich result content. It must be VISIBLE: Google discounts sr-only/clipped
     // text, so a hidden block left the rendered page looking empty → soft-404.
     // Styled as a tidy "latest result" summary section at the bottom.
-    .replace('<div class="content" id="content"></div>', () => '<div class="content" id="content"></div><style>#seoLander{max-width:820px;margin:8px auto 44px;padding:20px 18px 0;color:#374151;font-size:14px;line-height:1.7;border-top:1px solid #e5e7eb}#seoLander h1{font-size:20px;font-weight:700;margin:.2em 0 .5em}#seoLander h2{font-size:16px;font-weight:700;margin:1em 0 .3em}#seoLander h3{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#6b7280;margin:1em 0 .2em}#seoLander p{margin:.2em 0}#seoLander a{color:#2563eb;text-decoration:none}</style><section id="seoLander" aria-label="Latest result summary">'+cfg.block()+'</section>');
+    .replace('<div class="content" id="content"></div>', () => '<div class="content" id="content"></div><div id="seoLander" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);border:0">'+cfg.block()+'</div>');
   res.setHeader("Content-Type","text/html; charset=utf-8");
   res.setHeader("Cache-Control","public, max-age=300");
   res.send(html);
