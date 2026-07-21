@@ -146,6 +146,7 @@ app.get("/sitemap.xml", (req, res) => {
     ["/", homeLast], ["/singapore-4d-results", sg4d], ["/singapore-toto-results", toto],
     ["/malaysia-4d-results", myAll], ["/magnum-4d-result", magnum],
     ["/sports-toto-4d-result", sportstoto], ["/da-ma-cai-result", damacai],
+    ...(typeof _seoExtraPages !== "undefined" ? _seoExtraPages.map(([loc, sql]) => [loc, last(sql)]) : []),
   ];
   const urls = pages.map(([loc, lm]) =>
     `<url><loc>${base}${loc}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ""}</url>`
@@ -267,6 +268,9 @@ async function serveSeo(routePath, res){
   return true;
 }
 Object.keys(SEO_PAGES).forEach((rp) => app.get(rp, async (req, res) => { try { if(!(await serveSeo(rp,res))) res.status(404).end(); } catch(e){ res.status(500).end(); } }));
+
+// Additional server-rendered SEO pages: history tables, 4D checker, TOTO frequency (additive)
+const _seoExtraPages = require("./seo-pages-extra")(app, db, { seoDate, esc: _esc, parseFourdRow });
 
 app.use(express.static(path.join(__dirname)));
 
