@@ -125,6 +125,16 @@ Sitemap: ${SITE_URL}/sitemap.xml
 `);
 });
 
+// IndexNow ownership check: the engines fetch /<key>.txt and expect the key
+// back as plain text before accepting any URL submission. Declared here with
+// the other SEO routes so it takes precedence over static file serving.
+const _indexNow = require("./lib/indexnow");
+app.get("/:key.txt", (req, res, next) => {
+  const key = _indexNow.getKey();
+  if (req.params.key !== key) return next();   // any other *.txt falls through to static
+  res.type("text/plain").send(key);
+});
+
 app.get("/sitemap.xml", (req, res) => {
   // Each of these clean URLs is server-rendered with its OWN canonical + real
   // result content (see SEO_PAGES below), so they're genuinely distinct pages —
@@ -147,7 +157,13 @@ app.get("/sitemap.xml", (req, res) => {
     ["/malaysia-4d-results", myAll], ["/magnum-4d-result", magnum],
     ["/sports-toto-4d-result", sportstoto], ["/da-ma-cai-result", damacai],
     ...(typeof _seoExtraPages !== "undefined" ? _seoExtraPages.map(([loc, sql]) => [loc, last(sql)]) : []),
-  ];
+    // Announcement index + one entry per published article. Each article's
+    // lastmod is its own publish/update date, so the signal stays true per URL
+    // rather than every article claiming to have changed whenever one does.
+    ...(typeof _seoArticles !== "undefined"
+      ? [[_seoArticles.index[0], last(_seoArticles.index[1])], ...(() => { try { return _seoArticles.articles(db); } catch (e) { return []; } })()]
+      : []),
+  ].filter(([loc]) => loc);
   const urls = pages.map(([loc, lm]) =>
     `<url><loc>${base}${loc}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ""}</url>`
   ).join("\n");
@@ -271,6 +287,9 @@ Object.keys(SEO_PAGES).forEach((rp) => app.get(rp, async (req, res) => { try { i
 
 // Additional server-rendered SEO pages: history tables, 4D checker, TOTO frequency (additive)
 const _seoExtraPages = require("./seo-pages-extra")(app, db, { seoDate, esc: _esc, parseFourdRow });
+
+// Announcement articles: /announcements + /announcements/:slug (additive)
+const _seoArticles = require("./seo-articles")(app, db, { seoDate, esc: _esc });
 
 app.use(express.static(path.join(__dirname)));
 

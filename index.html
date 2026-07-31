@@ -985,7 +985,7 @@ function anyOpCfg(id){
   return { id:id, label:id, flag:'🇲🇾', color:'var(--p)', logo:id };
 }
 function renderHome(){
-  var h = '<h1>'+L('home.title','Latest Results')+'</h1><p class="desc">'+L('home.desc','Every Singapore & Malaysia draw at a glance.')+'</p>';
+  var h = '<h1>'+L('h1.home','4D & TOTO Results Today — Singapore & Malaysia')+'</h1><p class="desc">'+L('home.desc','Every Singapore & Malaysia draw at a glance.')+'</p>';
   h += '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:18px">';
   REGIONS.forEach(function(o){ var on=o.id===currentRegion;
     h += '<button onclick="setRegion(\''+o.id+'\')" style="padding:8px 14px;border-radius:9px;border:1px solid '+(on?'var(--p)':'var(--bd)')+';background:'+(on?'color-mix(in srgb, var(--p) 13%, transparent)':'var(--cd)')+';color:'+(on?'var(--p)':'var(--t2)')+';font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">'+(o.flag?o.flag+' ':'')+o.label+'</button>';
@@ -1024,7 +1024,7 @@ var OTHERS_OPS = [
 var currentOtherOp = 'grandragon';
 window.setOtherOp = function(op){ currentOtherOp = op; renderPage(); window.scrollTo(0,0); };
 function renderOthers(){
-  var h = '<h1>'+L('others.title','Other Malaysia Lotteries')+'</h1><p class="desc">'+L('others.desc','Non-4D games — 6D, 5D, Lotto, 3+3D, Jackpot Gold, Life & more.')+'</p>';
+  var h = '<h1>'+L('h1.others','Malaysia Lottery Results Today — 6D, 5D, Lotto & Jackpot')+'</h1><p class="desc">'+L('others.desc','Non-4D games — 6D, 5D, Lotto, 3+3D, Jackpot Gold, Life & more.')+'</p>';
   h += '<div class="grid g3" id="otherResult" style="gap:16px">'+loadingCard()+'</div>';
   lazyLoad('otherResult', loadOthers);
   return h;
@@ -1229,7 +1229,7 @@ window.setHistMonth = function(m){ currentHistMonth = m; loadDrawHistory(); };
 function renderDrawHistory(){
   var m = HIST_META[currentHistGame] || HIST_META.toto;
   var hint = (m.liveOnly || m.kind==='6d') ? '' : (currentHistGame==='toto' ? L('hist.tapToto','Tap any draw to see the Group 1–7 winners &amp; prize pool.') : L('hist.tap','Tap any draw to reveal its full Starter &amp; Consolation prizes.'));
-  var h = '<h1>'+m.label+' · '+L('hist.past','Past Results')+'</h1>';
+  var h = '<h1>'+L('h1.hist','{op} Past Results — Winning Numbers History').replace('{op}', m.label)+'</h1>';
   h += '<p class="desc">'+L('hist.desc','Every past draw with its date.')+' '+hint+'</p>';
   h += '<div id="histControls" style="margin-bottom:18px"></div>';
   h += '<div id="histBody">'+loadingCard()+'</div>';
@@ -1473,7 +1473,7 @@ function renderStats(){
   var h = statOpSelector();
   if (currentStatOp === 'sg4d') return h + render4DStats();       // SG 4D engine
   var cfg = opCfg(currentStatOp);                                 // MY operator → deep stats
-  h += '<h1>'+L('tabs.fourd','4D Stats')+' · '+cfg.flag+' '+cfg.label+'</h1>';
+  h += '<h1>'+L('h1.opStats','{op} 4D Results Today — Winning Numbers & Statistics').replace('{op}', cfg.label)+'</h1>';
   var pre = DATA.myStats[currentStatOp];
   if (pre) { h += '<div id="myStats">'+myStatsHTML(pre, cfg)+'</div>'; }
   else { h += '<div id="myStats">'+loadingCard()+'</div>'; lazyLoad('myStats', function(){ loadMyStats(currentStatOp); }); }
@@ -1594,14 +1594,19 @@ function renderNumbers(){
 
 // ─── MORE view — utility links (History Search · Disclaimer · payout later) ──
 function renderMore(){
-  var h = '<h1>'+L('tabs.more','More')+'</h1><p class="desc">'+L('more.desc','Tools & information.')+'</p>';
+  var h = '<h1>'+L('h1.more','More 4D & TOTO Tools')+'</h1><p class="desc">'+L('more.desc','Tools & information.')+'</p>';
   h += '<div class="grid g2" style="gap:14px;margin-top:8px">';
   var items = [
     ['history', 'goTab(\'history\')', L('tabs.history','History Search'), L('more.historyDesc','Search any 4-digit number across every past draw.')],
+    // Announcements is a server-rendered section, not a tab — it needs a real
+    // navigation so crawlers can follow it and users can bookmark it.
+    ['announcements', null, L('more.announcements','Announcements'), L('more.announcementsDesc','Jackpot amounts and draw notices as the operators publish them.')],
     ['disclaimer', 'showDisclaimer()', L('footer.link','Disclaimer'), L('more.disclaimerDesc','Legal notice & responsible play.')]
   ];
   items.forEach(function(it){
-    h += '<a href="/?tab='+it[0]+'" onclick="event.preventDefault();'+it[1]+'" style="text-decoration:none;color:inherit"><div class="card" style="padding:22px;cursor:pointer"><div style="font-size:17px;font-weight:800;color:var(--tx)">'+it[2]+'</div><div style="font-size:13px;color:var(--t2);margin-top:5px;line-height:1.5">'+it[3]+'</div></div></a>';
+    var href = it[1] ? '/?tab='+it[0] : '/'+it[0];
+    var onclick = it[1] ? ' onclick="event.preventDefault();'+it[1]+'"' : '';
+    h += '<a href="'+href+'"'+onclick+' style="text-decoration:none;color:inherit"><div class="card" style="padding:22px;cursor:pointer"><div style="font-size:17px;font-weight:800;color:var(--tx)">'+it[2]+'</div><div style="font-size:13px;color:var(--t2);margin-top:5px;line-height:1.5">'+it[3]+'</div></div></a>';
   });
   h += '</div>';
   return h;
@@ -1615,7 +1620,7 @@ function renderTotoStats() {
   var hot = s.hot_numbers, cold = s.cold_numbers;
   var tE = s.even_odd.total_even, tO = s.even_odd.total_odd;
   var evenPct = s.even_odd.even_pct, oddPct = s.even_odd.odd_pct;
-  var h = '<h1>'+L('toto.title','TOTO Stats')+' · 🇸🇬 '+L('fourd.sgLabel','SG Pools')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.analyzed','draws analyzed')+'.</p>';
+  var h = '<h1>'+L('h1.toto','Singapore TOTO Results Today — Winning Numbers & Statistics')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.analyzed','draws analyzed')+'.</p>';
 
   // Hot / Cold — bigger headers, no meter bars (all-time = strict 6/49 era)
   h += '<div class="grid g2" style="margin-bottom:28px;gap:18px">';
@@ -3010,7 +3015,7 @@ function renderAlpha4D() {
     starter: L('alpha4d.tier.starter','starter'),
     consol:  L('alpha4d.tier.consol','consol')
   };
-  var h = '<h1>'+L('tabs.alpha4d','Alpha 4D Simulator')+'</h1>';
+  var h = '<h1>'+L('h1.alpha4d','Singapore 4D Alpha Simulator — Strategy Backtest')+'</h1>';
   h += '<p class="desc">'+L('alpha4d.desc','Quantitative number-selection lab. Filter, backtest, and identify candidates with mathematical edges.')+'</p>';
 
 
@@ -4008,7 +4013,7 @@ function renderMoreAlpha(){
 
 // More 4D Stats — moved out of 4D Stats into the More Alpha 'Stats' mode
 function renderMore4DStats(){
-  var h = '<h1>'+L('fourd.moreStatsTitle','More 4D Stats')+'</h1><p class="desc">'+L('fourd.moreStatsDesc','Deeper year-over-year analyses for {op} 4D.').replace('{op}', alphaOpMeta().label)+'</p>';
+  var h = '<h1>'+L('h1.moreStats','{op} 4D Statistics — Year-by-Year Analysis').replace('{op}', alphaOpMeta().label)+'</h1><p class="desc">'+L('fourd.moreStatsDesc','Deeper year-over-year analyses for {op} 4D.').replace('{op}', alphaOpMeta().label)+'</p>';
   // $1 Bet Simulator \u2014 most profitable numbers if $1 Big bet every draw
   h += '<div class="card" style="margin-bottom:28px;padding:24px">';
   h += '<div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">';
@@ -4076,7 +4081,7 @@ function render4DStats() {
   var s = DATA.fourdStats;
   var top10 = s.top10_hot;
   var maxHot = top10.length ? top10[0].count : 1;
-  var h = '<h1>'+L('fourd.title','4D Stats')+' \u00B7 \uD83C\uDDF8\uD83C\uDDEC '+L('fourd.sgLabel','SG Pools')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.draws','draws')+' \u00B7 '+s.total_numbers.toLocaleString()+' numbers</p>';
+  var h = '<h1>'+L('h1.sg4d','Singapore 4D Results Today \u2014 Hot Numbers & Statistics')+'</h1><p class="desc">'+s.total_draws+' '+L('dashboard.draws','draws')+' \u00B7 '+s.total_numbers.toLocaleString()+' numbers</p>';
 
   // Top 10 hot 4D numbers — with prize tier breakdown and archive date range
   var dr = s.top10_date_range || {};
@@ -4239,7 +4244,7 @@ function lookHead(txt, extra) {
   return '<h2 style="font-size:14.5px;font-weight:800;color:var(--t2);margin:24px 0 12px;border-top:1px solid var(--bd);padding-top:18px">'+txt+(extra||'')+'</h2>';
 }
 function renderHistory() {
-  var h = '<h1>'+L('history.title','History Search')+'</h1><p class="desc">'+L('history.desc','Search past 4D & TOTO draws by number, then dig deeper with the lookup tools below.')+'</p>';
+  var h = '<h1>'+L('h1.history','Singapore 4D & TOTO History Search')+'</h1><p class="desc">'+L('history.desc','Search past 4D & TOTO draws by number, then dig deeper with the lookup tools below.')+'</p>';
 
   // Primary search bar
   h += '<div class="card" style="margin-bottom:28px"><div style="display:flex;gap:6px;margin-bottom:14px"><button class="tab active" id="tab4d" onclick="setHistGame(\'4d\')">4D</button><button class="tab" id="tabtoto" onclick="setHistGame(\'toto\')">TOTO</button></div>';
@@ -4284,7 +4289,7 @@ function renderHistory() {
 }
 
 function renderResearch() {
-  var h = '<h1>'+L('research.title','Research Lab')+'</h1><p class="desc">'+L('research.desc','Environmental correlations.')+'</p><div class="grid g4">';
+  var h = '<h1>'+L('h1.research','Lottery Research Lab — 4D & TOTO Correlations')+'</h1><p class="desc">'+L('research.desc','Environmental correlations.')+'</p><div class="grid g4">';
   [{i:"moon",t:"Moon phase",d:"Lunar correlations",c:"var(--vi)"},{i:"cloud",t:"Weather",d:"Environmental",c:"var(--cy)"},{i:"cal",t:"Day analysis",d:"By draw day",c:"var(--amb)"},{i:"trend",t:"Sum trend",d:"Over time",c:"var(--em)"}].forEach(function(tool) {
     h += '<div class="card tool-card"><div style="width:28px;height:28px;border-radius:7px;background:'+tool.c+'11;display:flex;align-items:center;justify-content:center;color:'+tool.c+';margin-bottom:12px">'+svgIcon(tool.i,14)+'</div><h3 style="font-size:13.5px;font-weight:700;margin-bottom:3px">'+tool.t+'</h3><p style="font-size:12px;color:var(--t2);margin:0">'+tool.d+'</p></div>';
   });
@@ -4293,7 +4298,7 @@ function renderResearch() {
 }
 
 function renderPrediction() {
-  var h = '<h1>'+L('prediction.title','AI Prediction')+'</h1>';
+  var h = '<h1>'+L('h1.prediction','AI 4D & TOTO Prediction — Singapore Quick Picks')+'</h1>';
   h += '<p class="desc">'+L('prediction.desc','This week\'s picks, filtered through 40 years of past results.')+'</p>';
 
   h += '<div id="predResult">'+loadingCard()+'</div>';
@@ -4377,7 +4382,7 @@ function renderAiPicksResult(d) {
 
 
 function renderLucky() {
-  var h = '<h1>'+L('lucky.heading','Your Lucky Numbers')+'</h1>';
+  var h = '<h1>'+L('h1.lucky','Your Lucky 4D & TOTO Numbers')+'</h1>';
   h += '<p class="desc">'+L('lucky.subheading','Personalised picks + a daily luck reading.')+'</p>';
   h += '<div class="card" style="margin-bottom:20px">';
   h += '<div class="section-title"><div class="dot" style="background:#3730a311;color:var(--p)">'+svgIcon("user",14)+'</div><h3>'+L('lucky.heading','Your Lucky Numbers')+'</h3></div>';
@@ -4648,7 +4653,13 @@ var initialStatOp = new URLSearchParams(location.search).get('statop');   // dee
 if (initialStatOp) currentStatOp = initialStatOp;
 var initialHist = new URLSearchParams(location.search).get('hist');       // deep-link a draw-history game
 if (initialHist) currentHistGame = initialHist;
-updateSEO(currentTab);   // set initial title/meta before content renders
+// On a clean SEO path the server already stamped the correct per-page title,
+// description and canonical (e.g. /magnum-4d-result). Running updateSEO() here
+// overwrote them with the generic per-tab copy, so every operator page shipped
+// the same "Singapore 4D Results…" title to crawlers. Only set meta on landing
+// when the path carries no server-rendered SEO of its own; tab clicks below
+// still call updateSEO() as before.
+if (!_pathRoute) updateSEO(currentTab);   // set initial title/meta before content renders
 loadStrings(function() {
   renderAll();
   loadData(function() { renderPage(); });

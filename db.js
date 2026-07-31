@@ -87,6 +87,64 @@ function initSchema(db) {
       PRIMARY KEY (game, draw_date)
     );
     CREATE INDEX IF NOT EXISTS idx_other_draws_game_date ON other_draws(game, draw_date DESC);
+
+    ---------------------------------------------------------------
+    -- Official announcements, captured verbatim from the operators'
+    -- own sites (Singapore Pools, Magnum, Da Ma Cai, Sports Toto).
+    -- This table is the SOURCE OF TRUTH and is never published as-is:
+    -- the facts column holds the exact figures/dates lifted from official
+    -- copy, and every generated article is checked back against it so
+    -- no number can drift during rewriting.
+    ---------------------------------------------------------------
+    CREATE TABLE IF NOT EXISTS announcements (
+      id             INTEGER PRIMARY KEY AUTOINCREMENT,
+      source         TEXT NOT NULL,   -- 'singaporepools' | 'magnum' | 'damacai' | 'sportstoto'
+      kind           TEXT NOT NULL,   -- 'jackpot' | 'result' | 'notice'
+      source_url     TEXT NOT NULL,
+      official_title TEXT,
+      official_text  TEXT,            -- verbatim excerpt, kept for verification only
+      published_date TEXT,            -- ISO date the operator published/scheduled it
+      facts          TEXT NOT NULL,   -- JSON of exact figures — the only numbers an article may state
+      fingerprint    TEXT NOT NULL UNIQUE,   -- dedupe: same announcement never stored twice
+      seen_at        TEXT DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_announcements_seen ON announcements(seen_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_announcements_src  ON announcements(source, kind);
+
+    ---------------------------------------------------------------
+    -- Generated announcement articles. One article per announcement,
+    -- rewritten in our own words with its OWN keyword cluster (see
+    -- keyword_usage) so keywords stay spread across the archive
+    -- instead of stuffed into one page.
+    ---------------------------------------------------------------
+    CREATE TABLE IF NOT EXISTS articles (
+      id              INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug            TEXT NOT NULL UNIQUE,
+      announcement_id INTEGER REFERENCES announcements(id),
+      title           TEXT NOT NULL,
+      h1              TEXT NOT NULL,
+      meta_desc       TEXT NOT NULL,
+      lead            TEXT NOT NULL,
+      body_html       TEXT NOT NULL,
+      primary_keyword TEXT NOT NULL,
+      secondary_keywords TEXT NOT NULL DEFAULT '[]',   -- JSON array
+      writer          TEXT NOT NULL,                   -- 'anthropic:<model>' | 'template'
+      status          TEXT NOT NULL DEFAULT 'published',
+      published_at    TEXT DEFAULT (datetime('now')),
+      updated_at      TEXT DEFAULT (datetime('now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_articles_pub ON articles(status, published_at DESC);
+
+    ---------------------------------------------------------------
+    -- Keyword ledger: how often each target keyword has been used as a
+    -- primary/secondary. The writer picks the least-used cluster so the
+    -- archive spreads keywords naturally rather than repeating one set.
+    ---------------------------------------------------------------
+    CREATE TABLE IF NOT EXISTS keyword_usage (
+      keyword      TEXT PRIMARY KEY,
+      uses         INTEGER NOT NULL DEFAULT 0,
+      last_used_at TEXT
+    );
   `);
 
   // Migration: add next_draws.jackpot to pre-existing DBs (CREATE IF NOT EXISTS

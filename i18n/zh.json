@@ -530,7 +530,9 @@
   "more": {
     "desc": "工具与信息。",
     "disclaimerDesc": "法律声明与理性投注。",
-    "historyDesc": "在所有过往开奖中搜索任意 4 位号码。"
+    "historyDesc": "在所有过往开奖中搜索任意 4 位号码。",
+    "announcements": "公告",
+    "announcementsDesc": "运营商公布的头奖金额与开奖公告。"
   },
   "others": {
     "bonus": "额外",
@@ -550,5 +552,20 @@
   },
   "results": {
     "special": "特别奖"
+  },
+  "h1": {
+    "home": "今日开奖成绩 — 新加坡与马来西亚 4D 和多多",
+    "sg4d": "新加坡 4D 今日成绩 — 热门号码与统计",
+    "opStats": "{op} 4D 今日成绩 — 中奖号码与统计",
+    "toto": "新加坡多多今日成绩 — 中奖号码与统计",
+    "others": "马来西亚彩票今日成绩 — 6D、5D、Lotto 与积宝",
+    "hist": "{op} 历史开奖 — 中奖号码记录",
+    "history": "新加坡 4D 与多多历史查询",
+    "prediction": "AI 4D 与多多预测 — 新加坡幸运选号",
+    "lucky": "您的 4D 与多多幸运号码",
+    "alpha4d": "新加坡 4D Alpha 模拟器 — 策略回测",
+    "moreStats": "{op} 4D 统计 — 逐年分析",
+    "research": "彩票研究实验室 — 4D 与多多相关性",
+    "more": "更多 4D 与多多工具"
   }
 }

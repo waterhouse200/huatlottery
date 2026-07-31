@@ -520,7 +520,9 @@
   "more": {
     "desc": "Tools & information.",
     "disclaimerDesc": "Legal notice & responsible play.",
-    "historyDesc": "Search any 4-digit number across every past draw."
+    "historyDesc": "Search any 4-digit number across every past draw.",
+    "announcements": "Announcements",
+    "announcementsDesc": "Jackpot amounts and draw notices as the operators publish them."
   },
   "others": {
     "bonus": "Bonus",
@@ -540,5 +542,20 @@
   },
   "results": {
     "special": "Special Prizes"
+  },
+  "h1": {
+    "home": "4D & TOTO Results Today — Singapore & Malaysia",
+    "sg4d": "Singapore 4D Results Today — Hot Numbers & Statistics",
+    "opStats": "{op} 4D Results Today — Winning Numbers & Statistics",
+    "toto": "Singapore TOTO Results Today — Winning Numbers & Statistics",
+    "others": "Malaysia Lottery Results Today — 6D, 5D, Lotto & Jackpot",
+    "hist": "{op} Past Results — Winning Numbers History",
+    "history": "Singapore 4D & TOTO History Search",
+    "prediction": "AI 4D & TOTO Prediction — Singapore Quick Picks",
+    "lucky": "Your Lucky 4D & TOTO Numbers",
+    "alpha4d": "Singapore 4D Alpha Simulator — Strategy Backtest",
+    "moreStats": "{op} 4D Statistics — Year-by-Year Analysis",
+    "research": "Lottery Research Lab — 4D & TOTO Correlations",
+    "more": "More 4D & TOTO Tools"
   }
 }

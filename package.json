@@ -9,10 +9,13 @@
     "seed": "node seed.js",
     "scrape:toto": "node scraper/scrape-toto.js",
     "scrape:fourd": "node scraper/scrape-fourd.js",
+    "scrape:announcements": "node scraper/announcements.js",
+    "articles": "node scraper/generate-articles.js",
     "scrape:floor:toto": "node scraper/scrape-toto.js --find-floor",
     "scrape:floor:fourd": "node scraper/scrape-fourd.js --find-floor"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
     "better-sqlite3": "^11.7.0",
     "cheerio": "^1.2.0",
     "compression": "^1.8.1",
