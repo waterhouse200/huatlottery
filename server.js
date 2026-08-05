@@ -156,6 +156,14 @@ app.get("/sitemap.xml", (req, res) => {
     ["/", homeLast], ["/singapore-4d-results", sg4d], ["/singapore-toto-results", toto],
     ["/malaysia-4d-results", myAll], ["/magnum-4d-result", magnum],
     ["/sports-toto-4d-result", sportstoto], ["/da-ma-cai-result", damacai],
+    // Secondary Malaysia operators — each carries its own operator's newest
+    // draw date, so the lastmod stays true per URL.
+    ["/grand-dragon-4d-result", myOp("grandragon")],
+    ["/lucky-hari-hari-4d-result", myOp("lucky")],
+    ["/perdana-4d-result", myOp("perdana")],
+    ["/sabah-4d-result", myOp("sabah")],
+    ["/cash-sweep-result", myOp("sarawak")],
+    ["/sandakan-4d-result", myOp("sandakan")],
     ...(typeof _seoExtraPages !== "undefined" ? _seoExtraPages.map(([loc, sql]) => [loc, last(sql)]) : []),
     // Announcement index + one entry per published article. Each article's
     // lastmod is its own publish/update date, so the signal stays true per URL
@@ -237,7 +245,7 @@ function totoBlock(){ const r=db.prepare("SELECT * FROM toto_draws ORDER BY draw
   return "<h1>Singapore TOTO Results Today</h1><p>Latest Singapore Pools TOTO result — Draw #"+t.draw_no+", "+seoDate(t.draw_date)+".</p><h2>Winning Numbers</h2><p>"+(t.numbers||[]).join(", ")+" — Additional Number "+t.additional_num+".</p>"; }
 function myBlock(op, name){ const r=db.prepare("SELECT * FROM my_draws WHERE operator=? ORDER BY draw_date DESC LIMIT 1").get(op); if(!r) return ""; const p=parseMyRow(r);
   return "<h1>"+name+" 4D Result Today</h1><p>Latest "+name+" 4D result — "+seoDate(p.draw_date)+".</p><h2>Winning Numbers</h2><p>1st Prize <b>"+p.first_prize+"</b>, 2nd Prize <b>"+p.second_prize+"</b>, 3rd Prize <b>"+p.third_prize+"</b>.</p>"+seoGrid("Special Prizes",p.special_prizes)+seoGrid("Consolation Prizes",p.consolation_prizes); }
-const _seoLinks = '<p>More live results on Huatlottery: <a href="/singapore-4d-results">Singapore 4D</a>, <a href="/singapore-toto-results">Singapore TOTO</a>, <a href="/magnum-4d-result">Magnum 4D</a>, <a href="/sports-toto-4d-result">Sports Toto</a>, <a href="/da-ma-cai-result">Da Ma Cai</a>, <a href="/malaysia-4d-results">Malaysia 4D</a>.</p>';
+const _seoLinks = '<p>More live results on Huatlottery: <a href="/singapore-4d-results">Singapore 4D</a>, <a href="/singapore-toto-results">Singapore TOTO</a>, <a href="/magnum-4d-result">Magnum 4D</a>, <a href="/sports-toto-4d-result">Sports Toto</a>, <a href="/da-ma-cai-result">Da Ma Cai</a>, <a href="/grand-dragon-4d-result">Grand Dragon 4D</a>, <a href="/lucky-hari-hari-4d-result">Lucky Hari Hari</a>, <a href="/perdana-4d-result">Perdana 4D</a>, <a href="/sabah-4d-result">Sabah 88</a>, <a href="/cash-sweep-result">Sarawak Cash Sweep</a>, <a href="/sandakan-4d-result">Sandakan 4D</a>, <a href="/malaysia-4d-results">Malaysia 4D</a>.</p>';
 const SEO_PAGES = {
   "/":                       { title:"4D & TOTO Results Today — Singapore & Malaysia | Huatlottery", desc:"Live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Latest winning numbers, jackpots and past results.", block:()=> sg4dBlock()+totoBlock()+_seoLinks },
   "/singapore-4d-results":   { title:"Singapore 4D Results Today — Live Winning Numbers | Huatlottery", desc:"Today's Singapore Pools 4D results and winning numbers — 1st, 2nd, 3rd, Starter and Consolation prizes. Live draws Wed, Sat & Sun.", block:()=> sg4dBlock()+_seoLinks },
@@ -246,6 +254,16 @@ const SEO_PAGES = {
   "/sports-toto-4d-result":  { statop:"sportstoto", title:"Sports Toto 4D Result Today — Winning Numbers | Huatlottery", desc:"Today's Sports Toto 4D result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sportstoto","Sports Toto")+_seoLinks },
   "/da-ma-cai-result":       { statop:"damacai", title:"Da Ma Cai 1+3D Result Today — Winning Numbers | Huatlottery", desc:"Today's Da Ma Cai (1+3D) result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("damacai","Da Ma Cai")+_seoLinks },
   "/malaysia-4d-results":    { title:"Malaysia 4D Results Today — Magnum, Sports Toto, Da Ma Cai | Huatlottery", desc:"Live Malaysia 4D results — Magnum, Sports Toto and Da Ma Cai winning numbers, plus 5D, 6D, Lotto and jackpots.", block:()=> myBlock("magnum","Magnum")+myBlock("sportstoto","Sports Toto")+myBlock("damacai","Da Ma Cai")+_seoLinks },
+  // Secondary Malaysia operators. We already scrape and store all of these
+  // (my_draws), but they had no landing page — so their branded queries
+  // ("grand dragon 4d result", "cash sweep result", "sabah 88") were invisible.
+  // These are far less contested than Magnum/Toto/Da Ma Cai.
+  "/grand-dragon-4d-result": { statop:"grandragon", title:"Grand Dragon 4D Result Today (GD Lotto) — Live Winning Numbers | Huatlottery", desc:"Today's Grand Dragon 4D (GD Lotto) result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("grandragon","Grand Dragon 4D")+_seoLinks },
+  "/lucky-hari-hari-4d-result": { statop:"lucky", title:"Lucky Hari Hari 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Lucky Hari Hari 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("lucky","Lucky Hari Hari 4D")+_seoLinks },
+  "/perdana-4d-result":      { statop:"perdana", title:"Perdana 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Perdana 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("perdana","Perdana 4D")+_seoLinks },
+  "/sabah-4d-result":        { statop:"sabah", title:"Sabah 88 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Sabah 88 4D result and winning numbers for East Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sabah","Sabah 88 4D")+_seoLinks },
+  "/cash-sweep-result":      { statop:"sarawak", title:"Sarawak Cash Sweep Result Today — Special CashSweep Winning Numbers | Huatlottery", desc:"Today's Sarawak Special Cash Sweep result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sarawak","Sarawak Cash Sweep")+_seoLinks },
+  "/sandakan-4d-result":     { statop:"sandakan", title:"Sandakan 4D Result Today (STC) — Live Winning Numbers | Huatlottery", desc:"Today's Sandakan 4D (STC) result and winning numbers for Sabah — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sandakan","Sandakan 4D")+_seoLinks },
 };
 async function serveSeo(routePath, res){
   const cfg = SEO_PAGES[routePath]; if(!cfg) return false;
@@ -291,7 +309,12 @@ const _seoExtraPages = require("./seo-pages-extra")(app, db, { seoDate, esc: _es
 // Announcement articles: /announcements + /announcements/:slug (additive)
 const _seoArticles = require("./seo-articles")(app, db, { seoDate, esc: _esc });
 
-app.use(express.static(path.join(__dirname)));
+// Serve ONLY the public asset directory. This used to be
+// `express.static(path.join(__dirname))`, which published the entire project
+// over HTTP — huatlottery.db (7.7MB, every draw back to 1985), server.js,
+// db.js, seed.js, the scraper and i18n were all downloadable by filename.
+// Never widen this back to __dirname; put anything web-facing in assets/.
+app.use("/assets", express.static(path.join(__dirname, "assets"), { maxAge: "7d" }));
 
 function parseFourdRow(row) {
   if (!row) return null;
