@@ -116,10 +116,14 @@ app.get("/robots.txt", (req, res) => {
   if (isLab) {
     return res.type("text/plain").send("User-agent: *\nDisallow: /\n");
   }
+  // /api/ must stay crawlable: the SPA fetches it to render, so blocking it
+  // makes Googlebot see loading spinners instead of results. Block the things
+  // that genuinely shouldn't be crawled instead.
   res.type("text/plain").send(
 `User-agent: *
 Allow: /
-Disallow: /api/
+Disallow: /lab
+Disallow: /api/lab/
 
 Sitemap: ${SITE_URL}/sitemap.xml
 `);
@@ -258,12 +262,12 @@ const SEO_PAGES = {
   // (my_draws), but they had no landing page — so their branded queries
   // ("grand dragon 4d result", "cash sweep result", "sabah 88") were invisible.
   // These are far less contested than Magnum/Toto/Da Ma Cai.
-  "/grand-dragon-4d-result": { statop:"grandragon", title:"Grand Dragon 4D Result Today (GD Lotto) — Live Winning Numbers | Huatlottery", desc:"Today's Grand Dragon 4D (GD Lotto) result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("grandragon","Grand Dragon 4D")+_seoLinks },
-  "/lucky-hari-hari-4d-result": { statop:"lucky", title:"Lucky Hari Hari 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Lucky Hari Hari 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("lucky","Lucky Hari Hari 4D")+_seoLinks },
-  "/perdana-4d-result":      { statop:"perdana", title:"Perdana 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Perdana 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("perdana","Perdana 4D")+_seoLinks },
-  "/sabah-4d-result":        { statop:"sabah", title:"Sabah 88 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Sabah 88 4D result and winning numbers for East Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sabah","Sabah 88 4D")+_seoLinks },
+  "/grand-dragon-4d-result": { statop:"grandragon", title:"Grand Dragon 4D Result Today (GD Lotto) — Live Winning Numbers | Huatlottery", desc:"Today's Grand Dragon 4D (GD Lotto) result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("grandragon","Grand Dragon")+_seoLinks },
+  "/lucky-hari-hari-4d-result": { statop:"lucky", title:"Lucky Hari Hari 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Lucky Hari Hari 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("lucky","Lucky Hari Hari")+_seoLinks },
+  "/perdana-4d-result":      { statop:"perdana", title:"Perdana 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Perdana 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("perdana","Perdana")+_seoLinks },
+  "/sabah-4d-result":        { statop:"sabah", title:"Sabah 88 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Sabah 88 4D result and winning numbers for East Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sabah","Sabah 88")+_seoLinks },
   "/cash-sweep-result":      { statop:"sarawak", title:"Sarawak Cash Sweep Result Today — Special CashSweep Winning Numbers | Huatlottery", desc:"Today's Sarawak Special Cash Sweep result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sarawak","Sarawak Cash Sweep")+_seoLinks },
-  "/sandakan-4d-result":     { statop:"sandakan", title:"Sandakan 4D Result Today (STC) — Live Winning Numbers | Huatlottery", desc:"Today's Sandakan 4D (STC) result and winning numbers for Sabah — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sandakan","Sandakan 4D")+_seoLinks },
+  "/sandakan-4d-result":     { statop:"sandakan", title:"Sandakan 4D Result Today (STC) — Live Winning Numbers | Huatlottery", desc:"Today's Sandakan 4D (STC) result and winning numbers for Sabah — 1st, 2nd, 3rd, Special and Consolation prizes.", block:()=> myBlock("sandakan","Sandakan")+_seoLinks },
 };
 async function serveSeo(routePath, res){
   const cfg = SEO_PAGES[routePath]; if(!cfg) return false;
@@ -273,7 +277,17 @@ async function serveSeo(routePath, res){
     .replace(/(<meta name="description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
     .replace(/(<link rel="canonical" href=")[^"]*(">)/, (m,a,b)=> a+canon+b)
     .replace(/(<meta property="og:title" content=")[^"]*(">)/, (m,a,b)=> a+cfg.title+b)
-    .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b);
+    .replace(/(<meta property="og:description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
+    .replace(/(<meta property="og:url" content=")[^"]*(">)/, (m,a,b)=> a+canon+b)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, (m,a,b)=> a+cfg.title+b)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(">)/, (m,a,b)=> a+cfg.desc+b)
+    // Server-render the page's real content as the INITIAL state of #content —
+    // the same container renderPage() overwrites on boot (contentEl.innerHTML).
+    // Not cloaking: bots and users receive identical markup, and the SPA simply
+    // hydrates over it. Without this the routes ship an empty shell, which is
+    // what got them flagged as soft-404s.
+    .replace('<div class="content" id="content"></div>',
+      () => '<div class="content" id="content">' + cfg.block() + '</div>');
   // (No hidden content block: the page renders its real content synchronously
   // from window.__BOOT__ below. A visually-hidden crawler-only copy would be
   // cloaking — text served to bots that users can't see — with no remaining benefit.)

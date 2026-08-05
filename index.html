@@ -4640,10 +4640,22 @@ var PATH_ROUTES = {
   '/magnum-4d-result':       { tab:'fourd', statop:'magnum' },
   '/sports-toto-4d-result':  { tab:'fourd', statop:'sportstoto' },
   '/da-ma-cai-result':       { tab:'fourd', statop:'damacai' },
-  '/malaysia-4d-results':    { tab:'others' }
+  '/malaysia-4d-results':    { tab:'others' },
+  // Secondary Malaysia operators — these live in the "others" tab, selected by
+  // currentOtherOp, so each landing page opens straight onto its own operator.
+  '/grand-dragon-4d-result':    { tab:'others', otherop:'grandragon' },
+  '/lucky-hari-hari-4d-result': { tab:'others', otherop:'lucky' },
+  '/perdana-4d-result':         { tab:'others', otherop:'perdana' },
+  '/sabah-4d-result':           { tab:'others', otherop:'sabah' },
+  '/cash-sweep-result':         { tab:'others', otherop:'sarawak' },
+  '/sandakan-4d-result':        { tab:'others', otherop:'sandakan' }
 };
 var _pathRoute = PATH_ROUTES[location.pathname.replace(/\/$/, '') || '/'];
-if (_pathRoute) { currentTab = _pathRoute.tab; if (_pathRoute.statop) currentStatOp = _pathRoute.statop; }
+if (_pathRoute) {
+  currentTab = _pathRoute.tab;
+  if (_pathRoute.statop) currentStatOp = _pathRoute.statop;
+  if (_pathRoute.otherop) currentOtherOp = _pathRoute.otherop;
+}
 var initialTab = new URLSearchParams(location.search).get('tab');
 if (initialTab) currentTab = initialTab;
 // operator for the Results view: URL ?op= wins, else remembered, else default
