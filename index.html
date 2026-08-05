@@ -4672,6 +4672,21 @@ if (initialHist) currentHistGame = initialHist;
 // when the path carries no server-rendered SEO of its own; tab clicks below
 // still call updateSEO() as before.
 if (!_pathRoute) updateSEO(currentTab);   // set initial title/meta before content renders
+// Hydrate synchronously from the server-inlined payload BEFORE the first
+// render. Without this, renderAll() runs while DATA is still empty, so the
+// first renderStats() takes the lazy-fetch branch and re-requests over the
+// network the very data already embedded in this page.
+(function hydrateBoot() {
+  var B = window.__BOOT__;
+  if (!B) return;
+  if (B.latest && B.totoStats && B.fourdStats) {
+    DATA.latest = B.latest; DATA.totoStats = B.totoStats; DATA.fourdStats = B.fourdStats;
+    DATA.ready = true;
+  }
+  if (B.myStats) DATA.myStats = B.myStats;
+  if (B.strings && B.lang === LANG) STRINGS = B.strings;
+})();
+
 loadStrings(function() {
   renderAll();
   loadData(function() { renderPage(); });
