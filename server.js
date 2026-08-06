@@ -304,23 +304,23 @@ function myBlock(op, name, lang){ const r=db.prepare("SELECT * FROM my_draws WHE
   return "<h1>"+t.todayResult(name)+"</h1><p>"+t.latest+" "+name+" — "+seoDate(p.draw_date)+".</p><h2>"+t.winning+"</h2><p>"+t.first+" <b>"+p.first_prize+"</b>, "+t.second+" <b>"+p.second_prize+"</b>, "+t.third+" <b>"+p.third_prize+"</b>.</p>"+seoGrid(t.special,p.special_prizes)+seoGrid(t.consol,p.consolation_prizes); }
 const _seoLinks = '<p>More live results on Huatlottery: <a href="/singapore-4d-results">Singapore 4D</a>, <a href="/singapore-toto-results">Singapore TOTO</a>, <a href="/magnum-4d-result">Magnum 4D</a>, <a href="/sports-toto-4d-result">Sports Toto</a>, <a href="/da-ma-cai-result">Da Ma Cai</a>, <a href="/grand-dragon-4d-result">Grand Dragon 4D</a>, <a href="/lucky-hari-hari-4d-result">Lucky Hari Hari</a>, <a href="/perdana-4d-result">Perdana 4D</a>, <a href="/sabah-4d-result">Sabah 88</a>, <a href="/cash-sweep-result">Sarawak Cash Sweep</a>, <a href="/sandakan-4d-result">Sandakan 4D</a>, <a href="/malaysia-4d-results">Malaysia 4D</a>.</p>';
 const SEO_PAGES = {
-  "/":                       { title:"4D & TOTO Results Today — Singapore & Malaysia | Huatlottery", desc:"Live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Latest winning numbers, jackpots and past results.", block:(lang)=> sg4dBlock(lang)+totoBlock(lang)+_seoLinks },
+  "/":                       { h1:"4D & TOTO Results Today — Singapore & Malaysia", h1zh:"\u4eca\u65e5\u4e07\u5b57\u4e0e\u591a\u591a\u5f00\u5956\u6210\u7ee9", title:"4D & TOTO Results Today — Singapore & Malaysia | Huatlottery", desc:"Live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Latest winning numbers, jackpots and past results.", block:(lang)=> sg4dBlock(lang)+totoBlock(lang)+_seoLinks },
   "/singapore-4d-results":   { title:"Singapore 4D Results Today — Live Winning Numbers | Huatlottery", desc:"Today's Singapore Pools 4D results and winning numbers — 1st, 2nd, 3rd, Starter and Consolation prizes. Live draws Wed, Sat & Sun.", block:(lang)=> sg4dBlock(lang)+_seoLinks },
   "/singapore-toto-results": { title:"Singapore TOTO Results Today — Winning Numbers | Huatlottery", desc:"Today's Singapore Pools TOTO winning numbers and additional number. Live TOTO draws every Monday and Thursday.", block:(lang)=> totoBlock(lang)+_seoLinks },
   "/magnum-4d-result":       { statop:"magnum", title:"Magnum 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Magnum 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes. Live Malaysia 4D draws.", block:(lang)=> myBlock("magnum","Magnum",lang)+_seoLinks },
   "/sports-toto-4d-result":  { statop:"sportstoto", title:"Sports Toto 4D Result Today — Winning Numbers | Huatlottery", desc:"Today's Sports Toto 4D result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("sportstoto","Sports Toto",lang)+_seoLinks },
   "/da-ma-cai-result":       { statop:"damacai", title:"Da Ma Cai 1+3D Result Today — Winning Numbers | Huatlottery", desc:"Today's Da Ma Cai (1+3D) result and winning numbers for Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("damacai","Da Ma Cai",lang)+_seoLinks },
-  "/malaysia-4d-results":    { title:"Malaysia 4D Results Today — Magnum, Sports Toto, Da Ma Cai | Huatlottery", desc:"Live Malaysia 4D results — Magnum, Sports Toto and Da Ma Cai winning numbers, plus 5D, 6D, Lotto and jackpots.", block:(lang)=> myBlock("magnum","Magnum",lang)+myBlock("sportstoto","Sports Toto",lang)+myBlock("damacai","Da Ma Cai",lang)+_seoLinks },
+  "/malaysia-4d-results":    { h1:"Malaysia 4D Results Today", h1zh:"\u9a6c\u6765\u897f\u4e9a\u4e07\u5b57\u4eca\u65e5\u5f00\u5956\u6210\u7ee9", title:"Malaysia 4D Results Today — Magnum, Toto, Da Ma Cai | Huatlottery", desc:"Live Malaysia 4D results — Magnum, Sports Toto and Da Ma Cai winning numbers, plus 5D, 6D, Lotto and jackpots.", block:(lang)=> myBlock("magnum","Magnum",lang)+myBlock("sportstoto","Sports Toto",lang)+myBlock("damacai","Da Ma Cai",lang)+_seoLinks },
   // Secondary Malaysia operators. We already scrape and store all of these
   // (my_draws), but they had no landing page — so their branded queries
   // ("grand dragon 4d result", "cash sweep result", "sabah 88") were invisible.
   // These are far less contested than Magnum/Toto/Da Ma Cai.
-  "/grand-dragon-4d-result": { statop:"grandragon", title:"Grand Dragon 4D Result Today (GD Lotto) — Live Winning Numbers | Huatlottery", desc:"Today's Grand Dragon 4D (GD Lotto) result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("grandragon","Grand Dragon",lang)+_seoLinks },
-  "/lucky-hari-hari-4d-result": { statop:"lucky", title:"Lucky Hari Hari 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Lucky Hari Hari 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("lucky","Lucky Hari Hari",lang)+_seoLinks },
+  "/grand-dragon-4d-result": { statop:"grandragon", title:"Grand Dragon 4D Result Today (GD Lotto) | Huatlottery", desc:"Today's Grand Dragon 4D (GD Lotto) result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("grandragon","Grand Dragon",lang)+_seoLinks },
+  "/lucky-hari-hari-4d-result": { statop:"lucky", title:"Lucky Hari Hari 4D Result Today — Winning Numbers | Huatlottery", desc:"Today's Lucky Hari Hari 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("lucky","Lucky Hari Hari",lang)+_seoLinks },
   "/perdana-4d-result":      { statop:"perdana", title:"Perdana 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Perdana 4D result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("perdana","Perdana",lang)+_seoLinks },
   "/sabah-4d-result":        { statop:"sabah", title:"Sabah 88 4D Result Today — Live Winning Numbers | Huatlottery", desc:"Today's Sabah 88 4D result and winning numbers for East Malaysia — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("sabah","Sabah 88",lang)+_seoLinks },
-  "/cash-sweep-result":      { statop:"sarawak", title:"Sarawak Cash Sweep Result Today — Special CashSweep Winning Numbers | Huatlottery", desc:"Today's Sarawak Special Cash Sweep result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("sarawak","Sarawak Cash Sweep",lang)+_seoLinks },
-  "/sandakan-4d-result":     { statop:"sandakan", title:"Sandakan 4D Result Today (STC) — Live Winning Numbers | Huatlottery", desc:"Today's Sandakan 4D (STC) result and winning numbers for Sabah — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("sandakan","Sandakan",lang)+_seoLinks },
+  "/cash-sweep-result":      { statop:"sarawak", title:"Sarawak Cash Sweep Result Today — Winning Numbers | Huatlottery", desc:"Today's Sarawak Special Cash Sweep result and winning numbers — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("sarawak","Sarawak Cash Sweep",lang)+_seoLinks },
+  "/sandakan-4d-result":     { statop:"sandakan", title:"Sandakan 4D Result Today (STC) — Winning Numbers | Huatlottery", desc:"Today's Sandakan 4D (STC) result and winning numbers for Sabah — 1st, 2nd, 3rd, Special and Consolation prizes.", block:(lang)=> myBlock("sandakan","Sandakan",lang)+_seoLinks },
 };
 
 // ── Chinese titles/descriptions for the same routes ─────────────────────────
@@ -381,8 +381,16 @@ async function serveSeo(routePath, res, lang){
     // Not cloaking: bots and users receive identical markup, and the SPA simply
     // hydrates over it. Without this the routes ship an empty shell, which is
     // what got them flagged as soft-404s.
-    .replace('<div class="content" id="content"></div>',
-      () => '<div class="content" id="content">' + cfg.block(lang) + '</div>');
+    .replace('<div class="content" id="content"></div>', () => {
+      let body = cfg.block(lang);
+      // Pages that stack several operator blocks would otherwise emit one <h1>
+      // per block, and the first block's heading (e.g. "Magnum 4D Result
+      // Today") would stand in for a page that is actually about all of
+      // Malaysia. Give those pages their own H1 and demote the blocks to H2.
+      const pageH1 = isZh ? (cfg.h1zh || cfg.h1) : cfg.h1;
+      if (pageH1) body = "<h1>" + pageH1 + "</h1>" + body.replace(/<(\/?)h1>/g, "<$1h2>");
+      return '<div class="content" id="content">' + body + '</div>';
+    });
   // (No hidden content block: the page renders its real content synchronously
   // from window.__BOOT__ below. A visually-hidden crawler-only copy would be
   // cloaking — text served to bots that users can't see — with no remaining benefit.)
