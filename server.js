@@ -139,7 +139,7 @@ app.get("/:key.txt", (req, res, next) => {
   res.type("text/plain").send(key);
 });
 
-app.get("/sitemap.xml", (req, res) => {
+app.get("/sitemap-pages.xml", (req, res) => {
   // Each of these clean URLs is server-rendered with its OWN canonical + real
   // result content (see SEO_PAGES below), so they're genuinely distinct pages —
   // safe to list (no duplicate-canonical problem the old single-URL map avoided).
@@ -184,6 +184,45 @@ app.get("/sitemap.xml", (req, res) => {
   const urls = pages.concat(zhPages).map(([loc, lm]) =>
     `<url><loc>${base}${loc}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ""}</url>`
   ).join("\n");
+  res.type("application/xml").send(
+`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`);
+});
+
+// ── Sitemap index ───────────────────────────────────────────────────────────
+// The archive is ~38,000 dated URLs, so it cannot live in one urlset alongside
+// the hub pages (50,000-URL / 50MB cap, and a single huge file is slow to
+// fetch and re-fetch). /sitemap.xml is now an index; each operator gets its own
+// child sitemap whose lastmod is that operator's newest draw, so a fresh draw
+// invalidates only that one file rather than signalling the whole archive
+// changed. Only the English permalinks are listed — every one of them carries
+// hreflang to its /zh twin, which is how Google is meant to discover the
+// alternate, and listing both would double crawl load for no extra coverage.
+const _slug = (rp) => rp.replace(/^\//, "");
+app.get("/sitemap.xml", (req, res) => {
+  const base = "https://" + SITE_URL.replace(/^https?:?\/\/?/, "").replace(/\/$/, "");
+  const last = (rp) => { try { const ds = DRAW_ROUTES[rp].dates(); return ds.length ? ds[0] : null; } catch (e) { return null; } };
+  const kids = [["/sitemap-pages.xml", null]].concat(
+    Object.keys(DRAW_ROUTES).map((rp) => ["/sitemap-draws-" + _slug(rp) + ".xml", last(rp)])
+  );
+  res.type("application/xml").send(
+`<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${kids.map(([loc, lm]) => `<sitemap><loc>${base}${loc}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ""}</sitemap>`).join("\n")}
+</sitemapindex>`);
+});
+app.get(/^\/sitemap-draws-(.+)\.xml$/, (req, res) => {
+  const rp = "/" + req.params[0];
+  const cfg = DRAW_ROUTES[rp];
+  if (!cfg) return res.status(404).end();
+  const base = "https://" + SITE_URL.replace(/^https?:?\/\/?/, "").replace(/\/$/, "");
+  let dates;
+  try { dates = cfg.dates(); } catch (e) { return res.status(500).end(); }
+  // lastmod is the draw's own date — the page's content is fixed the day the
+  // draw happens and never changes again, so this is true rather than "today".
+  const urls = dates.map((d) => `<url><loc>${base}${rp}/${d}</loc><lastmod>${d}</lastmod></url>`).join("\n");
   res.type("application/xml").send(
 `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -281,6 +320,12 @@ const _DOW = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Satur
 const _MON = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 function seoDate(iso){ if(!iso) return ""; const p=iso.split("-").map(Number); const dt=new Date(Date.UTC(p[0],p[1]-1,p[2])); return _DOW[dt.getUTCDay()]+", "+p[2]+" "+_MON[p[1]-1]+" "+p[0]; }
 function seoGrid(label, arr){ if(!arr||!arr.length) return ""; return "<h3>"+label+"</h3><p>"+arr.map(_esc).join(", ")+"</p>"; }
+// Chinese pages were rendering "Saturday, 16 March 2024" — the one untranslated
+// string on an otherwise fully translated page, and the exact form a Chinese
+// speaker would search ("2024年3月16日").
+const _DOW_ZH = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+function seoDateZh(iso){ if(!iso) return ""; const p=iso.split("-").map(Number); const dt=new Date(Date.UTC(p[0],p[1]-1,p[2])); return p[0]+"年"+p[1]+"月"+p[2]+"日（"+_DOW_ZH[dt.getUTCDay()]+"）"; }
+function seoDateL(iso, lang){ return lang === "zh" ? seoDateZh(iso) : seoDate(iso); }
 // Chinese labels + operator names, so the /zh pages carry Chinese BODY content
 // rather than a Chinese title wrapped around English text — otherwise the two
 // signals contradict each other and the mirror looks like a duplicate.
@@ -296,12 +341,18 @@ const T = (lang) => lang === "zh"
       draw:"Draw #", latest:"Latest", addl:"Additional Number",
       sg4d:"Singapore 4D Results Today", sgtoto:"Singapore TOTO Results Today",
       todayResult:(n)=> n+" 4D Result Today" };
-function sg4dBlock(lang){ const r=db.prepare("SELECT * FROM fourd_draws ORDER BY draw_no DESC LIMIT 1").get(); if(!r) return ""; const p=parseFourdRow(r); const t=T(lang);
-  return "<h1>"+t.sg4d+"</h1><p>"+t.latest+" Singapore Pools 4D — "+t.draw+p.draw_no+", "+seoDate(p.draw_date)+".</p><h2>"+t.winning+"</h2><p>"+t.first+" <b>"+p.first_prize+"</b>, "+t.second+" <b>"+p.second_prize+"</b>, "+t.third+" <b>"+p.third_prize+"</b>.</p>"+seoGrid(t.starter,p.starter_prizes)+seoGrid(t.consol,p.consolation_prizes); }
-function totoBlock(lang){ const r=db.prepare("SELECT * FROM toto_draws ORDER BY draw_no DESC LIMIT 1").get(); if(!r) return ""; const t=formatTotoRow(r); const L=T(lang);
-  return "<h1>"+L.sgtoto+"</h1><p>"+L.latest+" Singapore Pools TOTO — "+L.draw+t.draw_no+", "+seoDate(t.draw_date)+".</p><h2>"+L.winning+"</h2><p>"+(t.numbers||[]).join(", ")+" — "+L.addl+" "+t.additional_num+".</p>"; }
-function myBlock(op, name, lang){ const r=db.prepare("SELECT * FROM my_draws WHERE operator=? ORDER BY draw_date DESC LIMIT 1").get(op); if(!r) return ""; const p=parseMyRow(r); const t=T(lang); if(lang==="zh"&&ZH_OP[op]) name=ZH_OP[op];
-  return "<h1>"+t.todayResult(name)+"</h1><p>"+t.latest+" "+name+" — "+seoDate(p.draw_date)+".</p><h2>"+t.winning+"</h2><p>"+t.first+" <b>"+p.first_prize+"</b>, "+t.second+" <b>"+p.second_prize+"</b>, "+t.third+" <b>"+p.third_prize+"</b>.</p>"+seoGrid(t.special,p.special_prizes)+seoGrid(t.consol,p.consolation_prizes); }
+// The `date` argument turns a block into a permalink for one historical draw
+// instead of the newest one. Same markup either way, so a dated page is a real
+// page with real numbers — not a thin variant of the hub.
+function sg4dBlock(lang, date){ const r = date ? db.prepare("SELECT * FROM fourd_draws WHERE draw_date=? ORDER BY draw_no DESC LIMIT 1").get(date) : db.prepare("SELECT * FROM fourd_draws ORDER BY draw_no DESC LIMIT 1").get(); if(!r) return ""; const p=parseFourdRow(r); const t=T(lang);
+  const head = date ? t.sg4d.replace(/ Today$/,"").replace(/今日/,"") + " — " + seoDateL(p.draw_date, lang) : t.sg4d;
+  return "<h1>"+head+"</h1><p>"+(date?"":t.latest+" ")+"Singapore Pools 4D — "+t.draw+p.draw_no+", "+seoDate(p.draw_date)+".</p><h2>"+t.winning+"</h2><p>"+t.first+" <b>"+p.first_prize+"</b>, "+t.second+" <b>"+p.second_prize+"</b>, "+t.third+" <b>"+p.third_prize+"</b>.</p>"+seoGrid(t.starter,p.starter_prizes)+seoGrid(t.consol,p.consolation_prizes); }
+function totoBlock(lang, date){ const r = date ? db.prepare("SELECT * FROM toto_draws WHERE draw_date=? ORDER BY draw_no DESC LIMIT 1").get(date) : db.prepare("SELECT * FROM toto_draws ORDER BY draw_no DESC LIMIT 1").get(); if(!r) return ""; const t=formatTotoRow(r); const L=T(lang);
+  const head = date ? L.sgtoto.replace(/ Today$/,"").replace(/今日/,"") + " — " + seoDateL(t.draw_date, lang) : L.sgtoto;
+  return "<h1>"+head+"</h1><p>"+(date?"":L.latest+" ")+"Singapore Pools TOTO — "+L.draw+t.draw_no+", "+seoDate(t.draw_date)+".</p><h2>"+L.winning+"</h2><p>"+(t.numbers||[]).join(", ")+" — "+L.addl+" "+t.additional_num+".</p>"; }
+function myBlock(op, name, lang, date){ const r = date ? db.prepare("SELECT * FROM my_draws WHERE operator=? AND draw_date=?").get(op, date) : db.prepare("SELECT * FROM my_draws WHERE operator=? ORDER BY draw_date DESC LIMIT 1").get(op); if(!r) return ""; const p=parseMyRow(r); const t=T(lang); if(lang==="zh"&&ZH_OP[op]) name=ZH_OP[op];
+  const head = date ? (lang==="zh" ? name+"万字开奖成绩" : name+" 4D Result") + " — " + seoDateL(p.draw_date, lang) : t.todayResult(name);
+  return "<h1>"+head+"</h1><p>"+(date?"":t.latest+" ")+name+" — "+seoDate(p.draw_date)+".</p><h2>"+t.winning+"</h2><p>"+t.first+" <b>"+p.first_prize+"</b>, "+t.second+" <b>"+p.second_prize+"</b>, "+t.third+" <b>"+p.third_prize+"</b>.</p>"+seoGrid(t.special,p.special_prizes)+seoGrid(t.consol,p.consolation_prizes); }
 const _seoLinks = '<p>More live results on Huatlottery: <a href="/singapore-4d-results">Singapore 4D</a>, <a href="/singapore-toto-results">Singapore TOTO</a>, <a href="/magnum-4d-result">Magnum 4D</a>, <a href="/sports-toto-4d-result">Sports Toto</a>, <a href="/da-ma-cai-result">Da Ma Cai</a>, <a href="/grand-dragon-4d-result">Grand Dragon 4D</a>, <a href="/lucky-hari-hari-4d-result">Lucky Hari Hari</a>, <a href="/perdana-4d-result">Perdana 4D</a>, <a href="/sabah-4d-result">Sabah 88</a>, <a href="/cash-sweep-result">Sarawak Cash Sweep</a>, <a href="/sandakan-4d-result">Sandakan 4D</a>, <a href="/malaysia-4d-results">Malaysia 4D</a>.</p>';
 const SEO_PAGES = {
   "/":                       { h1:"4D & TOTO Results Today — Singapore & Malaysia", h1zh:"\u4eca\u65e5\u4e07\u5b57\u4e0e\u591a\u591a\u5f00\u5956\u6210\u7ee9", title:"4D & TOTO Results Today — Singapore & Malaysia | Huatlottery", desc:"Live 4D & TOTO results for Singapore Pools, Magnum, Sports Toto & Da Ma Cai. Latest winning numbers, jackpots and past results.", block:(lang)=> sg4dBlock(lang)+totoBlock(lang)+_seoLinks },
@@ -343,15 +394,100 @@ const SEO_ZH = {
   "/cash-sweep-result":         { title:"砂拉越金多多今日开奖成绩（Cash Sweep） | 发达彩票", desc:"砂拉越金多多（Special CashSweep）今日开奖成绩：头奖、二奖、三奖、特别奖与安慰奖。" },
   "/sandakan-4d-result":        { title:"山打根万字今日开奖成绩（STC） | 发达彩票", desc:"山打根万字（Sandakan 4D / STC）今日开奖成绩：头奖、二奖、三奖、特别奖与安慰奖。" },
 };
-async function serveSeo(routePath, res, lang){
+// ── Per-draw permalinks ─────────────────────────────────────────────────────
+// 37,000+ draws going back to 1985 were reachable through 32 URLs, so real
+// queries ("magnum 4d result 15 march 2024") had no page to match. Each dated
+// URL renders that draw's own prize table — up to 23 distinct numbers — so it
+// is a genuine page, not a thin variant of the hub. A date with no draw returns
+// 404 rather than an empty shell; empty shells are what got the original routes
+// flagged as soft-404s in Search Console.
+const MY_PERMALINK_OPS = {
+  "/magnum-4d-result":          ["magnum",     "Magnum"],
+  "/sports-toto-4d-result":     ["sportstoto", "Sports Toto"],
+  "/da-ma-cai-result":          ["damacai",    "Da Ma Cai"],
+  "/grand-dragon-4d-result":    ["grandragon", "Grand Dragon"],
+  "/lucky-hari-hari-4d-result": ["lucky",      "Lucky Hari Hari"],
+  "/perdana-4d-result":         ["perdana",    "Perdana"],
+  "/sabah-4d-result":           ["sabah",      "Sabah 88"],
+  "/cash-sweep-result":         ["sarawak",    "Sarawak Cash Sweep"],
+  "/sandakan-4d-result":        ["sandakan",   "Sandakan"],
+};
+const DRAW_ROUTES = {};
+for (const [rp, [op, name]] of Object.entries(MY_PERMALINK_OPS)) {
+  DRAW_ROUTES[rp] = {
+    label: name + " 4D", zhLabel: ((typeof ZH_OP !== "undefined" && ZH_OP[op]) || name) + "万字",
+    block: (lang, d) => myBlock(op, name, lang, d),
+    has:   (d) => !!db.prepare("SELECT 1 FROM my_draws WHERE operator=? AND draw_date=? LIMIT 1").get(op, d),
+    prev:  (d) => (db.prepare("SELECT MAX(draw_date) d FROM my_draws WHERE operator=? AND draw_date<?").get(op, d) || {}).d,
+    next:  (d) => (db.prepare("SELECT MIN(draw_date) d FROM my_draws WHERE operator=? AND draw_date>?").get(op, d) || {}).d,
+    dates: () => db.prepare("SELECT draw_date d FROM my_draws WHERE operator=? ORDER BY d DESC").all(op).map(r => r.d),
+  };
+}
+DRAW_ROUTES["/singapore-4d-results"] = {
+  label: "Singapore 4D", zhLabel: "新加坡万字",
+  block: (lang, d) => sg4dBlock(lang, d),
+  has:   (d) => !!db.prepare("SELECT 1 FROM fourd_draws WHERE draw_date=? LIMIT 1").get(d),
+  prev:  (d) => (db.prepare("SELECT MAX(draw_date) d FROM fourd_draws WHERE draw_date<?").get(d) || {}).d,
+  next:  (d) => (db.prepare("SELECT MIN(draw_date) d FROM fourd_draws WHERE draw_date>?").get(d) || {}).d,
+  dates: () => db.prepare("SELECT DISTINCT draw_date d FROM fourd_draws ORDER BY d DESC").all().map(r => r.d),
+};
+DRAW_ROUTES["/singapore-toto-results"] = {
+  label: "Singapore TOTO", zhLabel: "新加坡多多",
+  block: (lang, d) => totoBlock(lang, d),
+  has:   (d) => !!db.prepare("SELECT 1 FROM toto_draws WHERE draw_date=? LIMIT 1").get(d),
+  prev:  (d) => (db.prepare("SELECT MAX(draw_date) d FROM toto_draws WHERE draw_date<?").get(d) || {}).d,
+  next:  (d) => (db.prepare("SELECT MIN(draw_date) d FROM toto_draws WHERE draw_date>?").get(d) || {}).d,
+  dates: () => db.prepare("SELECT DISTINCT draw_date d FROM toto_draws ORDER BY d DESC").all().map(r => r.d),
+};
+// Prev/next chain. This is what makes the archive crawlable at all: without it
+// Googlebot can only reach whatever the sitemap lists, with no path between
+// pages and no signal that they form a series.
+function drawNav(rp, date, lang){
+  const cfg = DRAW_ROUTES[rp]; if(!cfg) return "";
+  const pfx = lang === "zh" ? "/zh" : "";
+  const p = cfg.prev(date), n = cfg.next(date);
+  const parts = [];
+  if (p) parts.push('<a rel="prev" href="'+pfx+rp+'/'+p+'">&larr; '+seoDateL(p, lang)+'</a>');
+  parts.push('<a href="'+pfx+rp+'">'+(lang === "zh" ? "最新开奖" : "Latest result")+'</a>');
+  if (n) parts.push('<a rel="next" href="'+pfx+rp+'/'+n+'">'+seoDateL(n, lang)+' &rarr;</a>');
+  return '<nav class="draw-nav"><p>'+parts.join(" &middot; ")+'</p></nav>';
+}
+// Entry point from a hub page into its archive. Without this the only route to
+// the dated pages is the sitemap, which Google treats as a hint rather than a
+// path — internal links are what actually distribute crawl priority.
+function recentDrawLinks(rp, lang, n){
+  const cfg = DRAW_ROUTES[rp]; if(!cfg) return "";
+  let ds; try { ds = cfg.dates().slice(0, n || 12); } catch(e){ return ""; }
+  if (ds.length < 2) return "";
+  const pfx = lang === "zh" ? "/zh" : "";
+  const heading = lang === "zh" ? "历届开奖记录" : "Past results";
+  return "<h2>"+heading+"</h2><ul>"+ds.map((d)=>
+    '<li><a href="'+pfx+rp+'/'+d+'">'+seoDateL(d, lang)+'</a></li>').join("")+"</ul>";
+}
+async function serveSeo(routePath, res, lang, drawDate){
   const cfg = SEO_PAGES[routePath]; if(!cfg) return false;
+  const dcfg = drawDate ? DRAW_ROUTES[routePath] : null;
+  if (drawDate && (!dcfg || !dcfg.has(drawDate))) return false;   // no draw that day → 404, never an empty page
   const isZh = lang === "zh";
   const zh = SEO_ZH[routePath] || {};
-  const title = (isZh && zh.title) || cfg.title;
-  const desc = (isZh && zh.desc) || cfg.desc;
+  let title = (isZh && zh.title) || cfg.title;
+  let desc = (isZh && zh.desc) || cfg.desc;
+  if (dcfg) {
+    // "Saturday, 15 March 2024" -> "15 March 2024": the weekday is useful in the
+    // body but wastes title characters Google will truncate.
+    const d = seoDate(drawDate).replace(/^[^,]+,\s*/, "");
+    const nm = isZh ? dcfg.zhLabel : dcfg.label;
+    title = isZh ? nm + seoDateZh(drawDate).replace(/（.*）/,"") + "开奖成绩 | 发达彩票"
+                 : nm + " Result " + d + " | Huatlottery";
+    // Only spend the extra words when they still fit inside the ~65 chars Google renders.
+    if (!isZh && (title.length + 18) <= 65) title = nm + " Result " + d + " — Winning Numbers | Huatlottery";
+    desc = isZh ? nm + seoDateZh(drawDate) + "开奖成绩与中奖号码：头奖、二奖、三奖、特别奖与安慰奖。"
+                : nm + " winning numbers for " + seoDate(drawDate) + " — 1st, 2nd and 3rd prize plus the full Special and Consolation lists.";
+  }
   const ORIGIN = "https://huatlottery.com";
-  const enUrl = ORIGIN + routePath;
-  const zhUrl = ORIGIN + "/zh" + (routePath === "/" ? "" : routePath);
+  const suffix = drawDate ? "/" + drawDate : "";
+  const enUrl = ORIGIN + routePath + suffix;
+  const zhUrl = ORIGIN + "/zh" + (routePath === "/" ? "" : routePath) + suffix;
   const canon = isZh ? zhUrl : enUrl;
   // hreflang: the site previously had none at all, so Google had nothing
   // telling it these pages target SG/MY rather than any English speaker.
@@ -382,7 +518,12 @@ async function serveSeo(routePath, res, lang){
     // hydrates over it. Without this the routes ship an empty shell, which is
     // what got them flagged as soft-404s.
     .replace('<div class="content" id="content"></div>', () => {
-      let body = cfg.block(lang);
+      if (dcfg) {
+        // A dated page is about one draw only — the hub's stacked blocks and
+        // "today" framing would both be wrong here.
+        return '<div class="content" id="content">' + dcfg.block(lang, drawDate) + drawNav(routePath, drawDate, lang) + _seoLinks + '</div>';
+      }
+      let body = cfg.block(lang) + recentDrawLinks(routePath, lang, 12);
       // Pages that stack several operator blocks would otherwise emit one <h1>
       // per block, and the first block's heading (e.g. "Magnum 4D Result
       // Today") would stand in for a page that is actually about all of
@@ -423,6 +564,13 @@ Object.keys(SEO_PAGES).forEach((rp) => {
   // Chinese mirror of every SEO route, so the already-translated UI finally has
   // an indexable URL instead of living behind a localStorage flag.
   app.get(rp === "/" ? "/zh" : "/zh" + rp, async (req, res) => { try { if(!(await serveSeo(rp,res,"zh"))) res.status(404).end(); } catch(e){ res.status(500).end(); } });
+  // Dated permalink for the same route, e.g. /magnum-4d-result/2024-03-15.
+  // The pattern only matches ISO dates, so it can't shadow other sub-paths.
+  if (DRAW_ROUTES[rp]) {
+    const dpat = "/:date(\\d{4}-\\d{2}-\\d{2})";
+    app.get(rp + dpat, async (req, res) => { try { if(!(await serveSeo(rp,res,"en",req.params.date))) res.status(404).end(); } catch(e){ res.status(500).end(); } });
+    app.get((rp === "/" ? "/zh" : "/zh" + rp) + dpat, async (req, res) => { try { if(!(await serveSeo(rp,res,"zh",req.params.date))) res.status(404).end(); } catch(e){ res.status(500).end(); } });
+  }
 });
 
 // Additional server-rendered SEO pages: history tables, 4D checker, TOTO frequency (additive)
