@@ -236,8 +236,41 @@ app.use((req, res, next) => req._isLab ? labRouter(req, res, next) : next());
 // Each route gets its own <title>/description/canonical + real result content in the
 // HTML (not just JS), so Google indexes them as separate pages instead of one SPA.
 const _fs = require("fs");
-let _seoHtml = null;
-const seoBase = () => (_seoHtml = _seoHtml || _fs.readFileSync(path.join(__dirname, "index.html"), "utf8"));
+const _crypto = require("crypto");
+
+// ── Lift the inline app bundle out of index.html ────────────────────────────
+// index.html carries ~339KB of inline JavaScript (95% of the file). Inlined, it
+// cannot be cached separately, so every navigation and every visit after the
+// 5-minute HTML TTL re-downloads the entire application even though it never
+// changed — expensive on a high-latency link with no CDN, and paid again on
+// every page a crawler visits.
+//
+// Split it out in memory at first read and serve it from a content-hashed,
+// immutable URL. index.html stays the single source of truth on disk; the hash
+// changes whenever the code does, so there is no stale-cache risk.
+let _seoHtml = null, _appJs = null, _appUrl = null;
+function splitAppBundle(html) {
+  // The bundle is the largest inline <script> with neither src nor type
+  // (skips the JSON-LD block and the external gtag tag).
+  const re = /<script(?![^>]*\bsrc=)(?![^>]*\btype=)[^>]*>([\s\S]*?)<\/script>/gi;
+  let m, best = null;
+  while ((m = re.exec(html))) if (!best || m[1].length > best[1].length) best = m;
+  if (!best || best[1].length < 50000) return html;   // nothing worth splitting
+  _appJs = best[1];
+  _appUrl = `/assets/app.${_crypto.createHash("sha1").update(_appJs).digest("hex").slice(0, 12)}.js`;
+  // defer is safe: the bundle already sat last in <body>, and window.__BOOT__ is
+  // injected into <head>, so it is present before the bundle executes.
+  return html.replace(best[0], `<script src="${_appUrl}" defer></script>`);
+}
+const seoBase = () => (_seoHtml = _seoHtml || splitAppBundle(_fs.readFileSync(path.join(__dirname, "index.html"), "utf8")));
+
+app.get(/^\/assets\/app\.[0-9a-f]+\.js$/, (req, res) => {
+  seoBase();                                   // ensure the split has happened
+  if (!_appJs) return res.status(404).end();
+  res.setHeader("Content-Type", "application/javascript; charset=utf-8");
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+  res.send(_appJs);
+});
 const _esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const _DOW = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const _MON = ["January","February","March","April","May","June","July","August","September","October","November","December"];
