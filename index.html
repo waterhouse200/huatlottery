@@ -513,7 +513,12 @@ function dowChip(dowCount, dayName){
 }
 
 // ═══ i18n ════════════════════════════════════════════════════
-var LANG = (localStorage.getItem('huat_lang')) || ((navigator.language||'en').toLowerCase().startsWith('zh') ? 'zh' : 'en');
+// URL wins over the stored preference: /zh/... is the indexable Chinese site,
+// so a visitor (or crawler) landing there must get Chinese regardless of what
+// localStorage remembers from a previous visit.
+var LANG = /^\/zh(\/|$)/.test(location.pathname)
+  ? 'zh'
+  : ((localStorage.getItem('huat_lang')) || ((navigator.language||'en').toLowerCase().startsWith('zh') ? 'zh' : 'en'));
 var STRINGS = null;     // dictionary loaded async
 
 function L(path, fallback) {
@@ -4650,7 +4655,9 @@ var PATH_ROUTES = {
   '/cash-sweep-result':         { tab:'others', otherop:'sarawak' },
   '/sandakan-4d-result':        { tab:'others', otherop:'sandakan' }
 };
-var _pathRoute = PATH_ROUTES[location.pathname.replace(/\/$/, '') || '/'];
+// Strip the /zh language prefix before matching, so the Chinese mirror of a
+// route opens the same view as its English counterpart.
+var _pathRoute = PATH_ROUTES[location.pathname.replace(/^\/zh(?=\/|$)/, '').replace(/\/$/, '') || '/'];
 if (_pathRoute) {
   currentTab = _pathRoute.tab;
   if (_pathRoute.statop) currentStatOp = _pathRoute.statop;
