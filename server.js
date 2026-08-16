@@ -200,6 +200,9 @@ ${urls}
 // changed. Only the English permalinks are listed — every one of them carries
 // hreflang to its /zh twin, which is how Google is meant to discover the
 // alternate, and listing both would double crawl load for no extra coverage.
+// How far back the dated URLs are actively submitted. Deliberately small
+// relative to the archive: see the note in the draw-sitemap handler.
+const SITEMAP_WINDOW_MONTHS = Number(process.env.SITEMAP_WINDOW_MONTHS || 12);
 const _slug = (rp) => rp.replace(/^\//, "");
 app.get("/sitemap.xml", (req, res) => {
   const base = "https://" + SITE_URL.replace(/^https?:?\/\/?/, "").replace(/\/$/, "");
@@ -220,6 +223,20 @@ app.get(/^\/sitemap-draws-(.+)\.xml$/, (req, res) => {
   const base = "https://" + SITE_URL.replace(/^https?:?\/\/?/, "").replace(/\/$/, "");
   let dates;
   try { dates = cfg.dates(); } catch (e) { return res.status(500).end(); }
+  // Only the recent window is submitted. Listing all ~43,000 dated URLs put
+  // Search Console at 28 indexed against 43,404 "Discovered - currently not
+  // indexed": a sitemap is a request for crawl budget, and asking for the whole
+  // archive at once on a site with 28 indexed pages got the request declined
+  // wholesale. The older pages are NOT removed and are still reachable through
+  // the prev/next chain and the hub's recent-results list, so Google can walk
+  // back on its own as the site earns more crawl. Widen this once the indexed
+  // count is climbing rather than flat.
+  const cut = dates.length ? new Date(dates[0]) : null;
+  if (cut) cut.setUTCMonth(cut.getUTCMonth() - SITEMAP_WINDOW_MONTHS);
+  // Bounded off the newest draw rather than today, so a stalled scraper shrinks
+  // the window instead of emptying the sitemap.
+  const cutIso = cut ? cut.toISOString().slice(0, 10) : null;
+  if (cutIso) dates = dates.filter((d) => d >= cutIso);
   // lastmod is the draw's own date — the page's content is fixed the day the
   // draw happens and never changes again, so this is true rather than "today".
   const urls = dates.map((d) => `<url><loc>${base}${rp}/${d}</loc><lastmod>${d}</lastmod></url>`).join("\n");
