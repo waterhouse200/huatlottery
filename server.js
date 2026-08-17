@@ -256,6 +256,12 @@ app.use(compression({ level: 6, threshold: 1024 }));
 app.use((req, res, next) => {
   if (req.path === "/" || req.path.endsWith(".html")) {
     res.setHeader("Cache-Control", "public, max-age=300, s-maxage=300");
+  } else if (req.path.startsWith("/assets/fonts/")) {
+    // Fonts never change under a fixed filename, and a re-download costs a
+    // round trip on the critical path. This runs BEFORE the static handlers,
+    // so a maxAge set there is overridden here — which is why PageSpeed saw
+    // 1-day lifetimes on assets despite express.static asking for longer.
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
   } else if (req.path.match(/\.(css|js|png|jpg|svg|woff2?|ico)$/)) {
     res.setHeader("Cache-Control", "public, max-age=86400");
   }
@@ -601,6 +607,9 @@ const _seoArticles = require("./seo-articles")(app, db, { seoDate, esc: _esc });
 // over HTTP — huatlottery.db (7.7MB, every draw back to 1985), server.js,
 // db.js, seed.js, the scraper and i18n were all downloadable by filename.
 // Never widen this back to __dirname; put anything web-facing in assets/.
+// Fonts get the immutable year; the actual header is set by the cache
+// middleware above, which runs first and would otherwise cap them at a day.
+app.use("/assets/fonts", express.static(path.join(__dirname, "assets/fonts"), { maxAge: "1y", immutable: true }));
 app.use("/assets", express.static(path.join(__dirname, "assets"), { maxAge: "7d" }));
 
 function parseFourdRow(row) {
